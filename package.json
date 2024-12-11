@@ -3,15 +3,24 @@
   "version": "0.4.0",
   "private": true,
   "description": "Forex trading bot",
-  "main": "index.js",
+  "type": "module",
   "author": "Sina Vali",
   "license": "ISC",
   "scripts": {
-    "start": "npx ts-node --transpile-only ./app.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:bot": "npx nodemon compiled/Packages/TradingBot/app.js",
+    "dev:bot": "tsc && npx nodemon",
+    "build": "npx tsc",
+    "bundle:bot": "npx esbuild Packages/TradingBot/app.ts --bundle --minify --platform=node --target=esnext --format=esm --outfile=dist/TradingBot/bundle.js"
   },
   "devDependencies": {
     "eslint": "^8.0.0",
     "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "@types/node": "^22.10.1",
+    "esbuild": "^0.24.0",
+    "ts-node": "^10.9.2",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0"
   }
 }
