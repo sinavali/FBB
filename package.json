@@ -9,7 +9,6 @@
   "scripts": {
     "start:bot": "npx nodemon compiled/Packages/TradingBot/app.js",
     "dev:bot": "tsc && npx nodemon",
-    "build": "npx tsc",
     "bundle:bot": "npx esbuild Packages/TradingBot/app.ts --bundle --minify --platform=node --target=esnext --format=esm --outfile=dist/TradingBot/bundle.js",
     "prisma:seed": "npx tsx prisma/seed.ts",
     "prisma:seed:reset": "npx tsx prisma/seed_reset.ts",

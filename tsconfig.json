@@ -13,7 +13,16 @@
     "composite": true,
     "emitDeclarationOnly": true,
     "allowImportingTsExtensions": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": "./",
+    "paths": {
+      "@shared/*": [
+        "Shared/*"
+      ],
+      "@tradingBot/*": [
+        "Packages/TradingBot/*"
+      ]
+    }
   },
   "include": [
     "Packages/**/*",
