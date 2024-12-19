@@ -33,7 +33,7 @@ export interface MicroTime {
   type: Enums.MicroTimeType;
   model: number;
   start: DateTime;
-  end?: DateTime | null;
+  end: DateTime | null;
 }
 
 export interface Liquidity {
@@ -43,9 +43,9 @@ export interface Liquidity {
   mode: Enums.LiquidityMode;
   price: number;
   time: number;
-  huntPrice?: number | null;
-  hunted?: DateTime | null;
-  micro?: number | null; // id of MicroTime
+  huntPrice: number | null;
+  hunted: DateTime | null;
+  micro: number | null; // id of MicroTime
   used: LiquidityUsed[];
 }
 
@@ -64,9 +64,9 @@ export interface FVG {
 export interface MSS {
   id: number;
   pairPeriod: PairPeriod;
-  limit?: number | null;
-  stoploss?: number | null;
-  takeprofit?: number | null;
+  limit: number | null;
+  stoploss: number | null;
+  takeprofit: number | null;
   liquidityUsed: LiquidityUsed;
   status: Enums.TriggerStatus;
   direction: Enums.Directions;
@@ -75,8 +75,8 @@ export interface MSS {
   mainDeepCandle: number; // id of the candle
   secondDeepCandle: number; // id of the candle
   mssCandle: number; // id of the candle
-  shiftCandle?: number | null; // id of the candle
-  returnCandle?: number | null; // id of the candle
+  shiftCandle: number | null; // id of the candle
+  returnCandle: number | null; // id of the candle
   FVGs: number[]; // id of FVGs
   height: number;
 }
@@ -118,6 +118,6 @@ export interface Candle {
   low: number;
   direction: Enums.CandleDirection;
   time: DateTime;
-  isDeep?: Enums.CandleDeepType | null;
+  isDeep: Enums.CandleDeepType | null;
   session: number; // id of session
 }
