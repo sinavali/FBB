@@ -9,13 +9,15 @@ import liveFlow from "@tradingBot/Features/Core/Controllers/liveModeController";
 import signalFlow from "@tradingBot/Features/Core/Controllers/signalModeController";
 import backtestFlow from "@tradingBot/Features/Core/Controllers/backtestModeController";
 import { ProjectName } from "@shared/Types/Enums.ts";
+import { PrismaClient } from "@prisma/client";
 // initiating connections
 
-initLogger(ProjectName.FBB_Bot);
-await initMysql(ProjectName.FBB_Bot);
+initLogger(ProjectName.BOT);
+await initMysql(ProjectName.BOT);
+const prisma = new PrismaClient();
 
 // init flows
-liveFlow();
+liveFlow(prisma);
 signalFlow();
 backtestFlow();
 

@@ -16,7 +16,7 @@ export async function initMysqlConnector(projectName: ProjectName) {
   try {
     if (!connection) {
       switch (projectName) {
-        case ProjectName.FBB_Bot:
+        case ProjectName.BOT:
           connection = await mysql.createConnection({
             host: FBB_Bot_DB_HOST,
             user: FBB_Bot_DB_USER,
