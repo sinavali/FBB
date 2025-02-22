@@ -25,15 +25,20 @@ export enum Directions {
   DOWN = "DOWN",
 }
 
+export enum MssState {
+  INITIATED = "INITIATED",
+  UPDATED = "UPDATED",
+}
+
 export enum MicroTimeType {
   SESSION = "SESSION",
   WORKTIME = "WORKTIME",
 }
-
 export enum LiquidityMode {
-  BYCANDLE = "BYCANDLE",
   BYSESSION = "BYSESSION",
-  BYTIME = "BYTIME",
+  BYWORKTIME = "BYWORKTIME",
+  DAILY = "DAILY",
+  WEEKLY = "WEEKLY",
 }
 
 export enum Triggers {
@@ -43,6 +48,8 @@ export enum Triggers {
 }
 
 export enum LiquidityUsedStatus {
+  FOUND = "FOUND",
+  TRIGGERED = "TRIGGERED",
   CANCELED = "CANCELED",
   FAILED = "FAILED",
   TAKEPROFIT = "TAKEPROFIT",
@@ -50,8 +57,16 @@ export enum LiquidityUsedStatus {
 }
 
 export enum TriggerStatus {
+  FOUND = "FOUND",
   CANCELED = "CANCELED",
   FAILED = "FAILED",
+  TRIGGERED = "TRIGGERED",
+  STOPLOSS = "STOPLOSS",
+  TAKEPROFIT = "TAKEPROFIT",
+}
+
+export enum SignalStatus {
+  CLOSED = "CLOSED", // closed manualy
   TRIGGERED = "TRIGGERED",
   STOPLOSS = "STOPLOSS",
   TAKEPROFIT = "TAKEPROFIT",
@@ -82,8 +97,15 @@ export enum Period {
 }
 
 export enum SettingParsTo {
-  BOOLEAN = "Boolean",
-  STRING = "String",
-  INT = "Int",
-  FLOAT = "Float",
+  INT = "INT",
+  FLOAT = "FLOAT",
+  STRING = "STRING",
+  BOOLEAN = "BOOLEAN",
+  BIGINT = "BIGINT",
+}
+
+export enum SystemMode {
+  LIVE = "LIVE",
+  SIGNAL = "SIGNAL",
+  BACKTEST = "BACKTEST",
 }

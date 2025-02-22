@@ -1,0 +1,562 @@
+
+> finance-best-burger@0.4.0 start:bot /home/sina/Projects/FBB-core/FBB-Core-v4.0-Refactor
+> npx tsx Packages/TradingBot/app.ts --experimental-require-module
+
+from: 2019-01-01 17:10 to: 2019-04-30 23:16
+Total candles => 245162
+chunk-size=10000
+--------------new chunk [1] [lastest candle id: undefined] ---------------
+Missing candles for deep processing [before]: 6
+chunk time: 30.814s
+
+
+[
+  {
+    maxTime: 64,
+    minTime: 64,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 2, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 1, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 4, minTime: 1, name: 'handleWorkTimeForFlow' },
+  { maxTime: 1, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 4, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 1, name: 'generateLiquidities Weekly' },
+  { maxTime: 3, minTime: 0, name: 'generateLiquidities BySession' },
+  { maxTime: 2, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 11, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 3, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 18, minTime: 1, name: 'processCandles each candle Loop' }
+]
+--------------new chunk [2] [lastest candle id: 10000] ---------------
+chunk time: 123.585s
+
+
+[
+  {
+    maxTime: 64,
+    minTime: 64,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 2, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 1, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 4, minTime: 1, name: 'handleWorkTimeForFlow' },
+  { maxTime: 1, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 4, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 1, name: 'generateLiquidities Weekly' },
+  { maxTime: 5, minTime: 0, name: 'generateLiquidities BySession' },
+  { maxTime: 5, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 13, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 16, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 30, minTime: 1, name: 'processCandles each candle Loop' }
+]
+--------------new chunk [3] [lastest candle id: 20000] ---------------
+chunk time: 307.543s
+
+
+[
+  {
+    maxTime: 64,
+    minTime: 64,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 2, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 1, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 4, minTime: 1, name: 'handleWorkTimeForFlow' },
+  { maxTime: 1, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 6, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 1, name: 'generateLiquidities Weekly' },
+  { maxTime: 7, minTime: 0, name: 'generateLiquidities BySession' },
+  { maxTime: 10, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 26, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 28, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 57, minTime: 1, name: 'processCandles each candle Loop' }
+]
+--------------new chunk [4] [lastest candle id: 30000] ---------------
+chunk time: 464.511s
+
+
+[
+  {
+    maxTime: 64,
+    minTime: 64,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 2, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 1, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 4, minTime: 1, name: 'handleWorkTimeForFlow' },
+  { maxTime: 3, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 6, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 1, name: 'generateLiquidities Weekly' },
+  { maxTime: 9, minTime: 0, name: 'generateLiquidities BySession' },
+  { maxTime: 17, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 59, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 92, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 121, minTime: 1, name: 'processCandles each candle Loop' }
+]
+--------------new chunk [5] [lastest candle id: 40000] ---------------
+chunk time: 730.398s
+
+
+[
+  {
+    maxTime: 64,
+    minTime: 64,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 2, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 1, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 4, minTime: 1, name: 'handleWorkTimeForFlow' },
+  { maxTime: 3, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 9, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 1, name: 'generateLiquidities Weekly' },
+  { maxTime: 12, minTime: 0, name: 'generateLiquidities BySession' },
+  { maxTime: 53, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 59, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 123, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 162, minTime: 1, name: 'processCandles each candle Loop' }
+]
+--------------new chunk [6] [lastest candle id: 50000] ---------------
+chunk time: 949.007s
+
+
+[
+  {
+    maxTime: 64,
+    minTime: 64,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 2, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 1, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 4, minTime: 1, name: 'handleWorkTimeForFlow' },
+  { maxTime: 3, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 9, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 1, name: 'generateLiquidities Weekly' },
+  { maxTime: 55, minTime: 0, name: 'generateLiquidities BySession' },
+  { maxTime: 54, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 77, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 147, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 187, minTime: 1, name: 'processCandles each candle Loop' }
+]
+--------------new chunk [7] [lastest candle id: 60000] ---------------
+chunk time: 993.044s
+
+
+[
+  {
+    maxTime: 64,
+    minTime: 64,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 2, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 1, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 4, minTime: 1, name: 'handleWorkTimeForFlow' },
+  { maxTime: 3, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 10, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 1, name: 'generateLiquidities Weekly' },
+  { maxTime: 55, minTime: 0, name: 'generateLiquidities BySession' },
+  { maxTime: 60, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 89, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 148, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 188, minTime: 1, name: 'processCandles each candle Loop' }
+]
+--------------new chunk [8] [lastest candle id: 70000] ---------------
+chunk time: 1219.670s
+
+
+[
+  {
+    maxTime: 64,
+    minTime: 64,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 2, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 1, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 4, minTime: 1, name: 'handleWorkTimeForFlow' },
+  { maxTime: 49, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 13, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 1, name: 'generateLiquidities Weekly' },
+  { maxTime: 59, minTime: 0, name: 'generateLiquidities BySession' },
+  { maxTime: 60, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 92, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 178, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 220, minTime: 1, name: 'processCandles each candle Loop' }
+]
+--------------new chunk [9] [lastest candle id: 80000] ---------------
+chunk time: 1256.498s
+
+
+[
+  {
+    maxTime: 64,
+    minTime: 64,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 2, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 1, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 4, minTime: 1, name: 'handleWorkTimeForFlow' },
+  { maxTime: 49, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 13, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 1, name: 'generateLiquidities Weekly' },
+  { maxTime: 59, minTime: 0, name: 'generateLiquidities BySession' },
+  { maxTime: 64, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 95, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 183, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 236, minTime: 1, name: 'processCandles each candle Loop' }
+]
+--------------new chunk [10] [lastest candle id: 90000] ---------------
+chunk time: 1215.511s
+
+
+[
+  {
+    maxTime: 64,
+    minTime: 64,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 2, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 1, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 4, minTime: 1, name: 'handleWorkTimeForFlow' },
+  { maxTime: 49, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 13, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 1, name: 'generateLiquidities Weekly' },
+  { maxTime: 59, minTime: 0, name: 'generateLiquidities BySession' },
+  { maxTime: 64, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 95, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 183, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 236, minTime: 1, name: 'processCandles each candle Loop' }
+]
+--------------new chunk [11] [lastest candle id: 100000] ---------------
+chunk time: 1173.587s
+
+
+[
+  {
+    maxTime: 64,
+    minTime: 64,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 2, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 1, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 4, minTime: 1, name: 'handleWorkTimeForFlow' },
+  { maxTime: 49, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 13, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 1, name: 'generateLiquidities Weekly' },
+  { maxTime: 59, minTime: 0, name: 'generateLiquidities BySession' },
+  { maxTime: 64, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 95, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 183, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 236, minTime: 1, name: 'processCandles each candle Loop' }
+]
+--------------new chunk [12] [lastest candle id: 110000] ---------------
+chunk time: 1304.955s
+
+
+[
+  {
+    maxTime: 64,
+    minTime: 64,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 2, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 1, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 4, minTime: 1, name: 'handleWorkTimeForFlow' },
+  { maxTime: 53, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 13, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 1, name: 'generateLiquidities Weekly' },
+  { maxTime: 62, minTime: 0, name: 'generateLiquidities BySession' },
+  { maxTime: 64, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 95, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 200, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 239, minTime: 1, name: 'processCandles each candle Loop' }
+]
+--------------new chunk [13] [lastest candle id: 120000] ---------------
+chunk time: 1380.671s
+
+
+[
+  {
+    maxTime: 64,
+    minTime: 64,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 2, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 1, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 4, minTime: 1, name: 'handleWorkTimeForFlow' },
+  { maxTime: 53, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 13, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 1, name: 'generateLiquidities Weekly' },
+  { maxTime: 62, minTime: 0, name: 'generateLiquidities BySession' },
+  { maxTime: 72, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 95, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 219, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 259, minTime: 1, name: 'processCandles each candle Loop' }
+]
+--------------new chunk [14] [lastest candle id: 130000] ---------------
+chunk time: 1391.732s
+
+
+[
+  {
+    maxTime: 64,
+    minTime: 64,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 2, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 1, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 4, minTime: 1, name: 'handleWorkTimeForFlow' },
+  { maxTime: 53, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 13, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 1, name: 'generateLiquidities Weekly' },
+  { maxTime: 62, minTime: 0, name: 'generateLiquidities BySession' },
+  { maxTime: 72, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 95, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 221, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 259, minTime: 1, name: 'processCandles each candle Loop' }
+]
+--------------new chunk [15] [lastest candle id: 140000] ---------------
+chunk time: 1331.105s
+
+
+[
+  {
+    maxTime: 64,
+    minTime: 64,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 2, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 1, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 4, minTime: 1, name: 'handleWorkTimeForFlow' },
+  { maxTime: 53, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 13, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 1, name: 'generateLiquidities Weekly' },
+  { maxTime: 62, minTime: 0, name: 'generateLiquidities BySession' },
+  { maxTime: 75, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 95, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 222, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 264, minTime: 1, name: 'processCandles each candle Loop' }
+]
+--------------new chunk [16] [lastest candle id: 150000] ---------------
+chunk time: 1568.517s
+
+
+[
+  {
+    maxTime: 64,
+    minTime: 64,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 2, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 5, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 4, minTime: 1, name: 'handleWorkTimeForFlow' },
+  { maxTime: 53, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 13, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 1, name: 'generateLiquidities Weekly' },
+  { maxTime: 63, minTime: 0, name: 'generateLiquidities BySession' },
+  { maxTime: 75, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 132, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 256, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 292, minTime: 1, name: 'processCandles each candle Loop' }
+]
+--------------new chunk [17] [lastest candle id: 160000] ---------------
+chunk time: 1423.115s
+
+
+[
+  {
+    maxTime: 64,
+    minTime: 64,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 2, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 5, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 4, minTime: 1, name: 'handleWorkTimeForFlow' },
+  { maxTime: 53, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 13, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 1, name: 'generateLiquidities Weekly' },
+  { maxTime: 63, minTime: 0, name: 'generateLiquidities BySession' },
+  { maxTime: 77, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 132, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 256, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 292, minTime: 1, name: 'processCandles each candle Loop' }
+]
+--------------new chunk [18] [lastest candle id: 170000] ---------------
+chunk time: 1468.545s
+
+
+[
+  {
+    maxTime: 64,
+    minTime: 64,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 2, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 5, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 54, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 4, minTime: 1, name: 'handleWorkTimeForFlow' },
+  { maxTime: 53, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 13, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 1, name: 'generateLiquidities Weekly' },
+  { maxTime: 63, minTime: 0, name: 'generateLiquidities BySession' },
+  { maxTime: 77, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 132, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 256, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 292, minTime: 1, name: 'processCandles each candle Loop' }
+]
+--------------new chunk [19] [lastest candle id: 180000] ---------------
+chunk time: 1665.571s
+
+
+[
+  {
+    maxTime: 64,
+    minTime: 64,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 2, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 6, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 54, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 4, minTime: 1, name: 'handleWorkTimeForFlow' },
+  { maxTime: 53, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 13, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 1, name: 'generateLiquidities Weekly' },
+  { maxTime: 64, minTime: 0, name: 'generateLiquidities BySession' },
+  { maxTime: 81, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 132, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 267, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 307, minTime: 1, name: 'processCandles each candle Loop' }
+]
+--------------new chunk [20] [lastest candle id: 190000] ---------------
+chunk time: 1824.472s
+
+
+[
+  {
+    maxTime: 64,
+    minTime: 64,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 2, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 6, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 54, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 4, minTime: 1, name: 'handleWorkTimeForFlow' },
+  { maxTime: 53, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 13, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 1, name: 'generateLiquidities Weekly' },
+  { maxTime: 64, minTime: 0, name: 'generateLiquidities BySession' },
+  { maxTime: 81, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 132, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 307, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 349, minTime: 1, name: 'processCandles each candle Loop' }
+]
+--------------new chunk [21] [lastest candle id: 200000] ---------------
+chunk time: 1904.007s
+
+
+[
+  {
+    maxTime: 64,
+    minTime: 64,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 2, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 6, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 54, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 5, minTime: 1, name: 'handleWorkTimeForFlow' },
+  { maxTime: 53, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 13, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 1, name: 'generateLiquidities Weekly' },
+  { maxTime: 70, minTime: 0, name: 'generateLiquidities BySession' },
+  { maxTime: 81, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 165, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 307, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 350, minTime: 1, name: 'processCandles each candle Loop' }
+]
+--------------new chunk [22] [lastest candle id: 210000] ---------------
+chunk time: 1843.806s
+
+
+[
+  {
+    maxTime: 64,
+    minTime: 64,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 2, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 6, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 54, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 53, minTime: 1, name: 'handleWorkTimeForFlow' },
+  { maxTime: 53, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 13, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 1, name: 'generateLiquidities Weekly' },
+  { maxTime: 70, minTime: 0, name: 'generateLiquidities BySession' },
+  { maxTime: 81, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 165, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 307, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 350, minTime: 1, name: 'processCandles each candle Loop' }
+]
+--------------new chunk [23] [lastest candle id: 220000] ---------------
+chunk time: 1928.110s
+
+
+[
+  {
+    maxTime: 64,
+    minTime: 64,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 2, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 6, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 54, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 53, minTime: 1, name: 'handleWorkTimeForFlow' },
+  { maxTime: 53, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 13, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 1, name: 'generateLiquidities Weekly' },
+  { maxTime: 70, minTime: 0, name: 'generateLiquidities BySession' },
+  { maxTime: 81, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 165, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 307, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 350, minTime: 1, name: 'processCandles each candle Loop' }
+]
+--------------new chunk [24] [lastest candle id: 230000] ---------------
+

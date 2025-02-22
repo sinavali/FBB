@@ -16,38 +16,20 @@ model Setting {
     @@index([id, settingKey])
 }
 
-model TimeMicro {
-    id         Int           @id @default(autoincrement())
-    type       TimeMicroType @default(Session)
-    Session    Session?      @relation(fields: [sessionId], references: [id])
-    sessionId  Int?
-    WorkTime   WorkTime?     @relation(fields: [workTimeId], references: [id])
-    workTimeId Int?
-    start      Int
-    end        Int?
-
-    @@index([id, type, start, end])
-}
-
 model Session {
-    id        Int         @id @default(autoincrement())
-    title     String
-    start     String
-    end       String
-    workTimes WorkTime[] // do not need
-    micros    TimeMicro[]
+    id    Int    @id @default(autoincrement())
+    title String
+    start String
+    end   String
 
     @@index([id, start, end])
 }
 
 model WorkTime {
-    id        Int         @id @default(autoincrement())
-    title     String
-    start     String
-    end       String
-    session   Session?    @relation(fields: [sessionId], references: [id])
-    sessionId Int?
-    micros    TimeMicro[]
+    id    Int    @id @default(autoincrement())
+    title String
+    start String
+    end   String
 
     @@index([id, start, end])
 }
@@ -62,16 +44,16 @@ model Currency {
 }
 
 enum TimeMicroType {
-    Session
-    WorkTime
+    SESSION
+    WORKTIME
 }
 
 enum SettingParseTo {
-    Int
-    Float
-    BigInt
-    String
-    Boolean
+    INT
+    FLOAT
+    STRING
+    BOOLEAN
+    BIGINT
 }
 
 enum SignalStatus {
@@ -91,4 +73,10 @@ enum PositionStatus {
     positionTriggeredTakeProfit
     positionCanceledByUser
     positionCanceledBySystem
+}
+
+enum SystemMode {
+    LIVE
+    SIGNAL
+    BACKTEST
 }

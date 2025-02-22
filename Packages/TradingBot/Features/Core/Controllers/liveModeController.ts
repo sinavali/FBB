@@ -1,13 +1,9 @@
-import { PrismaClient } from "@prisma/client";
-import logger from "@shared/Initiatives/Logger";
-import { initMetaTraderSocket } from "@shared/Initiatives/Socket";
-import { MetaTraderSocketType } from "@shared/Types/Enums";
+import logger from "@shared/Initiatives/Logger.ts";
+import { GeneralStore } from "@shared/Types/Interfaces/generalStore.ts";
 
-export default (prisma: PrismaClient) => {
+export default (generalStore: GeneralStore) => {
   try {
-    // const appMode = await prisma.setting;
-    initMetaTraderSocket(MetaTraderSocketType.CMD);
-    initMetaTraderSocket(MetaTraderSocketType.DATA);
+    console.info("live flow started");
   } catch (error) {
     logger.error(error);
     throw error;

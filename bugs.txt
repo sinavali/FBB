@@ -1,0 +1,581 @@
+1. checkHunt not working as expected
+2. SMT not working as expected
+3. no FVG in MSS
+4-1. cob update is not complete.
+4-2. 27 cob triggered takeprofit in 245000 candles (about 5 month)
+data:
+--------------new chunk [26] [lastest candle id: 241816] ---------------
+chunk time: 2.844s
+
+
+{ maxTime: 592737, minTime: 592737, name: 'backtest mode time' }
+[
+  {
+    maxTime: 65,
+    minTime: 65,
+    name: 'application warmup and initialization'
+  },
+  { maxTime: 3, minTime: 1, name: 'handleSessionForFlow' },
+  { maxTime: 1, minTime: 0, name: 'newMicroTimeForSession' },
+  { maxTime: 2, minTime: 0, name: 'isUnixInSessionRecords' },
+  { maxTime: 1, minTime: 0, name: 'handleWorkTimeForFlow' },
+  { maxTime: 1, minTime: 0, name: 'newMicroTimeForWorkTime' },
+  { maxTime: 1, minTime: 0, name: 'isUnixInWorkTimeRecords' },
+  { maxTime: 4, minTime: 1, name: 'generateLiquidities Daily' },
+  { maxTime: 1, minTime: 0, name: 'generateLiquidities Weekly' },
+  { maxTime: 6, minTime: 1, name: 'generateLiquidities BySession' },
+  { maxTime: 6, minTime: 0, name: 'validateLiquidities' },
+  { maxTime: 10, minTime: 1, name: 'initiationPhaseModelOne' },
+  { maxTime: 11, minTime: 0, name: 'updatePhaseModelOne' },
+  { maxTime: 17, minTime: 1, name: 'processCandles each candle Loop' },
+  { maxTime: 592737, minTime: 592737, name: 'backtest mode time' }
+]
+time range from Sun Jan 18 1970 21:32:30 GMT+0000 to Sun Jan 18 1970 21:49:10 GMT+0000
+candles 5000 241816
+sessions 100 354
+workTimes 100 25739
+microTimes 200 26093
+Liquidities 50 1556 weekly: 0 daily: 5 bySession: 45 failed: 45 hunted: 0 1556, 1555, 1554, 1553, 1552, 1551, 1550, 1549, 1548, 1547, 1546, 1545, 1544, 1543, 1542, 1541, 1540, 1539, 1538, 1537, 1536, 1535, 1534, 1533, 1532, 1531, 1530, 1529, 1528, 1527, 1526, 1525, 1524, 1523, 1522, 1521, 1520, 1519, 1518, 1517, 1516, 1515, 1514, 1513, 1512, 1511, 1510, 1509, 1508, 1507
+COB 27 27 [] [
+  {
+    id: 27,
+    bodyCandles: [ 241648, 241645, 241644 ],
+    confirmCandle: 241649,
+    direction: 'UP',
+    height: 0.005589999999999984,
+    limit: 1.28744,
+    stoploss: 1.29303,
+    takeprofit: 1.27626,
+    pairPeriod: { pair: 'GBPUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 241640,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 1548,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 26,
+    bodyCandles: [ 241648, 241645, 241644 ],
+    confirmCandle: 241649,
+    direction: 'UP',
+    height: 0.005589999999999984,
+    limit: 1.28744,
+    stoploss: 1.29303,
+    takeprofit: 1.27626,
+    pairPeriod: { pair: 'GBPUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 241640,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 1548,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 25,
+    bodyCandles: [ 225523, 225520, 225519 ],
+    confirmCandle: 225524,
+    direction: 'UP',
+    height: 0.0015299999999998093,
+    limit: 1.12261,
+    stoploss: 1.12414,
+    takeprofit: 1.1195500000000005,
+    pairPeriod: { pair: 'EURUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 225515,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 1425,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 24,
+    bodyCandles: [ 225523, 225520, 225519 ],
+    confirmCandle: 225524,
+    direction: 'UP',
+    height: 0.0015299999999998093,
+    limit: 1.12261,
+    stoploss: 1.12414,
+    takeprofit: 1.1195500000000005,
+    pairPeriod: { pair: 'EURUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 225515,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 1425,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 23,
+    bodyCandles: [ 181383, 181380, 181379 ],
+    confirmCandle: 181384,
+    direction: 'UP',
+    height: 0.00550000000000006,
+    limit: 1.29776,
+    stoploss: 1.30326,
+    takeprofit: 1.28676,
+    pairPeriod: { pair: 'GBPUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 181375,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 1167,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 22,
+    bodyCandles: [ 181383, 181380, 181379 ],
+    confirmCandle: 181384,
+    direction: 'UP',
+    height: 0.00550000000000006,
+    limit: 1.29776,
+    stoploss: 1.30326,
+    takeprofit: 1.28676,
+    pairPeriod: { pair: 'GBPUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 181375,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 1167,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 21,
+    bodyCandles: [ 169818, 169817, 169814 ],
+    confirmCandle: 169819,
+    direction: 'UP',
+    height: 0.0037599999999999856,
+    limit: 1.12732,
+    stoploss: 1.13108,
+    takeprofit: 1.1198000000000001,
+    pairPeriod: { pair: 'EURUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 169810,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 1091,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 20,
+    bodyCandles: [ 158615, 158612, 158611 ],
+    confirmCandle: 158616,
+    direction: 'UP',
+    height: 0.00818999999999992,
+    limit: 1.31841,
+    stoploss: 1.3266,
+    takeprofit: 1.3020300000000002,
+    pairPeriod: { pair: 'GBPUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 158607,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 1000,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 19,
+    bodyCandles: [ 158615, 158612, 158611 ],
+    confirmCandle: 158616,
+    direction: 'UP',
+    height: 0.00818999999999992,
+    limit: 1.31841,
+    stoploss: 1.3266,
+    takeprofit: 1.3020300000000002,
+    pairPeriod: { pair: 'GBPUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 158607,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 1000,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 18,
+    bodyCandles: [ 158595, 158592, 158591 ],
+    confirmCandle: 158596,
+    direction: 'UP',
+    height: 0.008259999999999934,
+    limit: 1.31841,
+    stoploss: 1.32667,
+    takeprofit: 1.3018900000000002,
+    pairPeriod: { pair: 'GBPUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 158587,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 1000,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 17,
+    bodyCandles: [ 158595, 158592, 158591 ],
+    confirmCandle: 158596,
+    direction: 'UP',
+    height: 0.008259999999999934,
+    limit: 1.31841,
+    stoploss: 1.32667,
+    takeprofit: 1.3018900000000002,
+    pairPeriod: { pair: 'GBPUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 158587,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 1000,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 16,
+    bodyCandles: [ 158320, 158317, 158316 ],
+    confirmCandle: 158321,
+    direction: 'UP',
+    height: 0.0025100000000000122,
+    limit: 1.13245,
+    stoploss: 1.13496,
+    takeprofit: 1.12743,
+    pairPeriod: { pair: 'EURUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 158312,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 1000,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 15,
+    bodyCandles: [ 158320, 158317, 158316 ],
+    confirmCandle: 158321,
+    direction: 'UP',
+    height: 0.0025100000000000122,
+    limit: 1.13245,
+    stoploss: 1.13496,
+    takeprofit: 1.12743,
+    pairPeriod: { pair: 'EURUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 158312,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 1000,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 14,
+    bodyCandles: [ 104423, 104420, 104419 ],
+    confirmCandle: 104424,
+    direction: 'UP',
+    height: 0.01419999999999999,
+    limit: 1.29029,
+    stoploss: 1.30449,
+    takeprofit: 1.26189,
+    pairPeriod: { pair: 'GBPUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 104415,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 661,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 13,
+    bodyCandles: [ 104423, 104420, 104419 ],
+    confirmCandle: 104424,
+    direction: 'UP',
+    height: 0.01419999999999999,
+    limit: 1.29029,
+    stoploss: 1.30449,
+    takeprofit: 1.26189,
+    pairPeriod: { pair: 'GBPUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 104415,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 661,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 12,
+    bodyCandles: [ 89981, 89978, 89977 ],
+    confirmCandle: 89982,
+    direction: 'UP',
+    height: 0.002080000000000082,
+    limit: 1.28426,
+    stoploss: 1.28634,
+    takeprofit: 1.2800999999999998,
+    pairPeriod: { pair: 'GBPUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 89973,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 548,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 11,
+    bodyCandles: [ 89981, 89978, 89977 ],
+    confirmCandle: 89982,
+    direction: 'UP',
+    height: 0.002080000000000082,
+    limit: 1.28426,
+    stoploss: 1.28634,
+    takeprofit: 1.2800999999999998,
+    pairPeriod: { pair: 'GBPUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 89973,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 548,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 10,
+    bodyCandles: [ 84213, 84210, 84209 ],
+    confirmCandle: 84214,
+    direction: 'UP',
+    height: 0.0017300000000000093,
+    limit: 1.28447,
+    stoploss: 1.2862,
+    takeprofit: 1.28101,
+    pairPeriod: { pair: 'GBPUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 84205,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 492,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 9,
+    bodyCandles: [ 84213, 84210, 84209 ],
+    confirmCandle: 84214,
+    direction: 'UP',
+    height: 0.0017300000000000093,
+    limit: 1.28447,
+    stoploss: 1.2862,
+    takeprofit: 1.28101,
+    pairPeriod: { pair: 'GBPUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 84205,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 492,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 8,
+    bodyCandles: [ 81099, 81096, 81095 ],
+    confirmCandle: 81100,
+    direction: 'UP',
+    height: 0.008059999999999956,
+    limit: 1.2854,
+    stoploss: 1.29346,
+    takeprofit: 1.2692800000000002,
+    pairPeriod: { pair: 'GBPUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 81091,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 510,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 7,
+    bodyCandles: [ 81099, 81096, 81095 ],
+    confirmCandle: 81100,
+    direction: 'UP',
+    height: 0.008059999999999956,
+    limit: 1.2854,
+    stoploss: 1.29346,
+    takeprofit: 1.2692800000000002,
+    pairPeriod: { pair: 'GBPUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 81091,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 510,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 6,
+    bodyCandles: [ 78487, 78484, 78483 ],
+    confirmCandle: 78488,
+    direction: 'UP',
+    height: 0.009499999999999842,
+    limit: 1.2854,
+    stoploss: 1.2949,
+    takeprofit: 1.2664000000000004,
+    pairPeriod: { pair: 'GBPUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 78479,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 491,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 5,
+    bodyCandles: [ 78487, 78484, 78483 ],
+    confirmCandle: 78488,
+    direction: 'UP',
+    height: 0.009499999999999842,
+    limit: 1.2854,
+    stoploss: 1.2949,
+    takeprofit: 1.2664000000000004,
+    pairPeriod: { pair: 'GBPUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 78479,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 491,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 4,
+    bodyCandles: [ 69569, 69566, 69565 ],
+    confirmCandle: 69570,
+    direction: 'UP',
+    height: 0.0014500000000001734,
+    limit: 1.30262,
+    stoploss: 1.30407,
+    takeprofit: 1.2997199999999995,
+    pairPeriod: { pair: 'GBPUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 69561,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 433,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 3,
+    bodyCandles: [ 69569, 69566, 69565 ],
+    confirmCandle: 69570,
+    direction: 'UP',
+    height: 0.0014500000000001734,
+    limit: 1.30262,
+    stoploss: 1.30407,
+    takeprofit: 1.2997199999999995,
+    pairPeriod: { pair: 'GBPUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 69561,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 433,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 2,
+    bodyCandles: [ 37441, 37438, 37437 ],
+    confirmCandle: 37442,
+    direction: 'UP',
+    height: 0.004170000000000007,
+    limit: 1.28319,
+    stoploss: 1.28736,
+    takeprofit: 1.27485,
+    pairPeriod: { pair: 'GBPUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 37433,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 216,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  },
+  {
+    id: 1,
+    bodyCandles: [ 37441, 37438, 37437 ],
+    confirmCandle: 37442,
+    direction: 'UP',
+    height: 0.004170000000000007,
+    limit: 1.28319,
+    stoploss: 1.28736,
+    takeprofit: 1.27485,
+    pairPeriod: { pair: 'GBPUSD', period: 'PERIOD_M1' },
+    pastConfirmCandles: [],
+    startCandle: 37433,
+    status: 'TAKEPROFIT',
+    liquidityUsed: {
+      liquidityId: 216,
+      status: 'FOUND',
+      time: [Object],
+      trigger: 'COB'
+    }
+  }
+]
+MSS 0 undefined

@@ -1,6 +1,6 @@
 import winston from "winston";
 import "winston-daily-rotate-file";
-import { ProjectName } from "@shared/Types/Enums";
+import { ProjectName } from "@shared/Types/Enums.ts";
 
 let logDirectory = "./Logs";
 const fullLogDirectory = `${logDirectory}/Full`;
