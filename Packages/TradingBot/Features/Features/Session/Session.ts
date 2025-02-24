@@ -1,6 +1,5 @@
 import {ISession} from "@shared/Types/Interfaces/general.ts";
 import {GeneralStore} from "@shared/Types/Interfaces/generalStore.ts";
-import logger from "@shared/Initiatives/Logger.ts";
 import moment from "moment-timezone";
 import {CircularBuffer} from "@tradingBot/Features/Core/CircularBuffer.ts";
 import {Session as DBSession} from "@prisma/client";
@@ -22,19 +21,14 @@ export default class Session {
      * Fetch initial session records from and save in local.
      * @returns new fetched sessions
      */
-    async fetch(): Promise<DBSession[]> {
-        try {
-            const generalStore = this.generalStore;
-            const prisma = generalStore.state.Prisma;
-            if (!prisma) throw "Prisma instance not found";
+    async fetch(): Promise<DBSession[] | void> {
+        const generalStore = this.generalStore;
+        const prisma = generalStore.state.Prisma;
+        if (!prisma) return;
 
-            this.sessionRecords = await prisma.session.findMany();
+        this.sessionRecords = await prisma.session.findMany();
 
-            return this.sessionRecords;
-        } catch (error) {
-            console.error("Error fetching initial session records:", error);
-            throw error;
-        }
+        return this.sessionRecords;
     }
 
     isUnixInSessionRecords(unix: number): DBSession | undefined {

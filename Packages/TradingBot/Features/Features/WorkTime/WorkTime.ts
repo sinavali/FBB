@@ -21,19 +21,14 @@ export default class WorkTime {
      * Fetch initial workTime records from and save in local.
      * @returns new fetched workTimes
      */
-    async fetch(): Promise<DBWorkTime[]> {
-        try {
-            const generalStore = this.generalStore;
-            const prisma = generalStore.state.Prisma;
-            if (!prisma) throw new Error("Prisma instance not found");
+    async fetch(): Promise<DBWorkTime[] | void> {
+        const generalStore = this.generalStore;
+        const prisma = generalStore.state.Prisma;
+        if (!prisma) return;
 
-            this.workTimeRecords = await prisma.workTime.findMany();
+        this.workTimeRecords = await prisma.workTime.findMany();
 
-            return this.workTimeRecords;
-        } catch (error) {
-            console.error("Error fetching initial workTime records:", error);
-            throw error;
-        }
+        return this.workTimeRecords;
     }
 
     isUnixInWorkTimeRecords(unix: number): DBWorkTime | undefined {
