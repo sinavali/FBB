@@ -49,8 +49,7 @@ export default class MarketShiftStructure {
           l.pairPeriod.pair === candle.pairPeriod.pair &&
           l.pairPeriod.period === candle.pairPeriod.period
       ) as ILiquidity[];
-
-    if (!liquidities?.length) return;
+    if (!liquidities || !liquidities.length) return;
 
     liquidities.sort((a, b) => (b.hunted?.unix ?? 0) - (a.hunted?.unix ?? 0));
     const liquidity = liquidities[0];
