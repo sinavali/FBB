@@ -1,0 +1,5 @@
+-- AddForeignKey
+ALTER TABLE `_Related` ADD CONSTRAINT `_Related_A_fkey` FOREIGN KEY (`A`) REFERENCES `Currency`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `_Related` ADD CONSTRAINT `_Related_B_fkey` FOREIGN KEY (`B`) REFERENCES `Currency`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
