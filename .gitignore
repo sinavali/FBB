@@ -133,3 +133,5 @@ Logs/*/*.json
 Logs/*/*.log
 compiled
 node_modules
+
+**/Reports/*.json
