@@ -134,4 +134,4 @@ Logs/*/*.log
 compiled
 node_modules
 
-**/Reports/*.json
+./**/Reports/*.json

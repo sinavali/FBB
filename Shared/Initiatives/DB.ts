@@ -34,12 +34,6 @@ export class MysqlConnector {
           });
         }
         if (systemMode === SystemMode.BACKTEST) {
-          console.log({
-            host: FBB_Bot_DB_HOST,
-            user: FBB_Bot_DB_USER,
-            password: FBB_Bot_DB_PASSWORD,
-            database: FBB_Bot_BACKTEST_DB_NAME,
-          })
           this.backtestDatabaseConnection = await mysql.createConnection({
             host: FBB_Bot_DB_HOST,
             user: FBB_Bot_DB_USER,
