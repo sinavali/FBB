@@ -196,7 +196,6 @@ async function setSettings() {
 async function setTimeStuff() {
   await prisma.$executeRaw`TRUNCATE TABLE Session`;
   await prisma.$executeRaw`TRUNCATE TABLE WorkTime`;
-  await prisma.$executeRaw`TRUNCATE TABLE TimeMicro`;
 
   await prisma.session.createMany({
     data: [

@@ -1,82 +1,74 @@
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "mysql"
-    url      = "mysql://root:qwerty@localhost:3306/fbb_core?schema=public?connection_limit=10&pool_timeout=100"
+  provider = "mysql"
+  url      = "mysql://root:@localhost:3306/fbb_core?schema=public?connection_limit=10&pool_timeout=100"
 }
 
 model Setting {
-    id           Int            @id @default(autoincrement())
-    settingKey   String
-    settingValue String
-    parseTo      SettingParseTo
-
-    @@index([id, settingKey])
+  id           Int            @id @default(autoincrement())
+  settingKey   String
+  settingValue String
+  parseTo      SettingParseTo
 }
 
 model Session {
-    id    Int    @id @default(autoincrement())
-    title String
-    start String
-    end   String
-
-    @@index([id, start, end])
+  id    Int    @id @default(autoincrement())
+  title String
+  start String
+  end   String
 }
 
 model WorkTime {
-    id    Int    @id @default(autoincrement())
-    title String
-    start String
-    end   String
-
-    @@index([id, start, end])
+  id    Int    @id @default(autoincrement())
+  title String
+  start String
+  end   String
 }
 
 model Currency {
-    id        Int        @id @default(autoincrement())
-    name      String
-    related   Currency[] @relation("Related")
-    relatedTo Currency[] @relation("Related")
-
-    @@index([id, name])
+  id        Int        @id @default(autoincrement())
+  name      String
+  related   Currency[] @relation("Related")
+  relatedTo Currency[] @relation("Related")
 }
 
 enum TimeMicroType {
-    SESSION
-    WORKTIME
+  SESSION
+  WORKTIME
 }
 
 enum SettingParseTo {
-    INT
-    FLOAT
-    STRING
-    BOOLEAN
-    BIGINT
+  INT
+  FLOAT
+  STRING
+  BOOLEAN
+  BIGINT
 }
 
 enum SignalStatus {
-    signalFound
-    signalFailed
-    signalTriggered
-    signalTriggeredStopLoss
-    signalTriggeredTakeProfit
-    signalCanceledByUser
-    signalCanceledBySystem
+  signalFound
+  signalFailed
+  signalTriggered
+  signalTriggeredStopLoss
+  signalTriggeredTakeProfit
+  signalCanceledByUser
+  signalCanceledBySystem
 }
 
 enum PositionStatus {
-    positionPlaced
-    positionTriggered
-    positionTriggeredStopLoss
-    positionTriggeredTakeProfit
-    positionCanceledByUser
-    positionCanceledBySystem
+  positionPlaced
+  positionTriggered
+  positionTriggeredStopLoss
+  positionTriggeredTakeProfit
+  positionCanceledByUser
+  positionCanceledBySystem
 }
 
 enum SystemMode {
-    LIVE
-    SIGNAL
-    BACKTEST
+  LIVE
+  SIGNAL
+  BACKTEST
 }

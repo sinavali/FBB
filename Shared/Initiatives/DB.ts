@@ -16,6 +16,7 @@ export class MysqlConnector {
   /**
    * Initialize a MySQL connection based on the provided project name.
    * @param projectName - The name of the project for which the database connection is required.
+   * @param systemMode - The name of the systemMode as SystemMode.
    * @returns A promise that resolves once the connection is established.
    */
   public init(projectName: ProjectName, systemMode: SystemMode): Promise<void> {
@@ -33,6 +34,12 @@ export class MysqlConnector {
           });
         }
         if (systemMode === SystemMode.BACKTEST) {
+          console.log({
+            host: FBB_Bot_DB_HOST,
+            user: FBB_Bot_DB_USER,
+            password: FBB_Bot_DB_PASSWORD,
+            database: FBB_Bot_BACKTEST_DB_NAME,
+          })
           this.backtestDatabaseConnection = await mysql.createConnection({
             host: FBB_Bot_DB_HOST,
             user: FBB_Bot_DB_USER,

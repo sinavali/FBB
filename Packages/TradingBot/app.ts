@@ -1,7 +1,3 @@
-// logger.info("This is an info log.");
-// logger.warn("This is a warning log.");
-// logger.error("This is an error log.");
-
 import { initLogger } from "@shared/Initiatives/Logger.ts";
 import logger from "@shared/Initiatives/Logger.ts";
 import liveMode from "@tradingBot/Features/Core/Controllers/liveModeController.ts";
@@ -9,6 +5,10 @@ import signalMode from "@tradingBot/Features/Core/Controllers/signalModeControll
 import backtestMode from "@tradingBot/Features/Core/Controllers/backtestModeController.ts";
 import { ProjectName, SystemMode } from "@shared/Types/Enums.ts";
 import { useGeneralStore } from "@shared/Stores/GeneralStore.ts";
+
+// logger.info("This is an info log.");
+// logger.warn("This is a warning log.");
+// logger.error("This is an error log.");
 
 const start = new Date().getTime();
 
