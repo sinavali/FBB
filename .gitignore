@@ -135,3 +135,4 @@ compiled
 node_modules
 
 /Packages/TradingBot/Reports/*.json
+/.idea

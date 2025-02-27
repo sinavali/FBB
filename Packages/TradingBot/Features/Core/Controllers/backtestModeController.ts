@@ -3,6 +3,7 @@ import {LiquidityMode} from "@shared/Types/Enums.ts";
 import {GeneralStore} from "@shared/Types/Interfaces/generalStore.ts";
 import {modelOne} from "@tradingBot/Features/Core/Controllers/flows.ts";
 import fs from "fs";
+import fsp from "fs/promises";
 import moment from "moment";
 
 export default async (generalStore: GeneralStore) => {
@@ -27,10 +28,29 @@ export default async (generalStore: GeneralStore) => {
         }
         console.log(`from: ${moment.unix(start.settingValueParsed).format("YYYY-MM-DD HH:mm")} to: ${moment.unix(end.settingValueParsed).format("YYYY-MM-DD HH:mm")}`);
 
+
+        // const [candles]: any = await generalStore.state.Candle.getCandles(
+        //     start.settingValueParsed,
+        //     end.settingValueParsed,
+        //     2000000
+        // );
+        //
+        // type OHLC = [number, number, number, number, number, "EURUSD" | "GBPUSD"];
+        //
+        // const candlesFormatted = candles.map((candle: any) =>
+        //     [candle.closeTime * 1000, parseFloat(candle.open), parseFloat(candle.high), parseFloat(candle.low), parseFloat(candle.close), candle.name]);
+        // const EurCandles = candlesFormatted.filter((candle: OHLC) => candle[5] === "EURUSD");
+        // fs.writeFileSync("P:/test/eurCandles.js", "var ohlcdata = " + JSON.stringify(EurCandles), "utf8");
+        //
+        // const GbpCandles = candlesFormatted.filter((candle: OHLC) => candle[5] === "GBPUSD");
+        // console.log(GbpCandles.length);
+        // fsp.writeFile("P:/test/gbpCandles.js", "var ohlcdata = " + JSON.stringify(GbpCandles), "utf8")
+        //     .finally(() => process.exit())
+
         await generalStore.state.Candle?.startCandleProcesses({
             from: start.settingValueParsed,
             to: end.settingValueParsed,
-            chunkSize: 10000
+            chunkSize: 30000
         }, modelOne);
 
         generalStore.state.Time.add("backtest mode time", new Date().getTime() - startTime);
@@ -127,13 +147,13 @@ function generateMicroTimesReport(generalStore: GeneralStore) {
 }
 
 function generateMssReport(generalStore: GeneralStore) {
+    const candles = generalStore.state.Candle.candles.getAll();
     const mss = generalStore.state.MSS.marketShifts.getAll();
     fs.writeFileSync("./Packages/TradingBot/Reports/mss.json", JSON.stringify(mss), "utf8");
 
-    const mssFormatted = mss.map((mss) => ({
+    const mssFormatted = mss.map((mss: any) => ({
         type: "MSS",
         id: mss.id,
-        mssCandleId: mss.mssCandle,
         height: mss.height,
         limit: mss.limit,
         tp: mss.takeprofit,
@@ -142,7 +162,14 @@ function generateMssReport(generalStore: GeneralStore) {
         pair: mss.pairPeriod.pair,
         status: mss.status,
         dateTime: mss.dateTime,
+        mainDeepCandleId: mss.mainDeepCandle,
+        secondDeepCandleId: mss.secondDeepCandle,
+        mssCandleId: mss.mssCandle,
+        secondDeepCandle: candles.find(c => c.id === mss.secondDeepCandle),
+        mainDeepCandle: candles.find(c => c.id === mss.mainDeepCandle),
+        mssCandle: candles.find(c => c.id === mss.mssCandle),
     }));
+    // console.log(mssFormatted)
     fs.writeFileSync("./Packages/TradingBot/Reports/mssFormatted.json", JSON.stringify(mssFormatted), "utf8");
 
     console.log(`MSS => Have: ${mss.length}, LastId: ${mss[0]?.id}`);

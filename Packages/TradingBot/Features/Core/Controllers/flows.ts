@@ -177,7 +177,7 @@ async function updatePhaseModelOne(
   data: ModelOneData
 ) {
   if (data.candle) {
-    generalStore.state.MSS?.initiateMSS(data.candle as ICandle);
+    generalStore.state.MSS?.updateMSS(data.candle as ICandle);
   }
 
   const liquidities = generalStore.state.Liquidity?.liquidities

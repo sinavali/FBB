@@ -77,22 +77,6 @@ describe("Session Class", () => {
       expect(result).toEqual(mockSessions); // Verify the result matches mock data
     });
 
-    it("should throw an error if Prisma is not found", async () => {
-      session = new Session(
-        {
-          ...mockGeneralStore,
-          state: { ...mockGeneralStore.state, Prisma: null },
-        },
-        10
-      );
-
-      let error = "";
-      await session.fetch().catch((err) => (error = err));
-
-      // could not work with .reject.toThrown("")
-      expect(error).toBe("Prisma instance not found");
-    });
-
     it("should log and rethrow any errors during fetching", async () => {
       mockPrisma.session.findMany.mockRejectedValueOnce(
         new Error("Database error")

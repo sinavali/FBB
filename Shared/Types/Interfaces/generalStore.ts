@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { MysqlConnector } from "@shared/Initiatives/DB.ts";
-import { IMTSocket, ITime } from "@shared/Types/Interfaces/general.ts";
+import { IMTSocket } from "@shared/Types/Interfaces/general.ts";
 import { SystemMode } from "@shared/Types/Enums.ts";
 import Time from "@tradingBot/Features/Core/Time.ts";
 import Setting from "@tradingBot/Features/Features/Setting/Setting.ts";

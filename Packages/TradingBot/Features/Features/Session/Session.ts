@@ -7,7 +7,7 @@ import {Session as DBSession} from "@prisma/client";
 export default class Session {
     public sessions: CircularBuffer<ISession>;
     public sessionRecords: DBSession[] = [];
-    private generalStore: GeneralStore;
+    private readonly generalStore: GeneralStore;
     private indexMap: Map<number, number> = new Map();
     private maxId: number = 0;
 
