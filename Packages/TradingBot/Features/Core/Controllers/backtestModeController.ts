@@ -5,6 +5,7 @@ import {modelOne} from "@tradingBot/Features/Core/Controllers/flows.ts";
 import fs from "fs";
 import fsp from "fs/promises";
 import moment from "moment";
+import {formatSignals} from "@tradingBot/Features/Core/ReportMaker.js";
 
 export default async (generalStore: GeneralStore) => {
     try {
@@ -50,7 +51,7 @@ export default async (generalStore: GeneralStore) => {
         await generalStore.state.Candle?.startCandleProcesses({
             from: start.settingValueParsed,
             to: end.settingValueParsed,
-            chunkSize: 30000
+            chunkSize: 10000
         }, modelOne);
 
         generalStore.state.Time.add("backtest mode time", new Date().getTime() - startTime);
@@ -212,7 +213,8 @@ function generateSignalReport(generalStore: GeneralStore) {
         stop: signal.stoploss,
         time: [signal.time.unix, signal.time.utc],
     }));
-    fs.writeFileSync("./Packages/TradingBot/Reports/cobFormatted.json", JSON.stringify(signalsFormatted), "utf8");
-
+    fs.writeFileSync("./Packages/TradingBot/Reports/signalFormatted.json", JSON.stringify(signalsFormatted), "utf8");
     console.log(`Signal => Have: ${signals.length}, LastId: ${signals[0]?.id}`);
+
+    formatSignals();
 }

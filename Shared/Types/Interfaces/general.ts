@@ -165,6 +165,7 @@ export interface ICOB {
 export interface LiquidityUsed {
   liquidityId: number;
   trigger: Enums.Triggers;
+  triggerId: number;
   status: Enums.LiquidityUsedStatus;
   time?: DateTime;
 }

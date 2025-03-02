@@ -7,11 +7,13 @@ import {
     LiquidityUsedStatus,
     MssState,
     SignalStatus,
+    SystemMode,
     Triggers,
     TriggerStatus,
 } from "@shared/Types/Enums.ts";
 import {CircularBuffer} from "@tradingBot/Features/Core/CircularBuffer.ts";
 import {useMarketUtils} from "@shared/Utilities/marketUtils.ts";
+import * as Enums from "@shared/Types/Enums.js";
 
 export default class MarketShiftStructure {
     public marketShifts: CircularBuffer<IMSS>;
@@ -127,6 +129,7 @@ export default class MarketShiftStructure {
             liquidityId: liquidity.id,
             status: LiquidityUsedStatus.FOUND,
             trigger: Triggers.MSS,
+            triggerId: model.id
         };
 
         this.marketShifts.add(model as IMSS);
@@ -247,6 +250,7 @@ export default class MarketShiftStructure {
                 status: LiquidityUsedStatus.FAILED,
                 time: candle.time,
                 trigger: mss.liquidityUsed.trigger,
+                triggerId: mss.id,
             };
             this.marketShifts.updateByIndex(index, "liquidityUsed", newLiquidityUsed);
 
@@ -274,6 +278,7 @@ export default class MarketShiftStructure {
                 "liquidityUsed",
                 newLiquidityUsed
             );
+            this.generalStore.state.Liquidity.updateUsed(mss.id, Triggers.MSS, newLiquidityUsed.liquidityId, newLiquidityUsed);
         }
 
         return true;
@@ -292,6 +297,7 @@ export default class MarketShiftStructure {
                 status: LiquidityUsedStatus.TRIGGERED,
                 time: candle.time,
                 trigger: mss.liquidityUsed.trigger,
+                triggerId: mss.id,
             };
             this.marketShifts.updateByIndex(index, "liquidityUsed", newLiquidityUsed);
 
@@ -310,6 +316,22 @@ export default class MarketShiftStructure {
                 liquidityUsed: newLiquidityUsed,
             };
             this.generalStore.state.Signal.signals.add(signal);
+            this.generalStore.state.Liquidity.addNewUsed(mss.id, Triggers.MSS, newLiquidityUsed.liquidityId, newLiquidityUsed);
+            this.generalStore.state.Liquidity.updateUsed(mss.id, Triggers.MSS, newLiquidityUsed.liquidityId, newLiquidityUsed);
+
+            if (this.generalStore.globalStates.systemMode === SystemMode.LIVE) {
+                const message: any = {
+                    "MSG": "ORDER_SEND",
+                    "SYMBOL": signal.pairPeriod.pair,
+                    "VOLUME": 0.33,
+                    "PRICE": signal.limit
+                }
+
+                if (signal.direction === Enums.Directions.UP) message["TYPE"] = "ORDER_TYPE_BUY";
+                else if (signal.direction === Enums.Directions.DOWN) message["TYPE"] = "ORDER_TYPE_SELL";
+
+                this.generalStore.state.MT.CMD;
+            }
         }
     }
 
@@ -320,11 +342,12 @@ export default class MarketShiftStructure {
 
         if (index >= 0) {
             this.marketShifts.updateByIndex(index, "status", TriggerStatus.STOPLOSS);
-            const liquidityUsed = {
+            const liquidityUsed: LiquidityUsed = {
                 liquidityId: mss.liquidityUsed.liquidityId,
-                status: TriggerStatus.STOPLOSS,
+                status: LiquidityUsedStatus.STOPLOSS,
                 time: mss.liquidityUsed.time,
                 trigger: mss.liquidityUsed.trigger,
+                triggerId: mss.id
             };
             this.marketShifts.updateByIndex(index, "liquidityUsed", liquidityUsed);
 
@@ -352,6 +375,7 @@ export default class MarketShiftStructure {
                 "liquidityUsed",
                 liquidityUsed
             );
+            this.generalStore.state.Liquidity.updateUsed(mss.id, Triggers.MSS, liquidityUsed.liquidityId, liquidityUsed);
         }
     }
 
@@ -366,11 +390,12 @@ export default class MarketShiftStructure {
                 "status",
                 TriggerStatus.TAKEPROFIT
             );
-            const liquidityUsed = {
+            const liquidityUsed: LiquidityUsed = {
                 liquidityId: mss.liquidityUsed.liquidityId,
-                status: TriggerStatus.TAKEPROFIT,
+                status: LiquidityUsedStatus.TAKEPROFIT,
                 time: mss.liquidityUsed.time,
                 trigger: mss.liquidityUsed.trigger,
+                triggerId: mss.id,
             };
             this.marketShifts.updateByIndex(index, "liquidityUsed", liquidityUsed);
 
@@ -398,6 +423,7 @@ export default class MarketShiftStructure {
                 "liquidityUsed",
                 liquidityUsed
             );
+            this.generalStore.state.Liquidity.updateUsed(mss.id, Triggers.MSS, liquidityUsed.liquidityId, liquidityUsed);
         }
     }
 
@@ -509,9 +535,8 @@ export default class MarketShiftStructure {
         const tempCandles = [...candles];
         tempCandles.sort((a, b) => b.time.unix - a.time.unix);
 
-        return tempCandles.find(
-            (c) =>
-                c.time.unix < highestHigh.time.unix && c.isDeep === CandleDeepType.LOW
+        return tempCandles.find(c =>
+            c.time.unix < highestHigh.time.unix && c.isDeep === CandleDeepType.LOW
         );
     }
 
@@ -552,9 +577,11 @@ export default class MarketShiftStructure {
         const vars = this.getVariables();
 
         if (direction === Directions.DOWN)
-            stopLoss = mainDeep.high + vars.stopLossError;
+            // stopLoss = mainDeep.high + vars.stopLossError;
+            stopLoss = mainDeep.high;
         else if (direction === Directions.UP)
-            stopLoss = mainDeep.low - vars.stopLossError;
+            // stopLoss = mainDeep.low - vars.stopLossError;
+            stopLoss = mainDeep.low;
 
         return stopLoss;
     }
@@ -565,10 +592,12 @@ export default class MarketShiftStructure {
 
         if (direction === Directions.DOWN)
             takeProfit =
-                limit - (stopLoss - limit) * vars.riskReward - vars.takeProfitError;
+                // limit - (stopLoss - limit) * vars.riskReward - vars.takeProfitError;
+                limit - (stopLoss - limit) * vars.riskReward;
         else if (direction === Directions.UP)
             takeProfit =
-                limit + (limit - stopLoss) * vars.riskReward + vars.takeProfitError;
+                // limit + (limit - stopLoss) * vars.riskReward + vars.takeProfitError;
+                limit + (limit - stopLoss) * vars.riskReward;
 
         return takeProfit;
     }

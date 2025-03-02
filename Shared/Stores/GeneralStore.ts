@@ -42,7 +42,7 @@ export function useGeneralStore(): GeneralStore {
 
     state.Time = new Time();
     state.Setting = new Setting({state, setter, globalStates});
-    state.Signal = new Signal({state, setter, globalStates}, 5000);
+    state.Signal = new Signal({state, setter, globalStates}, 50000);
     state.Candle = new Candle({state, setter, globalStates}, 5000);
     state.Session = new Session({state, setter, globalStates}, 100);
     state.WorkTime = new WorkTime({state, setter, globalStates}, 100);

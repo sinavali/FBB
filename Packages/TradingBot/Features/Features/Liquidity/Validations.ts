@@ -348,7 +348,5 @@ export function shouldCheckHunt(
   const candle = generalStore.state.Candle?.candles.getNewest();
   if (!candle) return false;
 
-  if (candle?.time.unix <= liquidity.timeRange.end.unix) return false;
-
-  return true;
+  return candle.time.unix > liquidity.timeRange.end.unix;
 }
