@@ -30,6 +30,11 @@ export enum MssState {
   UPDATED = "UPDATED",
 }
 
+export enum CobState {
+  INITIATED = "INITIATED",
+  UPDATED = "UPDATED",
+}
+
 export enum MicroTimeType {
   SESSION = "SESSION",
   WORKTIME = "WORKTIME",

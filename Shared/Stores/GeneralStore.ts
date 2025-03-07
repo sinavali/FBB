@@ -33,16 +33,12 @@ export function useGeneralStore(): GeneralStore {
 
     const state = {
         Prisma: new PrismaClient(),
-        MT: {
-            CMD: new MTSocket().initMetaTraderSocket(MetaTraderSocketType.CMD).CMD,
-            DATA: new MTSocket().initMetaTraderSocket(MetaTraderSocketType.DATA).DATA,
-        },
         Database: new MysqlConnector(),
     } as GeneralStoreState;
 
     state.Time = new Time();
     state.Setting = new Setting({state, setter, globalStates});
-    state.Signal = new Signal({state, setter, globalStates}, 5000);
+    state.Signal = new Signal({state, setter, globalStates}, 50000);
     state.Candle = new Candle({state, setter, globalStates}, 5000);
     state.Session = new Session({state, setter, globalStates}, 100);
     state.WorkTime = new WorkTime({state, setter, globalStates}, 100);
@@ -50,6 +46,10 @@ export function useGeneralStore(): GeneralStore {
     state.Liquidity = new Liquidity({state, setter, globalStates}, 1000);
     state.COB = new CandleOrderBlock({state, setter, globalStates}, 100);
     state.MSS = new MarketShiftStructure({state, setter, globalStates}, 100);
+
+    state.Socket = new MTSocket();
+    state.Socket.initMetaTraderSocket();
+    state.Socket.initMetaTraderSocket();
 
     return {state, setter, globalStates};
 }
