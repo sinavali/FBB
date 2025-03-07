@@ -1,0 +1,217 @@
+{
+  "overall": {
+    "consecutiveStopLosses": 11,
+    "consecutiveTakeProfits": 12,
+    "winrate": "45.62",
+    "stopLosses": 1142,
+    "takeProfits": 958,
+    "trades": 2100,
+    "R": 1732,
+    "sorts": {
+      "trades": [
+        1,
+        10,
+        8,
+        9,
+        12,
+        3,
+        7,
+        11,
+        2,
+        5,
+        4,
+        6
+      ],
+      "stopLoss": [
+        1,
+        10,
+        12,
+        9,
+        8,
+        3,
+        7,
+        4,
+        2,
+        11,
+        5,
+        6
+      ],
+      "takeProfit": [
+        1,
+        10,
+        8,
+        9,
+        11,
+        7,
+        2,
+        3,
+        5,
+        12,
+        6,
+        4
+      ],
+      "consecutiveStopLossDetails": [
+        2,
+        10,
+        12,
+        1,
+        7,
+        8,
+        9,
+        4,
+        5,
+        11,
+        3,
+        6
+      ],
+      "consecutiveTakeProfitDetails": [
+        8,
+        6,
+        1,
+        5,
+        2,
+        3,
+        4,
+        11,
+        12,
+        7,
+        9,
+        10
+      ]
+    }
+  },
+  "details": [
+    {
+      "id": 1,
+      "monthly": "2023-01",
+      "trades": 244,
+      "stopLosses": 130,
+      "takeProfits": 114,
+      "winrate": "46.72",
+      "R": 212,
+      "consecutiveStopLossDetails": 8,
+      "consecutiveTakeProfitDetails": 7
+    },
+    {
+      "id": 2,
+      "monthly": "2023-02",
+      "trades": 154,
+      "stopLosses": 82,
+      "takeProfits": 72,
+      "winrate": "46.75",
+      "R": 134,
+      "consecutiveStopLossDetails": 11,
+      "consecutiveTakeProfitDetails": 6
+    },
+    {
+      "id": 3,
+      "monthly": "2023-03",
+      "trades": 169,
+      "stopLosses": 99,
+      "takeProfits": 70,
+      "winrate": "41.42",
+      "R": 111,
+      "consecutiveStopLossDetails": 6,
+      "consecutiveTakeProfitDetails": 6
+    },
+    {
+      "id": 4,
+      "monthly": "2023-04",
+      "trades": 139,
+      "stopLosses": 84,
+      "takeProfits": 55,
+      "winrate": "39.57",
+      "R": 81,
+      "consecutiveStopLossDetails": 7,
+      "consecutiveTakeProfitDetails": 6
+    },
+    {
+      "id": 5,
+      "monthly": "2023-05",
+      "trades": 141,
+      "stopLosses": 72,
+      "takeProfits": 69,
+      "winrate": "48.94",
+      "R": 135,
+      "consecutiveStopLossDetails": 7,
+      "consecutiveTakeProfitDetails": 7
+    },
+    {
+      "id": 6,
+      "monthly": "2023-06",
+      "trades": 133,
+      "stopLosses": 67,
+      "takeProfits": 66,
+      "winrate": "49.62",
+      "R": 131,
+      "consecutiveStopLossDetails": 6,
+      "consecutiveTakeProfitDetails": 10
+    },
+    {
+      "id": 7,
+      "monthly": "2023-07",
+      "trades": 159,
+      "stopLosses": 85,
+      "takeProfits": 74,
+      "winrate": "46.54",
+      "R": 137,
+      "consecutiveStopLossDetails": 8,
+      "consecutiveTakeProfitDetails": 5
+    },
+    {
+      "id": 8,
+      "monthly": "2023-08",
+      "trades": 196,
+      "stopLosses": 101,
+      "takeProfits": 95,
+      "winrate": "48.47",
+      "R": 184,
+      "consecutiveStopLossDetails": 8,
+      "consecutiveTakeProfitDetails": 12
+    },
+    {
+      "id": 9,
+      "monthly": "2023-09",
+      "trades": 186,
+      "stopLosses": 103,
+      "takeProfits": 83,
+      "winrate": "44.62",
+      "R": 146,
+      "consecutiveStopLossDetails": 8,
+      "consecutiveTakeProfitDetails": 5
+    },
+    {
+      "id": 10,
+      "monthly": "2023-10",
+      "trades": 241,
+      "stopLosses": 128,
+      "takeProfits": 113,
+      "winrate": "46.89",
+      "R": 211,
+      "consecutiveStopLossDetails": 9,
+      "consecutiveTakeProfitDetails": 5
+    },
+    {
+      "id": 11,
+      "monthly": "2023-11",
+      "trades": 158,
+      "stopLosses": 80,
+      "takeProfits": 78,
+      "winrate": "49.37",
+      "R": 154,
+      "consecutiveStopLossDetails": 7,
+      "consecutiveTakeProfitDetails": 6
+    },
+    {
+      "id": 12,
+      "monthly": "2023-12",
+      "trades": 181,
+      "stopLosses": 112,
+      "takeProfits": 69,
+      "winrate": "38.12",
+      "R": 95,
+      "consecutiveStopLossDetails": 9,
+      "consecutiveTakeProfitDetails": 6
+    }
+  ]
+}

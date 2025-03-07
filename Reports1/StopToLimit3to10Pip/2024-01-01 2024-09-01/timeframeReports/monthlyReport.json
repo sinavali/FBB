@@ -1,0 +1,153 @@
+{
+  "overall": {
+    "consecutiveStopLosses": 11,
+    "consecutiveTakeProfits": 16,
+    "winrate": "47.25",
+    "stopLosses": 565,
+    "takeProfits": 506,
+    "trades": 1071,
+    "R": 953,
+    "sorts": {
+      "trades": [
+        4,
+        1,
+        2,
+        7,
+        8,
+        3,
+        5,
+        6
+      ],
+      "stopLoss": [
+        2,
+        1,
+        4,
+        7,
+        5,
+        3,
+        6,
+        8
+      ],
+      "takeProfit": [
+        4,
+        1,
+        7,
+        8,
+        2,
+        3,
+        5,
+        6
+      ],
+      "consecutiveStopLossDetails": [
+        2,
+        3,
+        6,
+        1,
+        5,
+        4,
+        7,
+        8
+      ],
+      "consecutiveTakeProfitDetails": [
+        8,
+        7,
+        3,
+        1,
+        5,
+        4,
+        2,
+        6
+      ]
+    }
+  },
+  "details": [
+    {
+      "id": 1,
+      "monthly": "2024-01",
+      "trades": 158,
+      "stopLosses": 86,
+      "takeProfits": 72,
+      "winrate": "45.57",
+      "R": 130,
+      "consecutiveStopLossDetails": 7,
+      "consecutiveTakeProfitDetails": 6
+    },
+    {
+      "id": 2,
+      "monthly": "2024-02",
+      "trades": 154,
+      "stopLosses": 91,
+      "takeProfits": 63,
+      "winrate": "40.91",
+      "R": 98,
+      "consecutiveStopLossDetails": 10,
+      "consecutiveTakeProfitDetails": 4
+    },
+    {
+      "id": 3,
+      "monthly": "2024-03",
+      "trades": 119,
+      "stopLosses": 57,
+      "takeProfits": 62,
+      "winrate": "52.10",
+      "R": 129,
+      "consecutiveStopLossDetails": 8,
+      "consecutiveTakeProfitDetails": 7
+    },
+    {
+      "id": 4,
+      "monthly": "2024-04",
+      "trades": 163,
+      "stopLosses": 80,
+      "takeProfits": 83,
+      "winrate": "50.92",
+      "R": 169,
+      "consecutiveStopLossDetails": 6,
+      "consecutiveTakeProfitDetails": 5
+    },
+    {
+      "id": 5,
+      "monthly": "2024-05",
+      "trades": 118,
+      "stopLosses": 65,
+      "takeProfits": 53,
+      "winrate": "44.92",
+      "R": 94,
+      "consecutiveStopLossDetails": 7,
+      "consecutiveTakeProfitDetails": 6
+    },
+    {
+      "id": 6,
+      "monthly": "2024-06",
+      "trades": 95,
+      "stopLosses": 57,
+      "takeProfits": 38,
+      "winrate": "40.00",
+      "R": 57,
+      "consecutiveStopLossDetails": 8,
+      "consecutiveTakeProfitDetails": 4
+    },
+    {
+      "id": 7,
+      "monthly": "2024-07",
+      "trades": 142,
+      "stopLosses": 74,
+      "takeProfits": 68,
+      "winrate": "47.89",
+      "R": 130,
+      "consecutiveStopLossDetails": 6,
+      "consecutiveTakeProfitDetails": 9
+    },
+    {
+      "id": 8,
+      "monthly": "2024-08",
+      "trades": 123,
+      "stopLosses": 55,
+      "takeProfits": 68,
+      "winrate": "55.28",
+      "R": 149,
+      "consecutiveStopLossDetails": 6,
+      "consecutiveTakeProfitDetails": 16
+    }
+  ]
+}

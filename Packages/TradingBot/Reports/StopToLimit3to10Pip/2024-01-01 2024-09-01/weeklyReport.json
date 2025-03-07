@@ -1,0 +1,293 @@
+{
+  "overall": {
+    "consecutiveStopLosses": 11,
+    "consecutiveTakeProfits": 11,
+    "winrate": "45.04",
+    "stopLosses": 1246,
+    "takeProfits": 1021,
+    "trades": 2267,
+    "R": 1817
+  },
+  "details": [
+    {
+      "weekly": "2024-01-01",
+      "trades": 48,
+      "stopLosses": 24,
+      "takeProfits": 24,
+      "winrate": "50.00",
+      "R": 48
+    },
+    {
+      "weekly": "2024-01-08",
+      "trades": 56,
+      "stopLosses": 30,
+      "takeProfits": 26,
+      "winrate": "46.43",
+      "R": 48
+    },
+    {
+      "weekly": "2024-01-15",
+      "trades": 69,
+      "stopLosses": 38,
+      "takeProfits": 31,
+      "winrate": "44.93",
+      "R": 55
+    },
+    {
+      "weekly": "2024-01-22",
+      "trades": 61,
+      "stopLosses": 32,
+      "takeProfits": 29,
+      "winrate": "47.54",
+      "R": 55
+    },
+    {
+      "weekly": "2024-01-29",
+      "trades": 71,
+      "stopLosses": 44,
+      "takeProfits": 27,
+      "winrate": "38.03",
+      "R": 37
+    },
+    {
+      "weekly": "2024-02-05",
+      "trades": 70,
+      "stopLosses": 37,
+      "takeProfits": 33,
+      "winrate": "47.14",
+      "R": 62
+    },
+    {
+      "weekly": "2024-02-12",
+      "trades": 71,
+      "stopLosses": 43,
+      "takeProfits": 28,
+      "winrate": "39.44",
+      "R": 41
+    },
+    {
+      "weekly": "2024-02-19",
+      "trades": 58,
+      "stopLosses": 26,
+      "takeProfits": 32,
+      "winrate": "55.17",
+      "R": 70
+    },
+    {
+      "weekly": "2024-02-26",
+      "trades": 74,
+      "stopLosses": 41,
+      "takeProfits": 33,
+      "winrate": "44.59",
+      "R": 58
+    },
+    {
+      "weekly": "2024-03-04",
+      "trades": 53,
+      "stopLosses": 25,
+      "takeProfits": 28,
+      "winrate": "52.83",
+      "R": 59
+    },
+    {
+      "weekly": "2024-03-11",
+      "trades": 85,
+      "stopLosses": 54,
+      "takeProfits": 31,
+      "winrate": "36.47",
+      "R": 39
+    },
+    {
+      "weekly": "2024-03-18",
+      "trades": 50,
+      "stopLosses": 30,
+      "takeProfits": 20,
+      "winrate": "40.00",
+      "R": 30
+    },
+    {
+      "weekly": "2024-03-25",
+      "trades": 52,
+      "stopLosses": 23,
+      "takeProfits": 29,
+      "winrate": "55.77",
+      "R": 64
+    },
+    {
+      "weekly": "2024-04-01",
+      "trades": 74,
+      "stopLosses": 40,
+      "takeProfits": 34,
+      "winrate": "45.95",
+      "R": 62
+    },
+    {
+      "weekly": "2024-04-08",
+      "trades": 78,
+      "stopLosses": 38,
+      "takeProfits": 40,
+      "winrate": "51.28",
+      "R": 82
+    },
+    {
+      "weekly": "2024-04-15",
+      "trades": 62,
+      "stopLosses": 41,
+      "takeProfits": 21,
+      "winrate": "33.87",
+      "R": 22
+    },
+    {
+      "weekly": "2024-04-22",
+      "trades": 74,
+      "stopLosses": 34,
+      "takeProfits": 40,
+      "winrate": "54.05",
+      "R": 86
+    },
+    {
+      "weekly": "2024-04-29",
+      "trades": 66,
+      "stopLosses": 40,
+      "takeProfits": 26,
+      "winrate": "39.39",
+      "R": 38
+    },
+    {
+      "weekly": "2024-05-06",
+      "trades": 64,
+      "stopLosses": 38,
+      "takeProfits": 26,
+      "winrate": "40.63",
+      "R": 40
+    },
+    {
+      "weekly": "2024-05-13",
+      "trades": 53,
+      "stopLosses": 26,
+      "takeProfits": 27,
+      "winrate": "50.94",
+      "R": 55
+    },
+    {
+      "weekly": "2024-05-20",
+      "trades": 84,
+      "stopLosses": 48,
+      "takeProfits": 36,
+      "winrate": "42.86",
+      "R": 60
+    },
+    {
+      "weekly": "2024-05-27",
+      "trades": 77,
+      "stopLosses": 45,
+      "takeProfits": 32,
+      "winrate": "41.56",
+      "R": 51
+    },
+    {
+      "weekly": "2024-06-03",
+      "trades": 57,
+      "stopLosses": 28,
+      "takeProfits": 29,
+      "winrate": "50.88",
+      "R": 59
+    },
+    {
+      "weekly": "2024-06-10",
+      "trades": 69,
+      "stopLosses": 37,
+      "takeProfits": 32,
+      "winrate": "46.38",
+      "R": 59
+    },
+    {
+      "weekly": "2024-06-17",
+      "trades": 59,
+      "stopLosses": 38,
+      "takeProfits": 21,
+      "winrate": "35.59",
+      "R": 25
+    },
+    {
+      "weekly": "2024-06-24",
+      "trades": 64,
+      "stopLosses": 38,
+      "takeProfits": 26,
+      "winrate": "40.63",
+      "R": 40
+    },
+    {
+      "weekly": "2024-07-01",
+      "trades": 71,
+      "stopLosses": 37,
+      "takeProfits": 34,
+      "winrate": "47.89",
+      "R": 65
+    },
+    {
+      "weekly": "2024-07-08",
+      "trades": 58,
+      "stopLosses": 30,
+      "takeProfits": 28,
+      "winrate": "48.28",
+      "R": 54
+    },
+    {
+      "weekly": "2024-07-15",
+      "trades": 50,
+      "stopLosses": 27,
+      "takeProfits": 23,
+      "winrate": "46.00",
+      "R": 42
+    },
+    {
+      "weekly": "2024-07-22",
+      "trades": 75,
+      "stopLosses": 44,
+      "takeProfits": 31,
+      "winrate": "41.33",
+      "R": 49
+    },
+    {
+      "weekly": "2024-07-29",
+      "trades": 81,
+      "stopLosses": 55,
+      "takeProfits": 26,
+      "winrate": "32.10",
+      "R": 23
+    },
+    {
+      "weekly": "2024-08-05",
+      "trades": 68,
+      "stopLosses": 29,
+      "takeProfits": 39,
+      "winrate": "57.35",
+      "R": 88
+    },
+    {
+      "weekly": "2024-08-12",
+      "trades": 70,
+      "stopLosses": 37,
+      "takeProfits": 33,
+      "winrate": "47.14",
+      "R": 62
+    },
+    {
+      "weekly": "2024-08-19",
+      "trades": 47,
+      "stopLosses": 21,
+      "takeProfits": 26,
+      "winrate": "55.32",
+      "R": 57
+    },
+    {
+      "weekly": "2024-08-26",
+      "trades": 49,
+      "stopLosses": 28,
+      "takeProfits": 21,
+      "winrate": "42.86",
+      "R": 35
+    }
+  ]
+}

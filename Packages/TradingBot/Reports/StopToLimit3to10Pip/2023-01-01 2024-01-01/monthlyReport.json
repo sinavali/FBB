@@ -1,0 +1,109 @@
+{
+  "overall": {
+    "consecutiveStopLosses": 14,
+    "consecutiveTakeProfits": 13,
+    "winrate": "44.00",
+    "stopLosses": 1717,
+    "takeProfits": 1349,
+    "trades": 3066,
+    "R": 2330
+  },
+  "details": [
+    {
+      "monthly": "2023-01",
+      "trades": 312,
+      "stopLosses": 182,
+      "takeProfits": 130,
+      "winrate": "41.67",
+      "R": 208
+    },
+    {
+      "monthly": "2023-02",
+      "trades": 214,
+      "stopLosses": 117,
+      "takeProfits": 97,
+      "winrate": "45.33",
+      "R": 174
+    },
+    {
+      "monthly": "2023-03",
+      "trades": 228,
+      "stopLosses": 138,
+      "takeProfits": 90,
+      "winrate": "39.47",
+      "R": 132
+    },
+    {
+      "monthly": "2023-04",
+      "trades": 201,
+      "stopLosses": 121,
+      "takeProfits": 80,
+      "winrate": "39.80",
+      "R": 119
+    },
+    {
+      "monthly": "2023-05",
+      "trades": 229,
+      "stopLosses": 122,
+      "takeProfits": 107,
+      "winrate": "46.72",
+      "R": 199
+    },
+    {
+      "monthly": "2023-06",
+      "trades": 210,
+      "stopLosses": 116,
+      "takeProfits": 94,
+      "winrate": "44.76",
+      "R": 166
+    },
+    {
+      "monthly": "2023-07",
+      "trades": 244,
+      "stopLosses": 139,
+      "takeProfits": 105,
+      "winrate": "43.03",
+      "R": 176
+    },
+    {
+      "monthly": "2023-08",
+      "trades": 290,
+      "stopLosses": 152,
+      "takeProfits": 138,
+      "winrate": "47.59",
+      "R": 262
+    },
+    {
+      "monthly": "2023-09",
+      "trades": 281,
+      "stopLosses": 158,
+      "takeProfits": 123,
+      "winrate": "43.77",
+      "R": 211
+    },
+    {
+      "monthly": "2023-10",
+      "trades": 340,
+      "stopLosses": 188,
+      "takeProfits": 152,
+      "winrate": "44.71",
+      "R": 268
+    },
+    {
+      "monthly": "2023-11",
+      "trades": 236,
+      "stopLosses": 120,
+      "takeProfits": 116,
+      "winrate": "49.15",
+      "R": 228
+    },
+    {
+      "monthly": "2023-12",
+      "trades": 282,
+      "stopLosses": 165,
+      "takeProfits": 117,
+      "winrate": "41.49",
+      "R": 186
+    }
+  ]
+}

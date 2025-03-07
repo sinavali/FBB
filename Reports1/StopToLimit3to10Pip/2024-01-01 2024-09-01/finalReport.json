@@ -1,0 +1,42 @@
+{
+  "daily": {
+    "consecutiveStopLosses": 2,
+    "consecutiveTakeProfits": 2,
+    "winrate": "50.00",
+    "stopLosses": 8,
+    "takeProfits": 8,
+    "trades": 16
+  },
+  "weekly": {
+    "consecutiveStopLosses": 5,
+    "consecutiveTakeProfits": 5,
+    "winrate": "43.75",
+    "stopLosses": 36,
+    "takeProfits": 28,
+    "trades": 64
+  },
+  "twoWeeks": {
+    "consecutiveStopLosses": 6,
+    "consecutiveTakeProfits": 5,
+    "winrate": "50.00",
+    "stopLosses": 56,
+    "takeProfits": 56,
+    "trades": 112
+  },
+  "monthly": {
+    "consecutiveStopLosses": 8,
+    "consecutiveTakeProfits": 11,
+    "winrate": "46.69",
+    "stopLosses": 161,
+    "takeProfits": 141,
+    "trades": 302
+  },
+  "yearly": {
+    "consecutiveStopLosses": 11,
+    "consecutiveTakeProfits": 11,
+    "winrate": "45.04",
+    "stopLosses": 1246,
+    "takeProfits": 1021,
+    "trades": 2267
+  }
+}

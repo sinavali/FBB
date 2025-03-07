@@ -1,0 +1,41 @@
+{
+  "overall": {
+    "consecutiveStopLosses": 10,
+    "consecutiveTakeProfits": 20,
+    "winrate": "47.71",
+    "stopLosses": 629,
+    "takeProfits": 574,
+    "trades": 1203,
+    "R": 1093,
+    "sorts": {
+      "trades": [
+        1
+      ],
+      "stopLoss": [
+        1
+      ],
+      "takeProfit": [
+        1
+      ],
+      "consecutiveStopLossDetails": [
+        1
+      ],
+      "consecutiveTakeProfitDetails": [
+        1
+      ]
+    }
+  },
+  "details": [
+    {
+      "id": 1,
+      "yearly": "2024-01-01",
+      "trades": 1204,
+      "stopLosses": 629,
+      "takeProfits": 575,
+      "winrate": "47.76",
+      "R": 1096,
+      "consecutiveStopLossDetails": 10,
+      "consecutiveTakeProfitDetails": 20
+    }
+  ]
+}

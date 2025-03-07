@@ -1,0 +1,21 @@
+{
+  "overall": {
+    "consecutiveStopLosses": 11,
+    "consecutiveTakeProfits": 11,
+    "winrate": "45.04",
+    "stopLosses": 1246,
+    "takeProfits": 1021,
+    "trades": 2267,
+    "R": 1817
+  },
+  "details": [
+    {
+      "yearly": "2024-01-01",
+      "trades": 2268,
+      "stopLosses": 1246,
+      "takeProfits": 1022,
+      "winrate": "45.06",
+      "R": 1820
+    }
+  ]
+}

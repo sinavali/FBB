@@ -1,0 +1,429 @@
+{
+  "overall": {
+    "consecutiveStopLosses": 14,
+    "consecutiveTakeProfits": 13,
+    "winrate": "44.00",
+    "stopLosses": 1717,
+    "takeProfits": 1349,
+    "trades": 3066,
+    "R": 2330
+  },
+  "details": [
+    {
+      "weekly": "2023-01-01",
+      "trades": 56,
+      "stopLosses": 33,
+      "takeProfits": 23,
+      "winrate": "41.07",
+      "R": 36
+    },
+    {
+      "weekly": "2023-01-08",
+      "trades": 75,
+      "stopLosses": 50,
+      "takeProfits": 25,
+      "winrate": "33.33",
+      "R": 25
+    },
+    {
+      "weekly": "2023-01-15",
+      "trades": 76,
+      "stopLosses": 31,
+      "takeProfits": 45,
+      "winrate": "59.21",
+      "R": 104
+    },
+    {
+      "weekly": "2023-01-22",
+      "trades": 55,
+      "stopLosses": 34,
+      "takeProfits": 21,
+      "winrate": "38.18",
+      "R": 29
+    },
+    {
+      "weekly": "2023-01-29",
+      "trades": 83,
+      "stopLosses": 54,
+      "takeProfits": 29,
+      "winrate": "34.94",
+      "R": 33
+    },
+    {
+      "weekly": "2023-02-05",
+      "trades": 57,
+      "stopLosses": 30,
+      "takeProfits": 27,
+      "winrate": "47.37",
+      "R": 51
+    },
+    {
+      "weekly": "2023-02-12",
+      "trades": 54,
+      "stopLosses": 32,
+      "takeProfits": 22,
+      "winrate": "40.74",
+      "R": 34
+    },
+    {
+      "weekly": "2023-02-19",
+      "trades": 42,
+      "stopLosses": 22,
+      "takeProfits": 20,
+      "winrate": "47.62",
+      "R": 38
+    },
+    {
+      "weekly": "2023-02-26",
+      "trades": 45,
+      "stopLosses": 24,
+      "takeProfits": 21,
+      "winrate": "46.67",
+      "R": 39
+    },
+    {
+      "weekly": "2023-03-05",
+      "trades": 54,
+      "stopLosses": 37,
+      "takeProfits": 17,
+      "winrate": "31.48",
+      "R": 14
+    },
+    {
+      "weekly": "2023-03-12",
+      "trades": 64,
+      "stopLosses": 35,
+      "takeProfits": 29,
+      "winrate": "45.31",
+      "R": 52
+    },
+    {
+      "weekly": "2023-03-19",
+      "trades": 56,
+      "stopLosses": 27,
+      "takeProfits": 29,
+      "winrate": "51.79",
+      "R": 60
+    },
+    {
+      "weekly": "2023-03-26",
+      "trades": 45,
+      "stopLosses": 33,
+      "takeProfits": 12,
+      "winrate": "26.67",
+      "R": 3
+    },
+    {
+      "weekly": "2023-04-02",
+      "trades": 31,
+      "stopLosses": 20,
+      "takeProfits": 11,
+      "winrate": "35.48",
+      "R": 13
+    },
+    {
+      "weekly": "2023-04-09",
+      "trades": 45,
+      "stopLosses": 29,
+      "takeProfits": 16,
+      "winrate": "35.56",
+      "R": 19
+    },
+    {
+      "weekly": "2023-04-16",
+      "trades": 52,
+      "stopLosses": 27,
+      "takeProfits": 25,
+      "winrate": "48.08",
+      "R": 48
+    },
+    {
+      "weekly": "2023-04-23",
+      "trades": 52,
+      "stopLosses": 31,
+      "takeProfits": 21,
+      "winrate": "40.38",
+      "R": 32
+    },
+    {
+      "weekly": "2023-04-30",
+      "trades": 42,
+      "stopLosses": 21,
+      "takeProfits": 21,
+      "winrate": "50.00",
+      "R": 42
+    },
+    {
+      "weekly": "2023-05-07",
+      "trades": 53,
+      "stopLosses": 29,
+      "takeProfits": 24,
+      "winrate": "45.28",
+      "R": 43
+    },
+    {
+      "weekly": "2023-05-14",
+      "trades": 59,
+      "stopLosses": 28,
+      "takeProfits": 31,
+      "winrate": "52.54",
+      "R": 65
+    },
+    {
+      "weekly": "2023-05-21",
+      "trades": 44,
+      "stopLosses": 24,
+      "takeProfits": 20,
+      "winrate": "45.45",
+      "R": 36
+    },
+    {
+      "weekly": "2023-05-28",
+      "trades": 52,
+      "stopLosses": 33,
+      "takeProfits": 19,
+      "winrate": "36.54",
+      "R": 24
+    },
+    {
+      "weekly": "2023-06-04",
+      "trades": 57,
+      "stopLosses": 29,
+      "takeProfits": 28,
+      "winrate": "49.12",
+      "R": 55
+    },
+    {
+      "weekly": "2023-06-11",
+      "trades": 59,
+      "stopLosses": 33,
+      "takeProfits": 26,
+      "winrate": "44.07",
+      "R": 45
+    },
+    {
+      "weekly": "2023-06-18",
+      "trades": 43,
+      "stopLosses": 22,
+      "takeProfits": 21,
+      "winrate": "48.84",
+      "R": 41
+    },
+    {
+      "weekly": "2023-06-25",
+      "trades": 43,
+      "stopLosses": 28,
+      "takeProfits": 15,
+      "winrate": "34.88",
+      "R": 17
+    },
+    {
+      "weekly": "2023-07-02",
+      "trades": 65,
+      "stopLosses": 37,
+      "takeProfits": 28,
+      "winrate": "43.08",
+      "R": 47
+    },
+    {
+      "weekly": "2023-07-09",
+      "trades": 54,
+      "stopLosses": 29,
+      "takeProfits": 25,
+      "winrate": "46.30",
+      "R": 46
+    },
+    {
+      "weekly": "2023-07-16",
+      "trades": 50,
+      "stopLosses": 32,
+      "takeProfits": 18,
+      "winrate": "36.00",
+      "R": 22
+    },
+    {
+      "weekly": "2023-07-23",
+      "trades": 48,
+      "stopLosses": 29,
+      "takeProfits": 19,
+      "winrate": "39.58",
+      "R": 28
+    },
+    {
+      "weekly": "2023-07-30",
+      "trades": 59,
+      "stopLosses": 28,
+      "takeProfits": 31,
+      "winrate": "52.54",
+      "R": 65
+    },
+    {
+      "weekly": "2023-08-06",
+      "trades": 62,
+      "stopLosses": 38,
+      "takeProfits": 24,
+      "winrate": "38.71",
+      "R": 34
+    },
+    {
+      "weekly": "2023-08-13",
+      "trades": 61,
+      "stopLosses": 29,
+      "takeProfits": 32,
+      "winrate": "52.46",
+      "R": 67
+    },
+    {
+      "weekly": "2023-08-20",
+      "trades": 73,
+      "stopLosses": 40,
+      "takeProfits": 33,
+      "winrate": "45.21",
+      "R": 59
+    },
+    {
+      "weekly": "2023-08-27",
+      "trades": 74,
+      "stopLosses": 31,
+      "takeProfits": 43,
+      "winrate": "58.11",
+      "R": 98
+    },
+    {
+      "weekly": "2023-09-03",
+      "trades": 69,
+      "stopLosses": 35,
+      "takeProfits": 34,
+      "winrate": "49.28",
+      "R": 67
+    },
+    {
+      "weekly": "2023-09-10",
+      "trades": 66,
+      "stopLosses": 38,
+      "takeProfits": 28,
+      "winrate": "42.42",
+      "R": 46
+    },
+    {
+      "weekly": "2023-09-17",
+      "trades": 67,
+      "stopLosses": 43,
+      "takeProfits": 24,
+      "winrate": "35.82",
+      "R": 29
+    },
+    {
+      "weekly": "2023-09-24",
+      "trades": 67,
+      "stopLosses": 40,
+      "takeProfits": 27,
+      "winrate": "40.30",
+      "R": 41
+    },
+    {
+      "weekly": "2023-10-01",
+      "trades": 83,
+      "stopLosses": 45,
+      "takeProfits": 38,
+      "winrate": "45.78",
+      "R": 69
+    },
+    {
+      "weekly": "2023-10-08",
+      "trades": 78,
+      "stopLosses": 42,
+      "takeProfits": 36,
+      "winrate": "46.15",
+      "R": 66
+    },
+    {
+      "weekly": "2023-10-15",
+      "trades": 55,
+      "stopLosses": 40,
+      "takeProfits": 15,
+      "winrate": "27.27",
+      "R": 5
+    },
+    {
+      "weekly": "2023-10-22",
+      "trades": 78,
+      "stopLosses": 44,
+      "takeProfits": 34,
+      "winrate": "43.59",
+      "R": 58
+    },
+    {
+      "weekly": "2023-10-29",
+      "trades": 81,
+      "stopLosses": 35,
+      "takeProfits": 46,
+      "winrate": "56.79",
+      "R": 103
+    },
+    {
+      "weekly": "2023-11-05",
+      "trades": 47,
+      "stopLosses": 28,
+      "takeProfits": 19,
+      "winrate": "40.43",
+      "R": 29
+    },
+    {
+      "weekly": "2023-11-12",
+      "trades": 59,
+      "stopLosses": 30,
+      "takeProfits": 29,
+      "winrate": "49.15",
+      "R": 57
+    },
+    {
+      "weekly": "2023-11-19",
+      "trades": 36,
+      "stopLosses": 16,
+      "takeProfits": 20,
+      "winrate": "55.56",
+      "R": 44
+    },
+    {
+      "weekly": "2023-11-26",
+      "trades": 61,
+      "stopLosses": 30,
+      "takeProfits": 31,
+      "winrate": "50.82",
+      "R": 63
+    },
+    {
+      "weekly": "2023-12-03",
+      "trades": 59,
+      "stopLosses": 34,
+      "takeProfits": 25,
+      "winrate": "42.37",
+      "R": 41
+    },
+    {
+      "weekly": "2023-12-10",
+      "trades": 86,
+      "stopLosses": 44,
+      "takeProfits": 42,
+      "winrate": "48.84",
+      "R": 82
+    },
+    {
+      "weekly": "2023-12-17",
+      "trades": 85,
+      "stopLosses": 56,
+      "takeProfits": 29,
+      "winrate": "34.12",
+      "R": 31
+    },
+    {
+      "weekly": "2023-12-24",
+      "trades": 50,
+      "stopLosses": 29,
+      "takeProfits": 21,
+      "winrate": "42.00",
+      "R": 34
+    }
+  ]
+}
