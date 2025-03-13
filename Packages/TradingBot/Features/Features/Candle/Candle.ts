@@ -88,23 +88,12 @@ export default class Candle {
         return res.count;
     }
 
-    async getCandles(
-        from: number,
-        to: number,
-        chunkSize: number
-    ): Promise<ICandle[]> {
+    async getCandles(from: number, to: number, chunkSize: number): Promise<ICandle[]> {
         const countOfCandlesQuery: IQuery = this.queryClass.getById(3);
-        const res: any = await this.queryClass.exec(
-            true,
-            countOfCandlesQuery,
-            [from, to],
-            chunkSize
-        );
+        const res: any = await this.queryClass.exec(true, countOfCandlesQuery, [from, to], chunkSize);
 
         if (!res || res instanceof Error)
-            throw new Error(
-                `Could not get candles: queryId=> 3 - queryName=> ${countOfCandlesQuery.name}`
-            );
+            throw new Error(`Could not get candles: queryId=> 3 - queryName=> ${countOfCandlesQuery.name}`);
 
         return res;
     }
@@ -203,7 +192,7 @@ export default class Candle {
 
                 await model(this.generalStore);
                 console.log(processedCandle)
-                
+
                 this.generalStore.state.Time.add("processCandles each candle Loop", new Date().getTime() - startTime);
             } catch (error) {
                 console.log(error);

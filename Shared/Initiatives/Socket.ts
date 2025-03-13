@@ -13,7 +13,6 @@ export default class MTSocket extends EventEmitter {
     };
     private readonly messageDelimiter = "\n";
 
-
     private setupDataHandlers(type: 'CMD' | 'DATA'): void {
         const socket = this.sockets[type];
         if (!socket) return;
