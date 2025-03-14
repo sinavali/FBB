@@ -3,9 +3,8 @@ import {LiquidityMode} from "@shared/Types/Enums.ts";
 import {GeneralStore} from "@shared/Types/Interfaces/generalStore.ts";
 import {modelOne} from "@tradingBot/Features/Core/Controllers/flows.ts";
 import fs from "fs";
-import fsp from "fs/promises";
 import moment from "moment";
-import {formatSignals} from "@tradingBot/Features/Core/ReportMaker.js";
+import { generateSignalReports } from '@tradingBot/Features/Core/ReportMaker.ts';
 
 export default async (generalStore: GeneralStore) => {
     try {
@@ -28,25 +27,6 @@ export default async (generalStore: GeneralStore) => {
             return;
         }
         console.log(`from: ${moment.unix(start.settingValueParsed).format("YYYY-MM-DD HH:mm")} to: ${moment.unix(end.settingValueParsed).format("YYYY-MM-DD HH:mm")}`);
-
-
-        // const [candles]: any = await generalStore.state.Candle.getCandles(
-        //     start.settingValueParsed,
-        //     end.settingValueParsed,
-        //     2000000
-        // );
-        //
-        // type OHLC = [number, number, number, number, number, "EURUSD" | "GBPUSD"];
-        //
-        // const candlesFormatted = candles.map((candle: any) =>
-        //     [candle.closeTime * 1000, parseFloat(candle.open), parseFloat(candle.high), parseFloat(candle.low), parseFloat(candle.close), candle.name]);
-        // const EurCandles = candlesFormatted.filter((candle: OHLC) => candle[5] === "EURUSD");
-        // fs.writeFileSync("P:/test/eurCandles.js", "var ohlcdata = " + JSON.stringify(EurCandles), "utf8");
-        //
-        // const GbpCandles = candlesFormatted.filter((candle: OHLC) => candle[5] === "GBPUSD");
-        // console.log(GbpCandles.length);
-        // fsp.writeFile("P:/test/gbpCandles.js", "var ohlcdata = " + JSON.stringify(GbpCandles), "utf8")
-        //     .finally(() => process.exit())
 
         await generalStore.state.Candle?.startCandleProcesses({
             from: start.settingValueParsed,
@@ -216,5 +196,5 @@ function generateSignalReport(generalStore: GeneralStore) {
     fs.writeFileSync("./Packages/TradingBot/Reports/signalFormatted.json", JSON.stringify(signalsFormatted), "utf8");
     console.log(`Signal => Have: ${signals.length}, LastId: ${signals[0]?.id}`);
 
-    formatSignals();
+    generateSignalReports();
 }
