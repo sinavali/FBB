@@ -175,6 +175,8 @@ export default class Candle {
     }
 
     async processCandles(candles: any, model: Function): Promise<void> {
+        console.log(candles[0] ?? "no candle");
+
         for (const candle of candles || []) {
             try {
                 let startTime = new Date().getTime();

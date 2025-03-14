@@ -26,7 +26,7 @@ export default async (generalStore: GeneralStore) => {
             }
             return;
         }
-        console.log(`from: ${moment.unix(start.settingValueParsed).format("YYYY-MM-DD HH:mm")} to: ${moment.unix(end.settingValueParsed).format("YYYY-MM-DD HH:mm")}`);
+        console.log(`from: ${moment.utc(start.settingValueParsed * 1000).format("YYYY-MM-DD HH:mm")} to: ${moment.utc(end.settingValueParsed * 1000).format("YYYY-MM-DD HH:mm")}`);
 
         await generalStore.state.Candle?.startCandleProcesses({
             from: start.settingValueParsed,
