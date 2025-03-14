@@ -4,7 +4,7 @@ import {GeneralStore} from "@shared/Types/Interfaces/generalStore.ts";
 import {modelOne} from "@tradingBot/Features/Core/Controllers/flows.ts";
 import fs from "fs";
 import moment from "moment";
-import {formatSignals} from "@tradingBot/Features/Core/ReportMaker.js";
+import { generateSignalReports } from '@tradingBot/Features/Core/ReportMaker.ts';
 
 export default async (generalStore: GeneralStore) => {
     try {
@@ -196,5 +196,5 @@ function generateSignalReport(generalStore: GeneralStore) {
     fs.writeFileSync("./Packages/TradingBot/Reports/signalFormatted.json", JSON.stringify(signalsFormatted), "utf8");
     console.log(`Signal => Have: ${signals.length}, LastId: ${signals[0]?.id}`);
 
-    formatSignals();
+    generateSignalReports();
 }

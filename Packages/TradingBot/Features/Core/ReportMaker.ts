@@ -1,239 +1,249 @@
+// ReportMaker.ts
 import fs from 'fs';
 import path from 'path';
-import moment from 'moment-timezone';
+import moment, { Moment } from 'moment-timezone';
+import { SignalStatus, Triggers, LiquidityUsedStatus } from '@shared/Types/Enums.ts';
+import { PairPeriod, DateTime } from '@shared/Types/Interfaces/common.ts';
 
-type Signal = {
+// Define proper TypeScript interfaces based on your existing types
+interface LiquidityUsed {
+    liquidityId: number;
+    status: LiquidityUsedStatus;
+    time: DateTime;
+    trigger: Triggers;
+    triggerId: number;
+}
+
+interface Signal {
     id: number;
     triggerCandleId: number;
     triggerId: number;
-    trigger: string;
-    direction: string;
+    trigger: Triggers;
+    direction: 'UP' | 'DOWN';
     limit: number;
     stoploss: number;
     takeprofit: number;
-    pairPeriod: {
-        pair: string;
-        period: string;
-    };
-    status: 'FAILED' | 'TRIGGERED' | 'STOPLOSS' | 'TAKEPROFIT';
-    time: {
-        unix: number;
-        utc: string;
-    };
-    liquidityUsed: {
-        liquidityId: number;
-        status: string;
-        time: {
-            unix: number;
-            utc: string;
-        };
-        trigger: string;
-        triggerId: number;
-    };
+    pairPeriod: PairPeriod;
+    status: SignalStatus;
+    time: DateTime;
+    liquidityUsed: LiquidityUsed;
+}
+
+interface TimeframeConfig {
+    unit: moment.unitOfTime.DurationConstructor;
+    count: number;
+    format: string;
+}
+
+const TIMEFRAME_CONFIG: Record<string, TimeframeConfig> = {
+    daily: { unit: 'day', count: 1, format: 'YYYY-MM-DD' },
+    weekly: { unit: 'week', count: 1, format: 'YYYY-MM-DD' },
+    twoWeeks: { unit: 'week', count: 2, format: 'YYYY-MM-DD' },
+    monthly: { unit: 'month', count: 1, format: 'YYYY-MM' },
+    yearly: { unit: 'year', count: 1, format: 'YYYY' },
 };
 
-function findSignalFiles(baseDir: string): string[] {
-    const results: string[] = [];
-    const items = fs.readdirSync(baseDir, {withFileTypes: true});
+const RISK_REWARD_RATIO = 3;
+const MIN_PIP_DIFFERENCE = 3;
+const PIP_DIVISOR = 0.0001;
 
-    for (const item of items) {
-        const fullPath = path.join(baseDir, item.name);
-        if (item.isDirectory()) {
-            results.push(...findSignalFiles(fullPath));
-        } else if (item.name === 'signal.json') {
-            results.push(fullPath);
-        }
+// File system helpers
+const readJSONFile = <T>(filePath: string): T => {
+    try {
+        return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    } catch (error: any) {
+        throw new Error(`Failed to read file ${filePath}: ${error.message}`);
     }
-    return results;
-}
+};
 
-function filterByTimeRange(data: Signal[], startTime: any, endTime: moment.Moment): Signal[] {
-    return data.filter((item) => {
-        const itemTime = moment.unix(item.time.unix).utc();
-        return itemTime.isBetween(startTime, endTime, null, '[)');
+const writeJSONFile = (filePath: string, data: unknown) => {
+    fs.mkdirSync(path.dirname(filePath), { recursive: true });
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+};
+
+// Signal processing functions
+const findSignalFiles = (baseDir: string): string[] => {
+    const entries = fs.readdirSync(baseDir, { withFileTypes: true });
+    return entries.flatMap(entry => {
+        const fullPath = path.join(baseDir, entry.name);
+        return entry.isDirectory() ? findSignalFiles(fullPath)
+            : entry.name === 'signal.json' ? [fullPath] : [];
     });
+};
+
+const filterSignalsByPipDifference = (signals: Signal[]): Signal[] => {
+    return signals.filter(signal => {
+        const priceDifference = signal.direction === 'UP'
+            ? signal.limit - signal.stoploss
+            : signal.stoploss - signal.limit;
+        return (priceDifference / PIP_DIVISOR) >= MIN_PIP_DIFFERENCE;
+    });
+};
+
+// Date/time helpers
+const getValidMoment = (timestamp: number): Moment => {
+    const date = moment.unix(timestamp).utc();
+    if (!date.isValid()) throw new Error(`Invalid timestamp: ${timestamp}`);
+    return date;
+};
+
+const filterByTimeRange = (signals: Signal[], start: Moment, end: Moment): Signal[] => {
+    return signals.filter(signal => {
+        const signalTime = getValidMoment(signal.time.unix);
+        return signalTime.isBetween(start, end, undefined, '[)');
+    });
+};
+
+// Statistical calculations
+interface ConsecutiveCounts {
+    maxSL: number;
+    maxTP: number;
+    currentSL: number;
+    currentTP: number;
+    slDetails: number[];
+    tpDetails: number[];
 }
 
-function calculateConsecutive(data: Signal[]): {
+const calculateConsecutiveStats = (signals: Signal[]): Omit<ConsecutiveCounts, 'currentSL' | 'currentTP'> => {
+    const initial: ConsecutiveCounts = {
+        maxSL: 0,
+        maxTP: 0,
+        currentSL: 0,
+        currentTP: 0,
+        slDetails: [],
+        tpDetails: [],
+    };
+
+    return signals.reduce((acc, signal) => {
+        if (signal.status === 'STOPLOSS') {
+            acc.currentSL++;
+            acc.currentTP = 0;
+            acc.maxSL = Math.max(acc.maxSL, acc.currentSL);
+        } else if (signal.status === 'TAKEPROFIT') {
+            acc.currentTP++;
+            acc.currentSL = 0;
+            acc.maxTP = Math.max(acc.maxTP, acc.currentTP);
+        } else {
+            acc.currentSL = 0;
+            acc.currentTP = 0;
+        }
+
+        acc.slDetails.push(acc.currentSL);
+        acc.tpDetails.push(acc.currentTP);
+        return acc;
+    }, initial);
+};
+
+const calculateWinRate = (signals: Signal[]): number => {
+    const validSignals = signals.filter(s => ['STOPLOSS', 'TAKEPROFIT'].includes(s.status));
+    if (validSignals.length === 0) return 0;
+    const tpCount = validSignals.filter(s => s.status === 'TAKEPROFIT').length;
+    return (tpCount / validSignals.length) * 100;
+};
+
+const calculateR = (stopLosses: number, takeProfits: number): number =>
+    takeProfits * RISK_REWARD_RATIO - stopLosses;
+
+// Report generation
+interface TimeframeReport {
+    id: number;
+    timeframeLabel: string;
+    trades: { time: moment.Moment; status: SignalStatus }[];
+    stopLosses: number;
+    takeProfits: number;
+    tradesCount: number;
+    winRate: string;
+    rValue: number;
     maxConsecutiveSL: number;
     maxConsecutiveTP: number;
-    consecutiveSLDetails: number[];
-    consecutiveTPDetails: number[];
-} {
-    let maxConsecutiveSL = 0;
-    let maxConsecutiveTP = 0;
-    let currentConsecutiveSL = 0;
-    let currentConsecutiveTP = 0;
-    const consecutiveSLDetails: number[] = [];
-    const consecutiveTPDetails: number[] = [];
-
-    data.forEach((item) => {
-        if (item.status === 'STOPLOSS') {
-            currentConsecutiveSL++;
-            currentConsecutiveTP = 0;
-            consecutiveSLDetails.push(currentConsecutiveSL);
-            consecutiveTPDetails.push(0);
-            if (currentConsecutiveSL > maxConsecutiveSL) {
-                maxConsecutiveSL = currentConsecutiveSL;
-            }
-        } else if (item.status === 'TAKEPROFIT') {
-            currentConsecutiveTP++;
-            currentConsecutiveSL = 0;
-            consecutiveTPDetails.push(currentConsecutiveTP);
-            consecutiveSLDetails.push(0);
-            if (currentConsecutiveTP > maxConsecutiveTP) {
-                maxConsecutiveTP = currentConsecutiveTP;
-            }
-        } else {
-            consecutiveSLDetails.push(0);
-            consecutiveTPDetails.push(0);
-            currentConsecutiveSL = 0;
-            currentConsecutiveTP = 0;
-        }
-    });
-
-    return {maxConsecutiveSL, maxConsecutiveTP, consecutiveSLDetails, consecutiveTPDetails};
 }
 
-function calculateWinrate(data: Signal[]): number {
-    const totalTrades = data.filter((item) => item.status === 'STOPLOSS' || item.status === 'TAKEPROFIT').length;
-    const totalTakeProfits = data.filter((item) => item.status === 'TAKEPROFIT').length;
-    return totalTrades === 0 ? 0 : (totalTakeProfits / totalTrades) * 100;
-}
+const generateTimeframeBreakdown = (
+    signals: Signal[],
+    timeframe: string,
+    start: Moment,
+    end: Moment
+): TimeframeReport[] => {
+    const config = TIMEFRAME_CONFIG[timeframe];
+    if (!config) throw new Error(`Invalid timeframe: ${timeframe}`);
 
-function countStats(data: Signal[]): { stopLosses: number; takeProfits: number; trades: number } {
-    const stopLosses = data.filter((item) => item.status === 'STOPLOSS').length;
-    const takeProfits = data.filter((item) => item.status === 'TAKEPROFIT').length;
-    const trades = stopLosses + takeProfits;
-    return {stopLosses, takeProfits, trades};
-}
-
-function calculateR(stopLosses: number, takeProfits: number, riskReward: number): number {
-    return takeProfits * riskReward - stopLosses;
-}
-
-function generateDetailedBreakdown(data: Signal[], timeframe: string, earliestTimestamp: number, latestTimestamp: number): any[] {
-    const breakdown: any[] = [];
-    const startTime = moment.unix(earliestTimestamp).utc();
-    const endTime = moment.unix(latestTimestamp).utc();
-
-    let currentStart = startTime.clone();
+    let currentStart = start.clone();
+    const breakdown: TimeframeReport[] = [];
     let detailId = 1;
 
-    while (currentStart.isBefore(endTime)) {
-        let currentEnd;
-        switch (timeframe) {
-            case 'daily':
-                currentEnd = currentStart.clone().add(1, 'day');
-                break;
-            case 'weekly':
-                currentEnd = currentStart.clone().add(1, 'week');
-                break;
-            case 'twoWeeks':
-                currentEnd = currentStart.clone().add(2, 'weeks');
-                break;
-            case 'monthly':
-                currentEnd = currentStart.clone().add(1, 'month');
-                break;
-            case 'yearly':
-                currentEnd = currentStart.clone().add(1, 'year');
-                break;
-            default:
-                throw new Error(`Invalid timeframe: ${timeframe}`);
-        }
+    while (currentStart.isBefore(end)) {
+        const currentEnd = currentStart.clone().add(config.count, config.unit);
+        const intervalSignals = filterByTimeRange(signals, currentStart, currentEnd);
+        const validTrades = intervalSignals.filter(s => ['STOPLOSS', 'TAKEPROFIT'].includes(s.status));
 
-        const filteredData = filterByTimeRange(data, currentStart, currentEnd);
-        const stats = countStats(filteredData);
-        const winrate = calculateWinrate(filteredData);
-        const R = calculateR(stats.stopLosses, stats.takeProfits, 3);
-        const consecutive = calculateConsecutive(filteredData);
+        const consecutiveStats = calculateConsecutiveStats(validTrades);
+        const stopLosses = validTrades.filter(s => s.status === 'STOPLOSS').length;
+        const takeProfits = validTrades.filter(s => s.status === 'TAKEPROFIT').length;
 
         breakdown.push({
             id: detailId++,
-            [timeframe]: currentStart.format(timeframe === 'monthly' ? 'YYYY-MM' : 'YYYY-MM-DD'),
-            trades: filteredData
-                .filter((item) => item.status === 'STOPLOSS' || item.status === 'TAKEPROFIT')
-                .map((item) => ({time: item.time.utc, status: item.status})),
-            ...stats,
-            winrate: winrate.toFixed(2),
-            R,
-            consecutiveStopLossDetails: consecutive.maxConsecutiveSL,
-            consecutiveTakeProfitDetails: consecutive.maxConsecutiveTP,
+            timeframeLabel: currentStart.format(config.format),
+            trades: validTrades.map(t => ({ time: t.time.utc, status: t.status })),
+            stopLosses,
+            takeProfits,
+            tradesCount: validTrades.length,
+            winRate: calculateWinRate(validTrades).toFixed(2),
+            rValue: calculateR(stopLosses, takeProfits),
+            maxConsecutiveSL: consecutiveStats.maxSL,
+            maxConsecutiveTP: consecutiveStats.maxTP,
         });
 
         currentStart = currentEnd;
     }
 
     return breakdown;
-}
+};
 
-function createSorts(details: any[]) {
-    return {
-        trades: [...details].sort((a, b) => b.trades - a.trades).map(d => d.id),
-        stopLoss: [...details].sort((a, b) => b.stopLosses - a.stopLosses).map(d => d.id),
-        takeProfit: [...details].sort((a, b) => b.takeProfits - a.takeProfits).map(d => d.id),
-        consecutiveStopLossDetails: [...details].sort((a, b) =>
-            b.consecutiveStopLossDetails - a.consecutiveStopLossDetails
-        ).map(d => d.id),
-        consecutiveTakeProfitDetails: [...details].sort((a, b) =>
-            b.consecutiveTakeProfitDetails - a.consecutiveTakeProfitDetails
-        ).map(d => d.id),
-    };
-}
+// Main report generation
+export const generateSignalReports = () => {
+    const signalFiles = findSignalFiles('./Packages/TradingBot');
 
-export function formatSignals() {
-    const reportsDir = './Packages/TradingBot';
-    const signalFiles = findSignalFiles(reportsDir);
+    signalFiles.forEach(filePath => {
+        try {
+            const rawSignals: Signal[] = readJSONFile(filePath);
+            const filteredSignals = filterSignalsByPipDifference(rawSignals);
 
-    for (const filePath of signalFiles) {
-        const originalData: Signal[] = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+            if (filteredSignals.length === 0) {
+                console.log(`No valid signals found in ${filePath}`);
+                return;
+            }
 
-        // Apply the signal filter
-        const data = originalData.filter(signal => {
-            const diff = (signal.direction === "UP"
-                ? signal.limit - signal.stoploss
-                : signal.stoploss - signal.limit) / 0.0001;
-            return diff >= 3;
-        });
+            const timestamps = filteredSignals.map(s => s.time.unix);
+            const start = getValidMoment(Math.min(...timestamps));
+            const end = getValidMoment(Math.max(...timestamps));
+            const outputDir = path.join(path.dirname(filePath), 'timeframeReports');
 
-        const outputDir = path.join(path.dirname(filePath), 'timeframeReports');
-        const timestamps = data.map((item) => item.time.unix);
-        const earliestTimestamp = Math.min(...timestamps);
-        const latestTimestamp = Math.max(...timestamps);
+            Object.keys(TIMEFRAME_CONFIG).forEach(timeframe => {
+                const breakdown = generateTimeframeBreakdown(filteredSignals, timeframe, start, end);
+                const overallStats = calculateConsecutiveStats(filteredSignals);
+                const winRate = calculateWinRate(filteredSignals);
+                const stopLosses = filteredSignals.filter(s => s.status === 'STOPLOSS').length;
+                const takeProfits = filteredSignals.filter(s => s.status === 'TAKEPROFIT').length;
 
-        if (!fs.existsSync(outputDir)) {
-            fs.mkdirSync(outputDir, {recursive: true});
+                const report = {
+                    overall: {
+                        consecutiveStopLosses: overallStats.maxSL,
+                        consecutiveTakeProfits: overallStats.maxTP,
+                        winRate: winRate.toFixed(2),
+                        stopLosses,
+                        takeProfits,
+                        trades: stopLosses + takeProfits,
+                        rValue: calculateR(stopLosses, takeProfits),
+                    },
+                    details: breakdown,
+                };
+
+                const outputPath = path.join(outputDir, `${timeframe}Report.json`);
+                writeJSONFile(outputPath, report);
+                console.log(`Generated report: ${outputPath}`);
+            });
+        } catch (error: any) {
+            console.error(`Error processing ${filePath}: ${error.message}`);
         }
-
-        const timeframes = ['daily', 'weekly', 'twoWeeks', 'monthly', 'yearly'];
-        for (const timeframe of timeframes) {
-            const filteredData = filterByTimeRange(data, moment.unix(earliestTimestamp).utc(), moment.unix(latestTimestamp).utc());
-            const consecutive = calculateConsecutive(filteredData);
-            const winrate = calculateWinrate(filteredData);
-            const stats = countStats(filteredData);
-            const R = calculateR(stats.stopLosses, stats.takeProfits, 3);
-            const details = generateDetailedBreakdown(data, timeframe, earliestTimestamp, latestTimestamp);
-
-            const report = {
-                overall: {
-                    consecutiveStopLosses: consecutive.maxConsecutiveSL,
-                    consecutiveTakeProfits: consecutive.maxConsecutiveTP,
-                    winrate: winrate.toFixed(2),
-                    ...stats,
-                    R,
-                    sorts: createSorts(details),
-                },
-                details,
-            };
-
-            fs.writeFileSync(
-                path.join(outputDir, `${timeframe}Report.json`),
-                JSON.stringify(report, null, 2),
-                'utf8'
-            );
-            console.log(`Report generated: ${path.join(outputDir, `${timeframe}Report.json`)}`);
-        }
-    }
-}
-
-// formatSignals();
+    });
+};
