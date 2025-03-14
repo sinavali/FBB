@@ -15,7 +15,7 @@ DB_CONFIG = {
 
 CHUNK_SIZE = 1000
 TABLE_NAME = 'candles'
-CSV_DIRECTORY = 'csv_files' # Hardcoded directory name
+CSV_DIRECTORY = 'Packages/Inserter/csv_files' # Hardcoded directory name
 
 def convert_to_utc_unix(date_str, time_str):
     tehran_tz = pytz.timezone('Asia/Tehran')

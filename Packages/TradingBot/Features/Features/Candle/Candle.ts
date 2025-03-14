@@ -5,13 +5,13 @@ import {
     IQuery,
 } from "@shared/Types/Interfaces/general.ts";
 import Query from "@shared/Queries.ts";
-import {GeneralStore} from "@shared/Types/Interfaces/generalStore.ts";
+import { GeneralStore } from "@shared/Types/Interfaces/generalStore.ts";
 import logger from "@shared/Initiatives/Logger.ts";
-import {CandleDeepType, CandleDirection} from "@shared/Types/Enums.ts";
-import {useMarketUtils} from "@shared/Utilities/marketUtils.ts";
+import { CandleDeepType, CandleDirection, SystemMode } from "@shared/Types/Enums.ts";
+import { useMarketUtils } from "@shared/Utilities/marketUtils.ts";
 import moment from "moment-timezone";
-import {CircularBuffer} from "@tradingBot/Features/Core/CircularBuffer.ts";
-import {PairPeriod} from "@shared/Types/Interfaces/common.ts";
+import { CircularBuffer } from "@tradingBot/Features/Core/CircularBuffer.ts";
+import { PairPeriod } from "@shared/Types/Interfaces/common.ts";
 
 export class CandleCircularBuffer extends CircularBuffer<ICandle> {
     getAfter(pairPeriod: PairPeriod, from: number): ICandle[] {
@@ -191,7 +191,7 @@ export default class Candle {
                 this.processDeep(processedCandle.id, processedCandle.pairPeriod);
 
                 await model(this.generalStore);
-                console.log(processedCandle)
+                if (this.generalStore.globalStates.systemMode === SystemMode.LIVE) console.log(processedCandle)
 
                 this.generalStore.state.Time.add("processCandles each candle Loop", new Date().getTime() - startTime);
             } catch (error) {
@@ -212,7 +212,7 @@ export default class Candle {
                 open: parseFloat(candle.open),
                 high: parseFloat(candle.high),
                 low: parseFloat(candle.low),
-                pairPeriod: {pair: candle.name, period: candle.period},
+                pairPeriod: { pair: candle.pair, period: candle.period },
                 direction: this.processCandleDirection(candle),
                 isDeep: null,
                 time: {

@@ -131,6 +131,7 @@ dist
 .pnp.*
 Logs/*/*.json
 Logs/*/*.log
+**/Reports/**/*.*
 compiled
 node_modules
 
