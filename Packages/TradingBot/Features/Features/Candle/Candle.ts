@@ -206,6 +206,9 @@ export default class Candle {
     processCandle(candle: any): ICandle {
         try {
             const id = ++this.maxId;
+            const timezone = this.generalStore.state.Setting?.getOne("BotTimezone")?.settingValueParsed;
+            const time = this.generalStore.globalStates.systemMode === SystemMode.LIVE ?
+                moment.tz(candle.closeTime * 1000, timezone) : moment.utc(candle.closeTime * 1000);
 
             return {
                 id,
@@ -214,12 +217,12 @@ export default class Candle {
                 open: parseFloat(candle.open),
                 high: parseFloat(candle.high),
                 low: parseFloat(candle.low),
-                pairPeriod: { pair: candle.pair, period: candle.period },
+                pairPeriod: { pair: candle.name, period: candle.period },
                 direction: this.processCandleDirection(candle),
                 isDeep: null,
                 time: {
-                    unix: candle.closeTime,
-                    utc: moment.utc(candle.closeTime * 1000),
+                    unix: time.unix(),
+                    utc: time,
                 },
             };
         } catch (error) {

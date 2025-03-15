@@ -196,5 +196,5 @@ function generateSignalReport(generalStore: GeneralStore) {
     fs.writeFileSync("./Packages/TradingBot/Reports/signalFormatted.json", JSON.stringify(signalsFormatted), "utf8");
     console.log(`Signal => Have: ${signals.length}, LastId: ${signals[0]?.id}`);
 
-    generateSignalReports();
+    generateSignalReports(generalStore);
 }

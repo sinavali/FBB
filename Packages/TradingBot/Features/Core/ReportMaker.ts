@@ -4,6 +4,7 @@ import path from 'path';
 import moment, { Moment } from 'moment-timezone';
 import { SignalStatus, Triggers, LiquidityUsedStatus } from '@shared/Types/Enums.ts';
 import { PairPeriod, DateTime } from '@shared/Types/Interfaces/common.ts';
+import { GeneralStore } from "@shared/Types/Interfaces/generalStore.ts";
 
 // Define proper TypeScript interfaces based on your existing types
 interface LiquidityUsed {
@@ -43,7 +44,8 @@ const TIMEFRAME_CONFIG: Record<string, TimeframeConfig> = {
     yearly: { unit: 'year', count: 1, format: 'YYYY' },
 };
 
-const RISK_REWARD_RATIO = 3;
+let generalStore: GeneralStore | null = null;
+let RISK_REWARD_RATIO = 3;
 const MIN_PIP_DIFFERENCE = 3;
 const PIP_DIVISOR = 0.0001;
 
@@ -199,8 +201,15 @@ const generateTimeframeBreakdown = (
     return breakdown;
 };
 
+function setRiskToRewardRatio(generalStoreInstance: GeneralStore) {
+    RISK_REWARD_RATIO = generalStoreInstance.state.Setting.getOne("RiskReward")?.settingValueParsed;
+}
+
 // Main report generation
-export const generateSignalReports = () => {
+export const generateSignalReports = (generalStoreInstance: GeneralStore) => {
+    generalStore = generalStoreInstance;
+    setRiskToRewardRatio(generalStoreInstance);
+
     const signalFiles = findSignalFiles('./Packages/TradingBot');
 
     signalFiles.forEach(filePath => {
