@@ -57,7 +57,7 @@ def process_file(cnx, cursor, file_path, pair_name):
 def insert_chunk(cnx, cursor, chunk):
     sql = f"""
     INSERT INTO {TABLE_NAME} 
-        (pair, period, open, high, low, close, closeTime, time)
+        (name, period, open, high, low, close, closeTime, time)
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"""
     
     try:
