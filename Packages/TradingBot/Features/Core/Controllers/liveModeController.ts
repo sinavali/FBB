@@ -4,8 +4,7 @@ import {modelOne} from "@tradingBot/Features/Core/Controllers/flows.ts";
 import {Directions, LiquidityMode, SystemMode} from "@shared/Types/Enums.js";
 import {io} from "socket.io-client";
 import moment from "moment-timezone";
-import {AddNewLiquidityParams, ICandle, ILiquidity} from "@shared/Types/Interfaces/general.js";
-import {Dates} from "@shared/Types/Interfaces/common.js";
+import {ICandle, ILiquidity} from "@shared/Types/Interfaces/general.js";
 
 export default async (generalStore: GeneralStore) => {
     try {
