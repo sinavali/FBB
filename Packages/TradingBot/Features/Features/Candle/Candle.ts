@@ -5,13 +5,13 @@ import {
     IQuery,
 } from "@shared/Types/Interfaces/general.ts";
 import Query from "@shared/Queries.ts";
-import { GeneralStore } from "@shared/Types/Interfaces/generalStore.ts";
+import {GeneralStore} from "@shared/Types/Interfaces/generalStore.ts";
 import logger from "@shared/Initiatives/Logger.ts";
-import { CandleDeepType, CandleDirection, SystemMode } from "@shared/Types/Enums.ts";
-import { useMarketUtils } from "@shared/Utilities/marketUtils.ts";
+import {CandleDeepType, CandleDirection, SystemMode} from "@shared/Types/Enums.ts";
+import {useMarketUtils} from "@shared/Utilities/marketUtils.ts";
 import moment from "moment-timezone";
-import { CircularBuffer } from "@tradingBot/Features/Core/CircularBuffer.ts";
-import { PairPeriod } from "@shared/Types/Interfaces/common.ts";
+import {CircularBuffer} from "@tradingBot/Features/Core/CircularBuffer.ts";
+import {PairPeriod} from "@shared/Types/Interfaces/common.ts";
 
 export class CandleCircularBuffer extends CircularBuffer<ICandle> {
     getAfter(pairPeriod: PairPeriod, from: number): ICandle[] {
@@ -175,8 +175,6 @@ export default class Candle {
     }
 
     async processCandles(candles: any, model: Function): Promise<void> {
-        console.log(candles[0] ?? "no candle");
-
         for (const candle of candles || []) {
             try {
                 let startTime = new Date().getTime();
@@ -190,6 +188,7 @@ export default class Candle {
                 }
 
                 this.indexMap.set(processedCandle.id, this.candles.getSize() - 1);
+
                 this.processDeep(processedCandle.id, processedCandle.pairPeriod);
 
                 await model(this.generalStore);
@@ -203,9 +202,11 @@ export default class Candle {
         }
     }
 
-    processCandle(candle: any): ICandle {
+    processCandle(candle: any, addToCandleList = true): ICandle {
         try {
-            const id = ++this.maxId;
+            let id = 0;
+            if (addToCandleList) id = ++this.maxId;
+
             const timezone = this.generalStore.state.Setting?.getOne("BotTimezone")?.settingValueParsed;
             const time = this.generalStore.globalStates.systemMode === SystemMode.LIVE ?
                 moment.tz(candle.closeTime * 1000, timezone) : moment.utc(candle.closeTime * 1000);
@@ -217,7 +218,7 @@ export default class Candle {
                 open: parseFloat(candle.open),
                 high: parseFloat(candle.high),
                 low: parseFloat(candle.low),
-                pairPeriod: { pair: candle.name, period: candle.period },
+                pairPeriod: {pair: candle.name, period: candle.period},
                 direction: this.processCandleDirection(candle),
                 isDeep: null,
                 time: {
@@ -304,17 +305,12 @@ export default class Candle {
             const pipDiff = marketUtils.methods.getPipDiff(candle.high, candle.low);
 
             let candleDirectionBuff = 0.1;
-            const candleDirectionBuffVar = this.generalStore.state.Setting.getOne(
-                "CandleDirectionBuff"
-            );
-            if (candleDirectionBuffVar)
-                candleDirectionBuff = parseFloat(candleDirectionBuffVar.settingValue);
+            const candleDirectionBuffVar = this.generalStore.state.Setting.getOne("CandleDirectionBuff");
+            if (candleDirectionBuffVar) candleDirectionBuff = parseFloat(candleDirectionBuffVar.settingValue);
 
-            return pipDiff > candleDirectionBuff
-                ? CandleDirection.UP
-                : pipDiff < -candleDirectionBuff
-                    ? CandleDirection.DOWN
-                    : CandleDirection.IDLE;
+            if (pipDiff > candleDirectionBuff) return CandleDirection.UP;
+            else if (pipDiff < -candleDirectionBuff) return CandleDirection.DOWN;
+            else return CandleDirection.IDLE;
         } catch (error) {
             console.log(error);
             throw error;

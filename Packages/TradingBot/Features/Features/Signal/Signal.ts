@@ -8,11 +8,29 @@ export default class Signal {
     private generalStore: GeneralStore;
     private indexMap: Map<number, number> = new Map();
     private maxId: number = 0;
+    private offLoadMode: boolean = false;
 
     // capacity = 22000 means 2 weeks and 4 days of 1-minute candles
     constructor(generalStoreInstance: GeneralStore, capacity: number = 5000) {
         this.generalStore = generalStoreInstance;
         this.signals = new CircularBuffer(capacity);
+    }
+
+    turnOffLoadModeOn() {
+        this.offLoadMode = true;
+        logger.warn("offload mode is ON");
+        return this.getOffLoadMode();
+    }
+
+    turnOffLoadModeOff() {
+        this.offLoadMode = false;
+        logger.warn("offload mode is OFF");
+        return this.getOffLoadMode();
+    }
+
+    getOffLoadMode() {
+        logger.warn(`offload mode is ${this.offLoadMode}`);
+        return this.offLoadMode;
     }
 
     add(signal: ISignal) {
@@ -21,6 +39,11 @@ export default class Signal {
     }
 
     async openPosition(position: IPosition) {
+        if (this.getOffLoadMode()) {
+            logger.warn("because of offload mode the position is not opened in platform but signal is submitted")
+            return;
+        }
+
         const res = await fetch("http://localhost:5000/place_order", {
             method: "POST",
             headers: {'Content-Type': 'application/json'},

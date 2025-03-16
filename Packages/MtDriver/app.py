@@ -1,4 +1,5 @@
 from eventlet import monkey_patch
+
 monkey_patch()
 
 from flask import Flask, request, jsonify
@@ -13,13 +14,14 @@ eventlet.monkey_patch()
 
 app = Flask(__name__)
 socketio = SocketIO(app,
-                  cors_allowed_origins="*",
-                  async_mode='eventlet',
-                  logger=True,
-                  engineio_logger=True)
+                    cors_allowed_origins="*",
+                    async_mode='eventlet',
+                    logger=True,
+                    engineio_logger=True)
 
 # Track active subscriptions
 active_subscriptions = {}
+
 
 def get_candle(symbol, timeframe):
     """Fetch latest candle data with enhanced error handling"""
@@ -62,24 +64,26 @@ def get_candle(symbol, timeframe):
         except Exception as e:
             logging.error(f"Error shutting down MT5: {str(e)}")
 
+
 def initialize_mt5():
     """Initialize MT5 with retry logic"""
     max_retries = 3
     for attempt in range(max_retries):
         try:
             if mt5.initialize(
-                path="C:/Program Files/MetaTrader 5/terminal64.exe",
-                login=5034048580,
-                password="*h3nNrEu",
-                server="MetaQuotes-Demo",
-                timeout=5000
+                    path="C:/Program Files/MetaTrader 5/terminal64.exe",
+                    login=5034048580,
+                    password="*h3nNrEu",
+                    server="MetaQuotes-Demo",
+                    timeout=5000
             ):
                 return True
-            logging.error(f"MT5 initialization failed (attempt {attempt+1}): {mt5.last_error()}")
+            logging.error(f"MT5 initialization failed (attempt {attempt + 1}): {mt5.last_error()}")
         except Exception as e:
-            logging.error(f"MT5 connection error (attempt {attempt+1}): {str(e)}")
+            logging.error(f"MT5 connection error (attempt {attempt + 1}): {str(e)}")
         time.sleep(1)
     return False
+
 
 @socketio.on('start_candle_stream')
 def handle_candle_stream(data):
@@ -109,6 +113,7 @@ def handle_candle_stream(data):
         logging.error(f"Stream setup error: {str(e)}")
         socketio.emit('error', {'message': 'Failed to start stream'}, room=sid)
 
+
 def candle_polling_worker(sid, socketio):
     """Background task to check for new candles"""
     with app.app_context():
@@ -125,6 +130,7 @@ def candle_polling_worker(sid, socketio):
                 logging.error(f"Polling error: {str(e)}")
                 break
 
+
 @socketio.on('disconnect')
 def handle_disconnect():
     """Clean up on client disconnect"""
@@ -133,6 +139,7 @@ def handle_disconnect():
         active_subscriptions[sid]['active'] = False
         del active_subscriptions[sid]
     logging.info(f"Client disconnected: {sid}")
+
 
 @app.route('/place_order', methods=['POST'])
 def place_order():
@@ -254,6 +261,113 @@ def place_order():
             mt5.shutdown()
         except Exception as e:
             logging.error(f"MT5 shutdown error: {str(e)}")
+
+
+@app.route('/last_week_candles_1d', methods=['POST'])
+def get_last_week_daily_candles():
+    """Fetch daily candles between client-provided dates"""
+    try:
+        data = request.json
+        required_fields = ['symbol', 'start', 'end']
+
+        # Validate request
+        for field in required_fields:
+            if field not in data:
+                return jsonify({"error": f"Missing required field: {field}"}), 400
+
+        symbol = data['symbol'].upper()
+        start_str = data['start']
+        end_str = data['end']
+
+        # Client handles timezone conversion - we use UTC directly
+        start_dt = datetime.fromisoformat(start_str)
+        end_dt = datetime.fromisoformat(end_str)
+
+        # Initialize MT5
+        if not initialize_mt5():
+            return jsonify({"error": "MT5 connection failed"}), 500
+
+        # Validate symbol
+        if not mt5.symbol_select(symbol, True):
+            return jsonify({"error": f"Symbol {symbol} not available"}), 400
+
+        # Fetch daily candles
+        rates = mt5.copy_rates_range(symbol, mt5.TIMEFRAME_D1, start_dt, end_dt)
+        if rates is None or len(rates) == 0:
+            return jsonify({"candles": []}), 200
+
+        # Return raw candles without processing
+        candles = [{
+            'closeTime': int(rate[0]),
+            'open': rate[1],
+            'high': rate[2],
+            'low': rate[3],
+            'close': rate[4],
+            'period': 'PERIOD_1D',
+            'name': symbol
+        } for rate in rates]
+
+        return jsonify({"candles": candles}), 200
+
+    except ValueError as e:
+        logging.error(f"Invalid date format: {str(e)}")
+        return jsonify({"error": "Invalid ISO date format"}), 400
+    except Exception as e:
+        logging.error(f"Daily candles error: {str(e)}")
+        return jsonify({"error": "Internal server error"}), 500
+
+
+@app.route('/last_day_candles_1m', methods=['POST'])
+def get_last_day_1m_candles():
+    """Fetch 1-minute candles from client-provided start to now"""
+    try:
+        data = request.json
+        required_fields = ['symbol', 'start']
+
+        # Validate request
+        for field in required_fields:
+            if field not in data:
+                return jsonify({"error": f"Missing required field: {field}"}), 400
+
+        symbol = data['symbol'].upper()
+        start_str = data['start']
+
+        # Direct conversion without timezone handling
+        start_dt = datetime.fromisoformat(start_str)
+
+        # Initialize MT5
+        if not initialize_mt5():
+            return jsonify({"error": "MT5 connection failed"}), 500
+
+        # Validate symbol
+        if not mt5.symbol_select(symbol, True):
+            return jsonify({"error": f"Symbol {symbol} not available"}), 400
+
+        # Fetch 1-minute candles
+        rates = mt5.copy_rates_range(symbol, mt5.TIMEFRAME_M1, start_dt, datetime.utcnow())
+        if rates is None or len(rates) == 0:
+            return jsonify({"candles": []}), 200
+
+        # Return raw data
+        candles = [{
+            'closeTime': int(rate[0]),
+            'open': rate[1],
+            'high': rate[2],
+            'low': rate[3],
+            'close': rate[4],
+            'period': 'PERIOD_1M',
+            'name': symbol
+        } for rate in rates]
+
+        return jsonify({"candles": candles}), 200
+
+    except ValueError as e:
+        logging.error(f"Invalid date format: {str(e)}")
+        return jsonify({"error": "Invalid ISO date format"}), 400
+    except Exception as e:
+        logging.error(f"1m candles error: {str(e)}")
+        return jsonify({"error": "Internal server error"}), 500
+
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)

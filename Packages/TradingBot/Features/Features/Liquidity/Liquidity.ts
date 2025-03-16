@@ -102,18 +102,7 @@ export default class Liquidity {
         return {lowestPoint, touches};
     }
 
-    /**
-     * Adds a new liquidity point to the CircularBuffer.
-     * @param direction - Direction of the liquidity (UP or DOWN).
-     * @param mode - Liquidity mode (BYSESSION, BYWORKTIME, BYTIME).
-     * @param pairPeriod - Pair period.
-     * @param price - Price of the liquidity point.
-     * @param time - Time of the liquidity point.
-     * @param touches - Array of all touches for the liquidity point.
-     * @param timeRange - Optional time range for BYTIME mode.
-     * @returns The newly added liquidity point.
-     */
-    private addLiquidity(params: AddNewLiquidityParams): ILiquidity {
+    public addLiquidity(params: AddNewLiquidityParams): ILiquidity {
         let newLiquidity: ILiquidity = {
             id: ++this.maxId,
             direction: params.direction,
