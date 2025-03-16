@@ -58,6 +58,7 @@ async function initiateFirstTimeRunScript(generalStore: GeneralStore) {
         });
 
         let temp: any[] = await lastWeekCandlesReq.json();
+        console.log(temp)
         lastWeekCandles = [...lastWeekCandles, ...temp];
 
         temp = await lastDayCandlesReq.json();
