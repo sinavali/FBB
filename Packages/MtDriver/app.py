@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify
 from flask_socketio import SocketIO
 import MetaTrader5 as mt5
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import eventlet
 import time  # Added missing import
 
@@ -40,7 +40,7 @@ def get_candle(symbol, timeframe):
             logging.error(f"Invalid timeframe: {timeframe}")
             return None
 
-        rates = mt5.copy_rates_from_pos(symbol, mt5_timeframe, 0, 1)
+        rates = mt5.copy_rates_from_pos(symbol, mt5_timeframe, 1, 1)
         if rates is None or len(rates) == 0:
             logging.warning(f"No data returned for {symbol} {timeframe}")
             return None
@@ -125,7 +125,7 @@ def candle_polling_worker(sid, socketio):
                     if candle and candle['closeTime'] > config['last_candle']:
                         socketio.emit('new_candle', candle, room=sid)
                         config['last_candle'] = candle['closeTime']
-                eventlet.sleep(60 - datetime.utcnow().second)
+                eventlet.sleep(60 - datetime.now(timezone.utc).second)
             except Exception as e:
                 logging.error(f"Polling error: {str(e)}")
                 break
