@@ -436,8 +436,7 @@ export default class MarketShiftStructure {
     }
 
     updateMssData(mss: IMSS, candle: ICandle) {
-        const mssIndex = this.marketShifts.getAll()
-            .findIndex((e) => e.id === mss.id);
+        const mssIndex = this.marketShifts.getAll().findIndex((e) => e.id === mss.id);
         if (!mssIndex) return;
 
         const secondDeepCandle = this.generalStore.state.Candle.getCandle(mss.secondDeepCandle);
@@ -475,10 +474,10 @@ export default class MarketShiftStructure {
         );
         if (height) newData.height = height;
 
-        this.marketShifts.updateByIndex(mssIndex, "limit", newData.limit);
-        this.marketShifts.updateByIndex(mssIndex, "stoploss", newData.stoploss);
-        this.marketShifts.updateByIndex(mssIndex, "takeprofit", newData.takeprofit);
-        this.marketShifts.updateByIndex(mssIndex, "height", newData.height);
+        // this.marketShifts.updateByIndex(mssIndex, "limit", newData.limit);
+        // this.marketShifts.updateByIndex(mssIndex, "stoploss", newData.stoploss);
+        // this.marketShifts.updateByIndex(mssIndex, "takeprofit", newData.takeprofit);
+        // this.marketShifts.updateByIndex(mssIndex, "height", newData.height);
     }
 
     private detectModelDirection(liquidity: ILiquidity): Directions | undefined {

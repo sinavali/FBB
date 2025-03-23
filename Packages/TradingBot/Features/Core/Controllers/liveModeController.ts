@@ -1,10 +1,10 @@
 import logger from "@shared/Initiatives/Logger.ts";
-import {GeneralStore} from "@shared/Types/Interfaces/generalStore.ts";
-import {modelOne} from "@tradingBot/Features/Core/Controllers/flows.ts";
-import {Directions, LiquidityMode, SystemMode} from "@shared/Types/Enums.js";
-import {io} from "socket.io-client";
+import { GeneralStore } from "@shared/Types/Interfaces/generalStore.ts";
+import { modelOne } from "@tradingBot/Features/Core/Controllers/flows.ts";
+import { Directions, LiquidityMode, Period, SystemMode } from "@shared/Types/Enums.js";
+import { io } from "socket.io-client";
 import moment from "moment-timezone";
-import {ICandle, ILiquidity} from "@shared/Types/Interfaces/general.js";
+import { ICandle, ILiquidity } from "@shared/Types/Interfaces/general.js";
 
 export default async (generalStore: GeneralStore) => {
     try {
@@ -23,61 +23,71 @@ export default async (generalStore: GeneralStore) => {
 }
 
 async function initiateFirstTimeRunScript(generalStore: GeneralStore) {
-    const candlesTimeZone = generalStore.state.Setting?.getOne("BotTimezone")?.settingValueParsed;
-    let now = moment.tz(candlesTimeZone);
+    try {
+        const candlesTimeZone = generalStore.state.Setting?.getOne("BotTimezone")?.settingValueParsed;
+        let now = moment.tz(candlesTimeZone);
+        let dayOfWeek = now.day(); // 0 (Sunday) to 6 (Saturday)
 
-    // need candles from start of week till now to push to backtest flow to validate liquidities
-    const startOfWeek = now.clone().startOf("week");
+        // need candles from start of week till now to push to backtest flow to validate liquidities
+        const startOfWeek = now.clone().startOf("week");
 
-    // need these to find last week's liquidities
-    const startOfLastWeek = startOfWeek.clone().subtract(1, "days").startOf("week");
-    const endOfLastWeek = startOfLastWeek.clone().endOf("week");
+        // need these to find last week's liquidities
+        const startOfLastWeek = startOfWeek.clone().subtract(1, "days").startOf("week");
+        const endOfLastWeek = startOfLastWeek.clone().endOf("week");
 
-    // need these to find yesterday's liquidities
-    const startOfYesterday = now.clone().startOf("day").subtract(1, "hour").startOf("day");
+        // need these to find yesterday's liquidities
+        let startOfYesterday;
 
-    let lastWeekCandles: ICandle[] = [];
-    let fromLastDayCandles: any[] = [];
+        // Sunday, Saturday, or Monday
+        if ([0, 1, 6].includes(dayOfWeek)) startOfYesterday = now.clone().startOf('day').subtract((dayOfWeek + 2) % 7, 'days').startOf('day');
+        else startOfYesterday = now.clone().subtract(1, 'days').startOf('day');
 
-    // fetch candles
-    const currencies = await generalStore.state.Prisma.currency.findMany();
-    for (const currency of currencies) {
-        const lastWeekCandlesReq: any = await fetch("http://localhost:5000/last_week_candles_1d", {
-            method: "POST",
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                symbol: currency.name,
-                start: startOfLastWeek.format("YYYY-MM-DDTHH:MM:SS"),
-                end: endOfLastWeek.format("YYYY-MM-DDTHH:MM:SS")
-            }),
-        });
-        const lastDayCandlesReq: any = await fetch("http://localhost:5000/last_day_candles_1m", {
-            method: "POST",
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({symbol: currency.name, start: startOfYesterday.format("YYYY-MM-DDTHH:MM:SS")})
-        });
+        let lastWeekCandles: ICandle[] = [];
+        let fromLastDayCandles: any[] = [];
 
-        let temp: any[] = await lastWeekCandlesReq.json();
-        console.log(temp)
-        lastWeekCandles = [...lastWeekCandles, ...temp];
+        // fetch candles
+        const currencies = await generalStore.state.Prisma.currency.findMany();
+        for (const currency of currencies) {
+            const lastWeekCandlesReq: any = await fetch("http://localhost:5000/last_week_candles_1d", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    symbol: currency.name,
+                    start: startOfLastWeek.format("YYYY-MM-DDThh:mm:ss"),
+                    end: endOfLastWeek.format("YYYY-MM-DDThh:mm:ss")
+                }),
+            });
+            const lastDayCandlesReq: any = await fetch("http://localhost:5000/last_day_candles_1m", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ symbol: currency.name, start: startOfYesterday.format("YYYY-MM-DDThh:mm:ss") })
+            });
 
-        temp = await lastDayCandlesReq.json();
-        fromLastDayCandles = [...fromLastDayCandles, ...temp];
+            let temp: any = await lastWeekCandlesReq.json();
+            temp = temp.candles;
+            temp.forEach((c: ICandle) => lastWeekCandles.push(c))
+
+            temp = await lastDayCandlesReq.json();
+            temp = temp.candles;
+            temp.forEach((c: any) => fromLastDayCandles.push(c))
+        }
+
+        lastWeekCandles = lastWeekCandles.map(c => generalStore.state.Candle.processCandle(c, false));
+        lastWeekCandles.sort((a, b) => b.time.unix - a.time.unix);
+        for (const currency of currencies) findWeeklyLiquiditiesOffLoaded(lastWeekCandles.filter(c => c.pairPeriod.pair === currency.name), currency.name, generalStore, startOfLastWeek, endOfLastWeek);
+
+        fromLastDayCandles.sort((a, b) => a.closeTime - b.closeTime);
+        if (!Array.isArray(fromLastDayCandles) || !fromLastDayCandles.length) return false;
+        await generalStore.state.Candle.processCandles(fromLastDayCandles, modelOne);
+
+        return true;
+    } catch (error) {
+        console.log(error)
     }
-
-    lastWeekCandles = lastWeekCandles.map(c => generalStore.state.Candle.processCandle(c, false));
-    lastWeekCandles.sort((a, b) => b.time.unix - a.time.unix);
-    for (const currency of currencies) findWeeklyLiquiditiesOffLoaded(lastWeekCandles.filter(c => c.pairPeriod.pair === currency), currency.name, generalStore, startOfLastWeek, endOfLastWeek);
-
-    fromLastDayCandles.sort((a, b) => a.time.unix - b.time.unix);
-    if (!Array.isArray(fromLastDayCandles) || !fromLastDayCandles.length) return false;
-    await generalStore.state.Candle.processCandles(fromLastDayCandles, modelOne);
-
-    return true;
 }
 
 async function runCandleStreamFlow(generalStore: GeneralStore, model: Function) {
-    const socket = io('http://localhost:5000', {transports: ['websocket'], reconnection: true});
+    const socket = io('http://localhost:5000', { transports: ['websocket'], reconnection: true });
 
     const currencies = await generalStore.state.Prisma.currency.findMany();
     socket.on('connect', () => {
@@ -85,7 +95,7 @@ async function runCandleStreamFlow(generalStore: GeneralStore, model: Function) 
         logger.info(`socket connected: ${currencies.map(c => c.name)} in PERIOD_M1`);
 
         socket.emit('start_candle_stream', {
-            subscriptions: currencies.map(c => ({symbol: c.name, timeframe: "PERIOD_M1"}))
+            subscriptions: currencies.map(c => ({ symbol: c.name, timeframe: "PERIOD_M1" }))
         });
     });
 
@@ -106,45 +116,45 @@ function findWeeklyLiquiditiesOffLoaded(candles: ICandle[], currency: string, ge
     const temp = [...candles];
 
     temp.sort((a, b) => b.high - a.high);
-    const highestHigh = {...temp[0]};
+    const highestHigh = { ...temp[0] };
 
     temp.sort((a, b) => a.low - b.low);
-    const lowestLow = {...temp[0]};
+    const lowestLow = { ...temp[0] };
 
     const liquidities: ILiquidity[] = [
         {
             id: 0,
-            pairPeriod: {pair: candles[0].pairPeriod.pair, period: candles[0].pairPeriod.period},
+            pairPeriod: { pair: currency, period: Period.PERIOD_M1 },
             direction: Directions.UP,
             mode: LiquidityMode.WEEKLY,
             price: highestHigh.high,
-            time: {utc: highestHigh.time.utc, unix: highestHigh.time.unix},
+            time: { utc: highestHigh.time.utc, unix: highestHigh.time.unix },
             failed: false,
             SMT: [],
             timeRange: {
-                start: {utc: startOfLastWeek.clone().utc(), unix: startOfLastWeek.clone().utc().unix()},
-                end: {utc: endOfLastWeek.clone().utc(), unix: endOfLastWeek.clone().utc().unix()}
+                start: { utc: startOfLastWeek.clone().utc(), unix: startOfLastWeek.clone().utc().unix() },
+                end: { utc: endOfLastWeek.clone().utc(), unix: endOfLastWeek.clone().utc().unix() }
             },
             used: [],
-            highTouches: [{utc: highestHigh.time.utc, unix: highestHigh.time.unix}],
-            lowTouches: [{utc: lowestLow.time.utc, unix: lowestLow.time.unix}],
+            highTouches: [{ utc: highestHigh.time.utc, unix: highestHigh.time.unix }],
+            lowTouches: [{ utc: lowestLow.time.utc, unix: lowestLow.time.unix }],
         },
         {
             id: 1,
-            pairPeriod: {pair: candles[0].pairPeriod.pair, period: candles[0].pairPeriod.period},
+            pairPeriod: { pair: currency, period: Period.PERIOD_M1 },
             direction: Directions.DOWN,
             mode: LiquidityMode.WEEKLY,
             price: lowestLow.low,
-            time: {utc: lowestLow.time.utc, unix: lowestLow.time.unix},
+            time: { utc: lowestLow.time.utc, unix: lowestLow.time.unix },
             failed: false,
             SMT: [],
             timeRange: {
-                start: {utc: startOfLastWeek.clone().utc(), unix: startOfLastWeek.clone().utc().unix()},
-                end: {utc: endOfLastWeek.clone().utc(), unix: endOfLastWeek.clone().utc().unix()}
+                start: { utc: startOfLastWeek.clone().utc(), unix: startOfLastWeek.clone().utc().unix() },
+                end: { utc: endOfLastWeek.clone().utc(), unix: endOfLastWeek.clone().utc().unix() }
             },
             used: [],
-            highTouches: [{utc: highestHigh.time.utc, unix: highestHigh.time.unix}],
-            lowTouches: [{utc: lowestLow.time.utc, unix: lowestLow.time.unix}],
+            highTouches: [{ utc: highestHigh.time.utc, unix: highestHigh.time.unix }],
+            lowTouches: [{ utc: lowestLow.time.utc, unix: lowestLow.time.unix }],
         }
     ]
 

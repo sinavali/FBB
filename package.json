@@ -7,7 +7,7 @@
   "author": "Sina Vali",
   "license": "ISC",
   "scripts": {
-    "start:bot": "npx tsx Packages/TradingBot/app.ts --experimental-require-module",
+    "start:bot": "npx tsx Packages/TradingBot/app.ts",
     "start:mtdriver": "python ./Packages/MtDriver/app.py",
     "start:inserter": "python ./Packages/Inserter/inserter.py",
     "bundle:bot": "npx esbuild Packages/TradingBot/app.ts --bundle --minify --platform=node --target=esnext --format=esm --outfile=dist/TradingBot/bundle.js",

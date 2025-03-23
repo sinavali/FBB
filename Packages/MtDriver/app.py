@@ -355,7 +355,7 @@ def get_last_day_1m_candles():
             'high': rate[2],
             'low': rate[3],
             'close': rate[4],
-            'period': 'PERIOD_1M',
+            'period': 'PERIOD_M1',
             'name': symbol
         } for rate in rates]
 
