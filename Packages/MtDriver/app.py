@@ -40,14 +40,13 @@ def get_candle(symbol, timeframe):
             logging.error(f"Invalid timeframe: {timeframe}")
             return None
 
-        # Using position 1 to get the last closed candle.
         rates = mt5.copy_rates_from_pos(symbol, mt5_timeframe, 1, 1)
-        if not rates or len(rates) == 0:
+        if rates is None or len(rates) == 0:
             logging.warning(f"No data returned for {symbol} {timeframe}")
             return None
-        print(rates[0][0])
+
         return {
-            'closeTime': rates[0][0],
+            'closeTime': int(rates[0][0]),
             'open': rates[0][1],
             'high': rates[0][2],
             'low': rates[0][3],
@@ -86,23 +85,6 @@ def initialize_mt5():
     return False
 
 
-def candle_polling_worker(sid, socketio):
-    """Background task to check for new candles"""
-    with app.app_context():
-        while active_subscriptions.get(sid, {}).get('active', False):
-            try:
-                subs = active_subscriptions.get(sid, {}).get('symbols', {})
-                for key, config in subs.items():
-                    candle = get_candle(config['symbol'], config['timeframe'])
-                    if candle and candle['closeTime'] > config['last_candle']:
-                        socketio.emit('new_candle', candle, room=sid)
-                        config['last_candle'] = candle['closeTime']
-                eventlet.sleep(60 - datetime.now(timezone.utc).second)
-            except Exception as e:
-                logging.error(f"Polling error: {str(e)}")
-                break
-
-
 @socketio.on('start_candle_stream')
 def handle_candle_stream(data):
     """Handle new candle stream requests"""
@@ -130,6 +112,23 @@ def handle_candle_stream(data):
     except Exception as e:
         logging.error(f"Stream setup error: {str(e)}")
         socketio.emit('error', {'message': 'Failed to start stream'}, room=sid)
+
+
+def candle_polling_worker(sid, socketio):
+    """Background task to check for new candles"""
+    with app.app_context():
+        while active_subscriptions.get(sid, {}).get('active', False):
+            try:
+                subs = active_subscriptions.get(sid, {}).get('symbols', {})
+                for key, config in subs.items():
+                    candle = get_candle(config['symbol'], config['timeframe'])
+                    if candle and candle['closeTime'] > config['last_candle']:
+                        socketio.emit('new_candle', candle, room=sid)
+                        config['last_candle'] = candle['closeTime']
+                eventlet.sleep(60 - datetime.now(timezone.utc).second)
+            except Exception as e:
+                logging.error(f"Polling error: {str(e)}")
+                break
 
 
 @socketio.on('disconnect')
@@ -372,5 +371,4 @@ def get_last_day_1m_candles():
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    get_candle("EURUSD", "PERIOD_M1")
     socketio.run(app, host='localhost', port=5000, debug=True)
