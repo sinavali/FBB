@@ -134,7 +134,7 @@ export default class MarketShiftStructure {
         };
 
         this.marketShifts.add(model as IMSS);
-        logger.info(`failed by pullback: ${JSON.stringify(this.marketShifts.getNewest())}`);
+        logger.info(`new MSS initiated: ${JSON.stringify(this.marketShifts.getNewest())}`);
     }
 
     updateMSS(candle: ICandle) {

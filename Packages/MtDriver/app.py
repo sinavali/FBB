@@ -265,7 +265,7 @@ def place_order():
 
 
 @app.route('/last_week_candles_1d', methods=['POST'])
-def get_last_week_daily_candles():
+def last_week_candles_1d():
     """Fetch daily candles between client-provided dates"""
     try:
         data = request.json
@@ -319,7 +319,7 @@ def get_last_week_daily_candles():
 
 
 @app.route('/last_day_candles_1m', methods=['POST'])
-def get_last_day_1m_candles():
+def last_day_candles_1m():
     """Fetch 1-minute candles from client-provided start to now"""
     try:
         data = request.json
@@ -346,6 +346,60 @@ def get_last_day_1m_candles():
 
         # Fetch 1-minute candles
         rates = mt5.copy_rates_range(symbol, mt5.TIMEFRAME_M1, start_dt, datetime.utcnow())
+        if rates is None or len(rates) == 0:
+            return jsonify({"candles": []}), 200
+
+        # Return raw data
+        candles = [{
+            'closeTime': int(rate[0]) + timezone_offset,
+            'open': rate[1],
+            'high': rate[2],
+            'low': rate[3],
+            'close': rate[4],
+            'period': 'PERIOD_M1',
+            'name': symbol
+        } for rate in rates]
+
+        return jsonify({"candles": candles}), 200
+
+    except ValueError as e:
+        logging.error(f"Invalid date format: {str(e)}")
+        return jsonify({"error": "Invalid ISO date format"}), 400
+    except Exception as e:
+        logging.error(f"1m candles error: {str(e)}")
+        return jsonify({"error": "Internal server error"}), 500
+
+
+@app.route('/get_candles_in', methods=['POST'])
+def get_candles_in():
+    """Fetch 1-minute candles from client-provided start to now"""
+    try:
+        data = request.json
+        required_fields = ['symbol', 'start', 'end']
+
+        # Validate request
+        for field in required_fields:
+            if field not in data:
+                return jsonify({"error": f"Missing required field: {field}"}), 400
+
+        symbol = data['symbol'].upper()
+        start_str = data['start']
+        end_str = data['end']
+
+        # Direct conversion without timezone handling
+        start_dt = datetime.fromisoformat(start_str)
+        end_dt = datetime.fromisoformat(end_str)
+
+        # Initialize MT5
+        if not initialize_mt5():
+            return jsonify({"error": "MT5 connection failed"}), 500
+
+        # Validate symbol
+        if not mt5.symbol_select(symbol, True):
+            return jsonify({"error": f"Symbol {symbol} not available"}), 400
+
+        # Fetch 1-minute candles
+        rates = mt5.copy_rates_range(symbol, mt5.TIMEFRAME_M1, start_dt, end_dt)
         if rates is None or len(rates) == 0:
             return jsonify({"candles": []}), 200
 

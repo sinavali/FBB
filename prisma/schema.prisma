@@ -71,4 +71,5 @@ enum SystemMode {
   LIVE
   SIGNAL
   BACKTEST
+  MTBACKTEST
 }

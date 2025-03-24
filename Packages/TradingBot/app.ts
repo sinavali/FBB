@@ -3,6 +3,7 @@ import logger from "@shared/Initiatives/Logger.ts";
 import liveMode from "@tradingBot/Features/Core/Controllers/liveModeController.ts";
 import signalMode from "@tradingBot/Features/Core/Controllers/signalModeController.ts";
 import backtestMode from "@tradingBot/Features/Core/Controllers/backtestModeController.ts";
+import mtBacktestMode from "@tradingBot/Features/Core/Controllers/MtBacktestModeController.js";
 import {ProjectName, SystemMode} from "@shared/Types/Enums.ts";
 import {useGeneralStore} from "@shared/Stores/GeneralStore.ts";
 
@@ -93,5 +94,7 @@ Promise.all([settingInit, sessionInit, workTimeInit]).then(async () => {
             signalMode(generalStore);
         else if (systemMode?.settingValueParsed === SystemMode.BACKTEST)
             backtestMode(generalStore);
-    }, 2000);
+        else if (systemMode?.settingValueParsed === SystemMode.MTBACKTEST)
+            mtBacktestMode(generalStore);
+    }, 5000);
 });

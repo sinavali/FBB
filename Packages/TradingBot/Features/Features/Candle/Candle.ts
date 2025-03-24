@@ -115,6 +115,7 @@ export default class Candle {
                 chunkOptions.latestTime,
                 chunkOptions.to
             );
+
             logger.info(`Total candles => ${totalCandles}`);
             console.log(`Total candles => ${totalCandles}`);
 
@@ -192,7 +193,7 @@ export default class Candle {
                 this.processDeep(processedCandle.id, processedCandle.pairPeriod);
 
                 await model(this.generalStore);
-                if (this.generalStore.state.Signal.getOffLoadMode() === false && this.generalStore.globalStates.systemMode === SystemMode.LIVE)
+                if (!this.generalStore.state.Signal.getOffLoadMode() && this.generalStore.globalStates.systemMode === SystemMode.LIVE)
                     console.log(processedCandle)
 
                 this.generalStore.state.Time.add("processCandles each candle Loop", new Date().getTime() - startTime);

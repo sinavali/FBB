@@ -13,7 +13,7 @@ async function setSettings() {
   await prisma.$executeRaw`TRUNCATE TABLE Setting`;
   await prisma.setting.createMany({
     data: [
-      { settingKey: "SystemMode", settingValue: "BACKTEST", parseTo: "STRING" },
+      { settingKey: "SystemMode", settingValue: "MTBACKTEST", parseTo: "STRING" },
       { settingKey: "RiskReward", settingValue: "2", parseTo: "FLOAT" },
       { settingKey: "SignalLoss", settingValue: "1", parseTo: "FLOAT" },
       {

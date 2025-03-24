@@ -32,6 +32,7 @@ async function initiationPhaseModelOne(generalStore: GeneralStore) {
     data.candle = candle;
 
     let startTime = new Date().getTime();
+
     // create new session if needed and get the latest session
     const session = generalStore.state.Session?.handleSessionForFlow(data.candle.time.unix);
 
@@ -83,47 +84,45 @@ async function initiationPhaseModelOne(generalStore: GeneralStore) {
     startTime = new Date().getTime();
 
     // generate liquidities if not exists
-    if (generalStore.state.Liquidity && data.timezone) {
+    startTime = new Date().getTime();
+
+    generalStore.state.Liquidity.generateLiquidities({
+        type: "daily",
+        candle: data.candle,
+        timezone: data.timezone as string,
+    });
+
+    generalStore.state.Time.add(
+        "generateLiquidities Daily",
+        new Date().getTime() - startTime
+    );
+
+    startTime = new Date().getTime();
+
+    generalStore.state.Liquidity.generateLiquidities({
+        type: "weekly",
+        candle: data.candle,
+        timezone: data.timezone as string,
+    });
+
+    generalStore.state.Time.add(
+        "generateLiquidities Weekly",
+        new Date().getTime() - startTime
+    );
+
+    if (data.latestSession) {
         startTime = new Date().getTime();
 
         generalStore.state.Liquidity.generateLiquidities({
-            type: "daily",
-            candle: data.candle,
-            timezone: data.timezone,
+            type: "bySession",
+            pairPeriod: data.candle.pairPeriod,
+            session: data.latestSession,
         });
 
         generalStore.state.Time.add(
-            "generateLiquidities Daily",
+            "generateLiquidities BySession",
             new Date().getTime() - startTime
         );
-
-        startTime = new Date().getTime();
-
-        generalStore.state.Liquidity.generateLiquidities({
-            type: "weekly",
-            candle: data.candle,
-            timezone: data.timezone,
-        });
-
-        generalStore.state.Time.add(
-            "generateLiquidities Weekly",
-            new Date().getTime() - startTime
-        );
-
-        if (data.latestSession) {
-            startTime = new Date().getTime();
-
-            generalStore.state.Liquidity.generateLiquidities({
-                type: "bySession",
-                pairPeriod: data.candle.pairPeriod,
-                session: data.latestSession,
-            });
-
-            generalStore.state.Time.add(
-                "generateLiquidities BySession",
-                new Date().getTime() - startTime
-            );
-        }
     }
 
     startTime = new Date().getTime();

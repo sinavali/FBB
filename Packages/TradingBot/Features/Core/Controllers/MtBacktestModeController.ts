@@ -28,11 +28,35 @@ export default async (generalStore: GeneralStore) => {
         }
         console.log(`from: ${moment.utc(start.settingValueParsed * 1000).format("YYYY-MM-DD HH:mm")} to: ${moment.utc(end.settingValueParsed * 1000).format("YYYY-MM-DD HH:mm")}`);
 
-        await generalStore.state.Candle?.startCandleProcesses({
-            from: start.settingValueParsed,
-            to: end.settingValueParsed,
-            chunkSize: 10000
-        }, modelOne);
+        let candlesInRange: any = [];
+        const currencies = await generalStore.state.Prisma.currency.findMany();
+
+        for (const currency of currencies) {
+            const startFrom = moment(start.settingValueParsed * 1000).format("YYYY-MM-DDThh:mm:ss");
+            const endTo = moment(end.settingValueParsed * 1000).format("YYYY-MM-DDThh:mm:ss");
+            console.log(`Request payload: ${currency.name}, ${startFrom}, ${endTo}`);
+
+            const candlesReq: any = await fetch("http://localhost:5000/get_candles_in", {
+                method: "POST",
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    symbol: currency.name,
+                    start: startFrom,
+                    end: endTo
+                })
+            });
+
+            let temp = await candlesReq.json();
+            temp = temp.candles;
+            temp.forEach((c: any) => candlesInRange.push(c))
+        }
+
+        logger.info(`Total candles => ${candlesInRange.length}`);
+        console.log(`Total candles => ${candlesInRange.length}`);
+
+        candlesInRange.sort((a: any, b: any) => a.closeTime - b.closeTime);
+
+        await generalStore.state.Candle.processCandles(candlesInRange, modelOne);
 
         generalStore.state.Time.add("backtest mode time", new Date().getTime() - startTime);
 

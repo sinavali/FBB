@@ -1,10 +1,10 @@
 import logger from "@shared/Initiatives/Logger.ts";
-import { GeneralStore } from "@shared/Types/Interfaces/generalStore.ts";
-import { modelOne } from "@tradingBot/Features/Core/Controllers/flows.ts";
-import { Directions, LiquidityMode, Period, SystemMode } from "@shared/Types/Enums.js";
-import { io } from "socket.io-client";
+import {GeneralStore} from "@shared/Types/Interfaces/generalStore.ts";
+import {modelOne} from "@tradingBot/Features/Core/Controllers/flows.ts";
+import {Directions, LiquidityMode, Period, SystemMode} from "@shared/Types/Enums.js";
+import {io} from "socket.io-client";
 import moment from "moment-timezone";
-import { ICandle, ILiquidity } from "@shared/Types/Interfaces/general.js";
+import {ICandle, ILiquidity} from "@shared/Types/Interfaces/general.js";
 
 export default async (generalStore: GeneralStore) => {
     try {
@@ -45,7 +45,6 @@ async function initiateFirstTimeRunScript(generalStore: GeneralStore) {
         let lastWeekCandles: ICandle[] = [];
         let fromLastDayCandles: any[] = [];
 
-        // fetch candles
         const currencies = await generalStore.state.Prisma.currency.findMany();
         for (const currency of currencies) {
             const lastWeekCandlesReq: any = await fetch("http://localhost:5000/last_week_candles_1d", {

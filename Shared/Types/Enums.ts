@@ -113,4 +113,5 @@ export enum SystemMode {
   LIVE = "LIVE",
   SIGNAL = "SIGNAL",
   BACKTEST = "BACKTEST",
+  MTBACKTEST = "MTBACKTEST",
 }

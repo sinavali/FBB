@@ -49,7 +49,7 @@ export default class MicroTime {
 
         this.indexMap.set(data.id, this.microTimes.getSize() - 1);
 
-        logger.info(`failed by pullback: ${JSON.stringify(this.microTimes.getNewest())}`);
+        logger.info(`new MicroTime: ${JSON.stringify(this.microTimes.getNewest())}`);
         return this.microTimes.getNewest();
     }
 
