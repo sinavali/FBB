@@ -24,8 +24,8 @@ export default async (generalStore: GeneralStore) => {
 
 async function initiateFirstTimeRunScript(generalStore: GeneralStore) {
     try {
-        const candlesTimeZone = generalStore.state.Setting?.getOne("BotTimezone")?.settingValueParsed;
-        let now = moment.tz(candlesTimeZone);
+        const botTimezoneOffset = generalStore.state.Setting?.getOne("BotTimezoneOffset")?.settingValueParsed;
+        let now = moment().add(botTimezoneOffset, "seconds");
         let dayOfWeek = now.day(); // 0 (Sunday) to 6 (Saturday)
 
         // need candles from start of week till now to push to backtest flow to validate liquidities

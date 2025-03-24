@@ -19,7 +19,7 @@ export async function modelOne(generalStore: GeneralStore) {
 async function initiationPhaseModelOne(generalStore: GeneralStore) {
     const data: ModelOneData = {
         timezone:
-        generalStore.state.Setting?.getOne("BotTimezone")?.settingValueParsed,
+        generalStore.state.Setting?.getOne("BotTimezoneOffset")?.settingValueParsed,
         isInSession: false,
         isInWorkTime: false,
         candle: null,

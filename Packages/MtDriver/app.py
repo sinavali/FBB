@@ -21,6 +21,7 @@ socketio = SocketIO(app,
 
 # Track active subscriptions
 active_subscriptions = {}
+timezone_offset = -7200
 
 
 def get_candle(symbol, timeframe):
@@ -46,7 +47,7 @@ def get_candle(symbol, timeframe):
             return None
 
         return {
-            'closeTime': int(rates[0][0]),
+            'closeTime': int(rates[0][0]) + timezone_offset,
             'open': rates[0][1],
             'high': rates[0][2],
             'low': rates[0][3],
@@ -122,7 +123,7 @@ def candle_polling_worker(sid, socketio):
                 subs = active_subscriptions.get(sid, {}).get('symbols', {})
                 for key, config in subs.items():
                     candle = get_candle(config['symbol'], config['timeframe'])
-                    if candle and candle['closeTime'] > config['last_candle']:
+                    if candle and (candle['closeTime']) > config['last_candle']:
                         socketio.emit('new_candle', candle, room=sid)
                         config['last_candle'] = candle['closeTime']
                 eventlet.sleep(60 - datetime.now(timezone.utc).second)
@@ -298,7 +299,7 @@ def get_last_week_daily_candles():
 
         # Return raw candles without processing
         candles = [{
-            'closeTime': int(rate[0]),
+            'closeTime': int(rate[0]) + timezone_offset,
             'open': rate[1],
             'high': rate[2],
             'low': rate[3],
@@ -350,7 +351,7 @@ def get_last_day_1m_candles():
 
         # Return raw data
         candles = [{
-            'closeTime': int(rate[0]),
+            'closeTime': int(rate[0]) + timezone_offset,
             'open': rate[1],
             'high': rate[2],
             'low': rate[3],

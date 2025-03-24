@@ -175,9 +175,9 @@ async function setSettings() {
         parseTo: "INT",
       },
       {
-        settingKey: "BotTimezone",
-        settingValue: "America/New_York",
-        parseTo: "STRING",
+        settingKey: "BotTimezoneOffset",
+        settingValue: "-3700",
+        parseTo: "INT",
       },
       {
         settingKey: "BackTestStartUTCUnix",
