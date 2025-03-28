@@ -2,6 +2,8 @@ from eventlet import monkey_patch
 
 monkey_patch()
 
+import os
+import requests
 from flask import Flask, request, jsonify
 from flask_socketio import SocketIO
 import MetaTrader5 as mt5
@@ -22,7 +24,8 @@ socketio = SocketIO(app,
 # Track active subscriptions
 active_subscriptions = {}
 timezone_offset = -7200
-
+telegram_bot_token = '6778796222:AAH-UKnDf5y5axNcLjk1LL1prUx2i7R9EL8'
+telegram_chat_id = '-1002469452779'
 
 def get_candle(symbol, timeframe):
     """Fetch latest candle data with enhanced error handling"""
@@ -141,6 +144,37 @@ def handle_disconnect():
         del active_subscriptions[sid]
     logging.info(f"Client disconnected: {sid}")
 
+def send_telegram_message(trade_data):
+    """Send trade notification to Telegram channel using request data"""
+
+    if not (telegram_bot_token and telegram_chat_id):
+        logging.warning("Telegram credentials not configured")
+        return False
+
+    try:
+        message = (
+            "📈 *New Trade Signal*\n"
+            f"• Symbol: {trade_data['symbol']}\n"
+            f"• Direction: {trade_data['direction']}\n"
+            f"• Volume: {trade_data['volume']}\n"
+            f"• Entry Price: {trade_data['price']}\n"
+            f"• SL: {trade_data['sl']}\n"
+            f"• TP: {trade_data['tp']}"
+        )
+
+        url = f"https://api.telegram.org/bot{telegram_bot_token}/sendMessage"
+        payload = {
+            'chat_id': telegram_chat_id,
+            'text': message,
+            'parse_mode': 'Markdown'
+        }
+        
+        response = requests.post(url, data=payload, timeout=5000)
+        response.raise_for_status()
+        return True
+    except Exception as e:
+        logging.error(f"Telegram notification failed: {str(e)}")
+        return False
 
 @app.route('/place_order', methods=['POST'])
 def place_order():
@@ -163,7 +197,16 @@ def place_order():
         entry_price = float(data['price'])
         sl = float(data['sl'])
         tp = float(data['tp'])
-
+        
+        send_telegram_message({
+            'symbol': symbol,
+            'direction': direction,
+            'volume': volume,
+            'price': entry_price,
+            'sl': sl,
+            'tp': tp
+        })
+        
         # Get current market price
         tick = mt5.symbol_info_tick(symbol)
         if not tick:
