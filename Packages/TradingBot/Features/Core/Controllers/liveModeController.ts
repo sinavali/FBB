@@ -1,10 +1,10 @@
 import logger from "@shared/Initiatives/Logger.ts";
-import {GeneralStore} from "@shared/Types/Interfaces/generalStore.ts";
-import {modelOne} from "@tradingBot/Features/Core/Controllers/flows.ts";
-import {Directions, LiquidityMode, Period, SystemMode} from "@shared/Types/Enums.js";
-import {io} from "socket.io-client";
+import { GeneralStore } from "@shared/Types/Interfaces/generalStore.ts";
+import { modelOne } from "@tradingBot/Features/Core/Controllers/flows.ts";
+import { Directions, LiquidityMode, Period, SystemMode } from "@shared/Types/Enums.js";
+import { io } from "socket.io-client";
 import moment from "moment-timezone";
-import {ICandle, ILiquidity} from "@shared/Types/Interfaces/general.js";
+import { ICandle, ILiquidity } from "@shared/Types/Interfaces/general.js";
 
 export default async (generalStore: GeneralStore) => {
     try {
@@ -24,23 +24,22 @@ export default async (generalStore: GeneralStore) => {
 
 async function initiateFirstTimeRunScript(generalStore: GeneralStore) {
     try {
-        const botTimezoneOffset = generalStore.state.Setting?.getOne("BotTimezoneOffset")?.settingValueParsed;
-        let now = moment().add(botTimezoneOffset, "seconds");
-        let dayOfWeek = now.day(); // 0 (Sunday) to 6 (Saturday)
+        const now = moment.utc();
+        const dayOfWeek = now.day(); // 0 (Sunday) to 6 (Saturday)
 
         // need candles from start of week till now to push to backtest flow to validate liquidities
         const startOfWeek = now.clone().startOf("week");
 
         // need these to find last week's liquidities
         const startOfLastWeek = startOfWeek.clone().subtract(1, "days").startOf("week");
-        const endOfLastWeek = startOfLastWeek.clone().endOf("week");
+        const endOfLastWeek = startOfLastWeek.clone().add(1, 'week').startOf('week'); // instead of adding one minute, we get the start of next week that equals to end of last week
 
         // need these to find yesterday's liquidities
-        let startOfYesterday;
+        let startOfLastBussinessDay;
 
         // Sunday, Saturday, or Monday
-        if ([0, 1, 6].includes(dayOfWeek)) startOfYesterday = now.clone().startOf('day').subtract((dayOfWeek + 2) % 7, 'days').startOf('day');
-        else startOfYesterday = now.clone().subtract(1, 'days').startOf('day');
+        if ([0, 1, 6].includes(dayOfWeek)) startOfLastBussinessDay = now.clone().startOf('day').subtract((dayOfWeek + 2) % 7, 'days').startOf('day');
+        else startOfLastBussinessDay = now.clone().subtract(1, 'days').startOf('day');
 
         let lastWeekCandles: ICandle[] = [];
         let fromLastDayCandles: any[] = [];
@@ -52,21 +51,24 @@ async function initiateFirstTimeRunScript(generalStore: GeneralStore) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     symbol: currency.name,
-                    start: startOfLastWeek.format("YYYY-MM-DDThh:mm:ss"),
-                    end: endOfLastWeek.format("YYYY-MM-DDThh:mm:ss")
+                    start: startOfLastWeek,
+                    end: endOfLastWeek
                 }),
             });
-            const lastDayCandlesReq: any = await fetch("http://localhost:5000/last_day_candles_1m", {
+
+            const lastDayCandlesReq: any = await fetch("http://localhost:5000/candles_from", {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ symbol: currency.name, start: startOfYesterday.format("YYYY-MM-DDThh:mm:ss") })
+                body: JSON.stringify({ symbol: currency.name, start: startOfWeek })
             });
 
             let temp: any = await lastWeekCandlesReq.json();
+            console.log("Start and End of Last Week Candles: ", temp.candles[0], temp.candles[temp.candles.length - 1])
             temp = temp.candles;
             temp.forEach((c: ICandle) => lastWeekCandles.push(c))
 
             temp = await lastDayCandlesReq.json();
+            console.log("Start and End of Last Day Candles: ", temp.candles[0], temp.candles[temp.candles.length - 1])
             temp = temp.candles;
             temp.forEach((c: any) => fromLastDayCandles.push(c))
         }
@@ -99,7 +101,6 @@ async function runCandleStreamFlow(generalStore: GeneralStore, model: Function) 
     });
 
     socket.on('new_candle', async (candle) => {
-        logger.info(`new candle from stream: ${JSON.stringify(candle)}`);
         console.log(`${candle["closeTime"]}: New ${candle["period"]} candle for ${candle["name"]}:`);
 
         await generalStore.state.Candle.processCandles([candle], model);

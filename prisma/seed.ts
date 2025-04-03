@@ -45,8 +45,8 @@ async function setSettings() {
         parseTo: "INT",
       },
       {
-        settingKey: "SystemBrokerTimezoneName",
-        settingValue: "Europe/Moscow",
+        settingKey: "TargetTimezone",
+        settingValue: "America/New_York",
         parseTo: "STRING",
       },
       {
@@ -172,11 +172,6 @@ async function setSettings() {
       {
         settingKey: "LiquidityPullbackPercent",
         settingValue: "25",
-        parseTo: "INT",
-      },
-      {
-        settingKey: "BotTimezoneOffset",
-        settingValue: "-3700",
         parseTo: "INT",
       },
       {

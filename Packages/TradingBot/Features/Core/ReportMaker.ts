@@ -65,12 +65,19 @@ const writeJSONFile = (filePath: string, data: unknown) => {
 
 // Signal processing functions
 const findSignalFiles = (baseDir: string): string[] => {
-    const entries = fs.readdirSync(baseDir, { withFileTypes: true });
-    return entries.flatMap(entry => {
-        const fullPath = path.join(baseDir, entry.name);
-        return entry.isDirectory() ? findSignalFiles(fullPath)
-            : entry.name === 'signal.json' ? [fullPath] : [];
-    });
+    const maxDepth = 2;
+
+    const search = (dir: string, currentLevel: number): string[] => {
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        return entries.flatMap(entry => {
+            const fullPath = path.join(dir, entry.name);
+
+            if (entry.isDirectory() && currentLevel < maxDepth) return search(fullPath, currentLevel + 1);
+            else if (!entry.isDirectory() && entry.name === 'signal.json') return [fullPath];
+            else return [];
+        });
+    };
+    return search(baseDir, 1);
 };
 
 const filterSignalsByPipDifference = (signals: Signal[]): Signal[] => {

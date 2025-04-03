@@ -29,7 +29,6 @@ export default class Signal {
     }
 
     getOffLoadMode() {
-        logger.warn(`offload mode is ${this.offLoadMode}`);
         return this.offLoadMode;
     }
 

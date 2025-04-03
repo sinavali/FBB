@@ -32,8 +32,8 @@ export default async (generalStore: GeneralStore) => {
         const currencies = await generalStore.state.Prisma.currency.findMany();
 
         for (const currency of currencies) {
-            const startFrom = moment(start.settingValueParsed * 1000).format("YYYY-MM-DDThh:mm:ss");
-            const endTo = moment(end.settingValueParsed * 1000).format("YYYY-MM-DDThh:mm:ss");
+            const startFrom = moment(start.settingValueParsed * 1000).format("YYYY-MM-DDTHH:mm:ss");
+            const endTo = moment(end.settingValueParsed * 1000).format("YYYY-MM-DDTHH:mm:ss");
             console.log(`Request payload: ${currency.name}, ${startFrom}, ${endTo}`);
 
             const candlesReq: any = await fetch("http://localhost:5000/get_candles_in", {

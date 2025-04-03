@@ -18,8 +18,7 @@ export async function modelOne(generalStore: GeneralStore) {
 // should initiate data here (finding new MSS, COB, Liquidity and ...)
 async function initiationPhaseModelOne(generalStore: GeneralStore) {
     const data: ModelOneData = {
-        timezone:
-        generalStore.state.Setting?.getOne("BotTimezoneOffset")?.settingValueParsed,
+        timezone: "Asia/Tehran", // actually no need for timezone, all of timezone calcualtions should be in the driver
         isInSession: false,
         isInWorkTime: false,
         candle: null,
