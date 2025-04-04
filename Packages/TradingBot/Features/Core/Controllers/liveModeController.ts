@@ -46,7 +46,7 @@ async function initiateFirstTimeRunScript(generalStore: GeneralStore) {
 
         const currencies = await generalStore.state.Prisma.currency.findMany();
         for (const currency of currencies) {
-            const lastWeekCandlesReq: any = await fetch("http://localhost:5000/last_week_candles_1d", {
+            const lastWeekCandlesReq: any = await fetch("http://127.0.0.1:5000/last_week_candles_1d", {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -55,8 +55,9 @@ async function initiateFirstTimeRunScript(generalStore: GeneralStore) {
                     end: endOfLastWeek
                 }),
             });
+            console.log(currency.name, startOfLastWeek, endOfLastWeek)
 
-            const lastDayCandlesReq: any = await fetch("http://localhost:5000/candles_from", {
+            const lastDayCandlesReq: any = await fetch("http://127.0.0.1:5000/candles_from", {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ symbol: currency.name, start: startOfWeek })
@@ -88,7 +89,7 @@ async function initiateFirstTimeRunScript(generalStore: GeneralStore) {
 }
 
 async function runCandleStreamFlow(generalStore: GeneralStore, model: Function) {
-    const socket = io('http://localhost:5000', { transports: ['websocket'], reconnection: true });
+    const socket = io('http://127.0.0.1:5000', { transports: ['websocket'], reconnection: true });
 
     const currencies = await generalStore.state.Prisma.currency.findMany();
     socket.on('connect', () => {

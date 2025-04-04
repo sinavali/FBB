@@ -772,4 +772,4 @@ def test_pending_order():
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     tg_bot.start_monitoring()
-    socketio.run(app, host='localhost', port=5000, debug=True)
+    socketio.run(app, host='127.0.0.1', port=5000, debug=True)

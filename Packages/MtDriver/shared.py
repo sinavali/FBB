@@ -1,6 +1,7 @@
 from zoneinfo import ZoneInfo
 
 target_tz_name = "Europe/Athens"
+# target_tz_name = "Asia/Nicosia"
 target_tz = ZoneInfo(target_tz_name) # +02:00 | +03:00
 
 demo_login = 5034048580
@@ -21,9 +22,9 @@ def initialize_mt5():
         try:
             if mt5.initialize(
                     path="C:/Program Files/MetaTrader 5/terminal64.exe",
-                    login=demo_login,
-                    password=demo_password,
-                    server=demo_server,
+                    login=fundedNext15kWith5PercentLoss_login,
+                    password=fundedNext15kWith5PercentLoss_password,
+                    server=fundedNext15kWith5PercentLoss_server,
                     timeout=5000
             ):
                 return True

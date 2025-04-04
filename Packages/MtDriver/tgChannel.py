@@ -61,7 +61,7 @@ class TelegramChannel:
             digits = symbol_info.digits if symbol_info else 5
             fmt = f"%.{digits}f"
             
-            base = (f"🎯 *{order_type}*\n"
+            base = (f"🎯 *{order_type}* - FundedNext\n"
                     f"• Ticket: #{trade_data['ticket']}\n"
                     f"• Symbol: {trade_data['symbol']}\n"
                     f"• Direction: {trade_data['direction']}\n"

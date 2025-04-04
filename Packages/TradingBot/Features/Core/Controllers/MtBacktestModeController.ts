@@ -36,7 +36,7 @@ export default async (generalStore: GeneralStore) => {
             const endTo = moment(end.settingValueParsed * 1000).format("YYYY-MM-DDTHH:mm:ss");
             console.log(`Request payload: ${currency.name}, ${startFrom}, ${endTo}`);
 
-            const candlesReq: any = await fetch("http://localhost:5000/get_candles_in", {
+            const candlesReq: any = await fetch("http://127.0.0.1:5000/get_candles_in", {
                 method: "POST",
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
