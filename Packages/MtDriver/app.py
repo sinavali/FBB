@@ -13,6 +13,14 @@ import eventlet
 import time  # Added missing import
 from zoneinfo import ZoneInfo
 from collections import defaultdict
+from tgChannel import TelegramChannel
+from threading import Lock
+
+# Initialize Telegram channel
+tg_bot = TelegramChannel(
+    bot_token='6778796222:AAH-UKnDf5y5axNcLjk1LL1prUx2i7R9EL8',
+    chat_id='-1002469452779'
+)
 
 eventlet.monkey_patch()
 
@@ -25,6 +33,10 @@ socketio = SocketIO(app,
 
 # Track active subscriptions
 active_subscriptions = {}
+subscription_lock = Lock()
+
+min_distance_point = 2
+min_stop_distance_point = 10
 
 target_tz_name = "Europe/Athens"
 target_tz = ZoneInfo(target_tz_name) # +02:00 | +03:00
@@ -67,68 +79,8 @@ def print_default_data():
     print(f"now_in_utc: {now_in_utc()}")
     print(f"now_in_target_tz: {now_in_target_tz()}")
     print("--------------------------------------------------") 
-
-
-
-def _send_telegram(text: str) -> bool:
-    """Universal Telegram message sender"""
-    if not (telegram_bot_token and telegram_chat_id):
-        logging.warning("Telegram credentials not configured")
-        return False
-
-    try:
-        url = f"https://api.telegram.org/bot{telegram_bot_token}/sendMessage"
-        payload = {
-            'chat_id': telegram_chat_id,
-            'text': text,
-            'parse_mode': 'Markdown'
-        }
-        response = requests.post(url, data=payload, timeout=5)
-        response.raise_for_status()
-        return True
-    except Exception as e:
-        logging.error(f"Telegram notification failed: {str(e)}")
-        return False
-
-
-def build_signal_message(trade_data: dict) -> str:
-    """Construct new trade signal message with statistics"""
     
-    return (
-        "📈 *New Trade Signal*\n"
-        f"• Symbol: {trade_data['symbol']}\n"
-        f"• Direction: {trade_data['direction']}\n"
-        f"• Volume: {trade_data['volume']}\n"
-        f"• Entry Price: {trade_data['price']}\n"
-        f"• SL: {trade_data['sl']}\n"
-        f"• TP: {trade_data['tp']}"
-    )
-
-
-def build_closed_position_message(deal) -> str:
-    """Construct closed position message"""
-    stats = get_closed_positions_stats(live_start_time_target_tz)
-    stat_message = format_positions_message(stats)
     
-    reason = "Manual Close"
-    if deal.reason == DEAL_REASON_SL:
-        reason = "Stop Loss"
-    elif deal.reason == DEAL_REASON_TP:
-        reason = "Take Profit"
-
-    deal_time = datetime.fromtimestamp(deal.time, tz=utc_tz).astimezone(target_tz)
-    
-    return (
-        "🔒 *Position Closed*\n"
-        f"• Symbol: {deal.symbol}\n"
-        f"• Profit: {deal.profit:.2f}\n"
-        f"• Volume: {deal.volume}\n"
-        f"• Reason: {reason}\n"
-        f"• Time: {deal_time.strftime('%Y-%m-%d %H:%M:%S')}\n\n"
-        f"{stat_message}"
-    )
-
-
 def format_positions_message(stats: dict) -> str:
     """Format position statistics into human-readable message"""
     if stats.get('error'):
@@ -207,37 +159,7 @@ def get_closed_positions_stats(start_date: datetime) -> dict:
     finally:
         mt5.shutdown()
 
-
-def check_closed_positions_periodically():
-    """Periodic closed position checker with proper time conversion"""
-    last_check_time = None
-    
-    while True:
-        current_time = now_in_target_tz()
-        if last_check_time is None:
-            last_check_time = current_time - timedelta(seconds=20)
-        
-        try:
-            if not mt5.initialize():
-                eventlet.sleep(30)
-                continue
-
-            deals = mt5.history_deals_get(last_check_time.timestamp(), current_time.timestamp()) or []
-            for deal in deals:
-                if deal.entry == DEAL_ENTRY_OUT:
-                    message = build_closed_position_message(deal)
-                    _send_telegram(message)
-
-            last_check_time = current_time
-        except Exception as e:
-            logging.error(f"Error in closed positions check: {str(e)}")
-        finally:
-            mt5.shutdown()
-
-        # Wait for 30 seconds before next check
-        eventlet.sleep(30)
-
-            
+         
 def get_candle(symbol, timeframe):
     """Fetch latest candle data with enhanced error handling"""
     try:
@@ -281,23 +203,29 @@ def get_candle(symbol, timeframe):
 
 
 def initialize_mt5():
-    """Initialize MT5 with retry logic"""
-    max_retries = 3
-    for attempt in range(max_retries):
-        try:
-            if mt5.initialize(
-                    path="C:/Program Files/MetaTrader 5/terminal64.exe",
-                    login=5034048580,
-                    password="*h3nNrEu",
-                    server="MetaQuotes-Demo",
-                    timeout=5000
-            ):
-                return True
-            logging.error(f"MT5 initialization failed (attempt {attempt + 1}): {mt5.last_error()}")
-        except Exception as e:
-            logging.error(f"MT5 connection error (attempt {attempt + 1}): {str(e)}")
-        time.sleep(1)
-    return False
+    """Initialize MT5 with connection pooling"""
+    try:
+        if mt5.initialize():
+            return True
+            
+        for attempt in range(3):
+            try:
+                if mt5.initialize(
+                        path="C:/Program Files/MetaTrader 5/terminal64.exe",
+                        login=5034048580,
+                        password="*h3nNrEu",
+                        server="MetaQuotes-Demo",
+                        timeout=5000
+                ):
+                    return True
+                logging.error(f"MT5 init attempt {attempt+1} failed")
+                time.sleep(1)
+            except Exception as e:
+                logging.error(f"Connection error: {str(e)}")
+        return False
+    except Exception as e:
+        logging.error(f"MT5 initialization failed: {str(e)}")
+        return False
 
 
 @socketio.on('start_candle_stream')
@@ -349,11 +277,11 @@ def candle_polling_worker(sid, socketio):
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    """Clean up on client disconnect"""
     sid = request.sid
-    if sid in active_subscriptions:
-        active_subscriptions[sid]['active'] = False
-        del active_subscriptions[sid]
+    with subscription_lock:
+        if sid in active_subscriptions:
+            active_subscriptions[sid]['active'] = False
+            del active_subscriptions[sid]
     logging.info(f"Client disconnected: {sid}")
 
 
@@ -425,18 +353,6 @@ def place_order():
                 "magic": 12345,
                 "comment": "FBB",
             }
-            
-            trade_info = {
-                'symbol': symbol,
-                'direction': direction,
-                'volume': volume,
-                'price': entry_price,
-                'sl': sl,
-                'tp': tp,
-                'ask': current_price
-            }
-            message = build_signal_message(trade_info)
-            _send_telegram(message)
         elif direction == "SELL":
             current_price = tick.bid  # Use BID price for SELL orders
             
@@ -460,18 +376,6 @@ def place_order():
                 "magic": 12345,
                 "comment": "FBB",
             }
-            
-            trade_info = {
-                'symbol': symbol,
-                'direction': direction,
-                'volume': volume,
-                'price': entry_price,
-                'sl': sl,
-                'tp': tp,
-                'bid': current_price
-            }
-            message = build_signal_message(trade_info)
-            _send_telegram(message)
         else:
             return jsonify({"error": "Invalid direction - use BUY/SELL"}), 400
 
@@ -497,7 +401,17 @@ def place_order():
                 "message": error[1],
                 "comment": result.comment
             }), 400
-
+            
+        tg_bot.on_order_event('placed', {
+            'ticket': result.order,
+            'symbol': symbol,
+            'direction': direction,
+            'volume': volume,
+            'price': entry_price,
+            'sl': sl,
+            'tp': tp
+        })
+        
         return jsonify({
             "message": "Market order executed successfully",
             "ticket": result.order,
@@ -519,6 +433,146 @@ def place_order():
             logging.error(f"MT5 shutdown error: {str(e)}")
 
 
+@app.route('/place_limit_order', methods=['POST'])
+def place_limit_order():
+    """Execute pending (limit/stop) orders with proper validations"""
+    try:
+        data = request.json
+        required_fields = ['symbol', 'volume', 'direction', 'sl', 'tp', 'price']
+
+        # Validate request
+        for field in required_fields:
+            if field not in data or data[field] is None:
+                return jsonify({"error": f"Missing required field: {field}"}), 400
+
+        if not initialize_mt5():
+            return jsonify({"error": "MT5 connection failed"}), 500
+
+        symbol = data['symbol'].upper()
+        direction = data['direction'].upper()
+        volume = float(data['volume'])
+        entry_price = float(data['price'])
+        sl = float(data['sl'])
+        tp = float(data['tp'])
+
+        # Get current market price
+        tick = mt5.symbol_info_tick(symbol)
+        if not tick:
+            return jsonify({"error": "Failed to get market price"}), 400
+
+        # Determine prices and order type
+        current_price = tick.ask if direction == "BUY" else tick.bid
+        price_diff = entry_price - current_price
+        
+        if direction == "BUY":
+            if entry_price > current_price:
+                order_type = mt5.ORDER_TYPE_BUY_STOP
+                min_distance = min_distance_point * mt5.symbol_info(symbol).point
+                if abs(price_diff) < min_distance:
+                    return jsonify({"error": f"Entry price too close to current price (min {min_distance})"}), 400
+            else:
+                order_type = mt5.ORDER_TYPE_BUY_LIMIT
+        elif direction == "SELL":
+            if entry_price < current_price:
+                order_type = mt5.ORDER_TYPE_SELL_STOP
+                min_distance = min_distance_point * mt5.symbol_info(symbol).point
+                if abs(price_diff) < min_distance:
+                    return jsonify({"error": f"Entry price too close to current price (min {min_distance})"}), 400
+            else:
+                order_type = mt5.ORDER_TYPE_SELL_LIMIT
+        else:
+            return jsonify({"error": "Invalid direction - use BUY/SELL"}), 400
+
+        # Validate symbol
+        if not mt5.symbol_select(symbol, True):
+            return jsonify({"error": f"Symbol {symbol} not available"}), 400
+
+        # Get symbol precision
+        symbol_info = mt5.symbol_info(symbol)
+        digits = symbol_info.digits
+        point = symbol_info.point
+
+        # Format prices
+        entry_price = round(entry_price, digits)
+        sl = round(sl, digits)
+        tp = round(tp, digits)
+
+        # Validate stop levels
+        min_stop_distance = min_stop_distance_point * point
+        if direction == "BUY":
+            if sl >= entry_price - min_stop_distance:
+                return jsonify({"error": "SL too close to entry price for BUY order"}), 400
+            if tp <= entry_price + min_stop_distance:
+                return jsonify({"error": "TP too close to entry price for BUY order"}), 400
+        else:
+            if sl <= entry_price + min_stop_distance:
+                return jsonify({"error": "SL too close to entry price for SELL order"}), 400
+            if tp >= entry_price - min_stop_distance:
+                return jsonify({"error": "TP too close to entry price for SELL order"}), 400
+
+        # Build order request
+        order_request = {
+            "action": mt5.TRADE_ACTION_PENDING,
+            "symbol": symbol,
+            "volume": volume,
+            "type": order_type,
+            "price": entry_price,
+            "sl": sl,
+            "tp": tp,
+            "deviation": 30,
+            "type_time": mt5.ORDER_TIME_GTC,
+            "type_filling": mt5.ORDER_FILLING_RETURN,  # More suitable for pending orders
+        }
+
+        # Execute order
+        result = mt5.order_send(order_request)
+        if not result:
+            error = mt5.last_error()
+            return jsonify({
+                "error": "Order failed - no response from MT5",
+                "code": error[0],
+                "message": error[1]
+            }), 500
+
+        if result.retcode != mt5.TRADE_RETCODE_DONE:
+            error = mt5.last_error()
+            return jsonify({
+                "error": "Order rejected",
+                "code": error[0],
+                "message": error[1],
+                "comment": result.comment
+            }), 400
+
+        tg_bot.on_order_event('placed', {
+            'ticket': result.order,
+            'symbol': symbol,
+            'direction': f"PENDING {direction}",
+            'volume': volume,
+            'price': entry_price,
+            'sl': sl,
+            'tp': tp
+        })
+
+        return jsonify({
+            "message": "Pending order placed successfully",
+            "ticket": result.order,
+            "direction": direction,
+            "order_type": mt5.order_type_to_string(order_type),
+            "entry_price": entry_price,
+            "sl": sl,
+            "tp": tp,
+            "expiration": order_request['expiration']
+        }), 200
+
+    except Exception as e:
+        logging.error(f"Order processing error: {str(e)}")
+        return jsonify({"error": "Internal server error"}), 500
+    finally:
+        try:
+            mt5.shutdown()
+        except Exception as e:
+            logging.error(f"MT5 shutdown error: {str(e)}")  
+            
 @app.route('/last_week_candles_1d', methods=['POST'])
 def last_week_candles_1d():
     """Fetch daily candles between client-provided dates"""
@@ -680,8 +734,52 @@ def get_candles_in():
         logging.error(f"1m candles error: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
+@app.route('/test_pending_order', methods=['GET'])
+def test_pending_order():
+    """Test endpoint for generating valid pending orders (EURUSD M1)"""
+    try:
+        if not initialize_mt5():
+            return jsonify({"error": "MT5 connection failed"}), 500
+
+        # Get current EURUSD price
+        symbol = "EURUSD"
+        tick = mt5.symbol_info_tick(symbol)
+        if not tick:
+            return jsonify({"error": "Failed to get EURUSD price"}), 400
+
+        # Generate valid order parameters
+        current_price = round((tick.ask + tick.bid)/2, 5)
+        point = mt5.symbol_info(symbol).point
+        spread = mt5.symbol_info(symbol).spread * point
+
+        # Calculate valid price levels (2% from current price)
+        entry_price = round(current_price + (0.02 * 100 * point), 5)
+        sl = round(entry_price - (0.01 * 100 * point), 5)  # 1% risk
+        tp = round(entry_price + (0.03 * 100 * point), 5)  # 3% reward (3:1 ratio)
+
+        # Build test order
+        test_data = {
+            "symbol": symbol,
+            "volume": 0.1,
+            "direction": "BUY",
+            "sl": sl,
+            "tp": tp,
+            "price": entry_price
+        }
+
+        # Use existing limit order endpoint
+        response = place_limit_order()
+        response.headers.add('X-Test-Data', str(test_data))
+        return response
+
+    except Exception as e:
+        logging.error(f"Test order failed: {str(e)}")
+        return jsonify({"error": "Test order generation failed"}), 500
+    finally:
+        mt5.shutdown()
+
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    eventlet.spawn(check_closed_positions_periodically)
+    tg_bot.start_monitoring()
     socketio.run(app, host='localhost', port=5000, debug=True)
