@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from MetaTrader5 import mt5
 from queue import Queue
 from decimal import Decimal
-from app import target_tz, initialize_mt5  # Import from main app
+from shared import initialize_mt5
 
 class TelegramChannel:
     def __init__(self, bot_token: str, chat_id: str):
