@@ -7,13 +7,13 @@ from datetime import datetime, timedelta
 import MetaTrader5 as mt5
 from queue import Queue
 from decimal import Decimal
-from shared import initialize_mt5
+from shared import initialize_mt5, target_tz
 
 class TelegramChannel:
     def __init__(self, bot_token: str, chat_id: str):
         self.bot_token = bot_token
         self.chat_id = chat_id
-        self.last_check_time = datetime.now()
+        self.last_check_time = datetime.now().astimezone(target_tz)
         self.running = True
         self.message_queue = Queue()
         self.failure_count = 0
@@ -92,6 +92,10 @@ class TelegramChannel:
         while self.running:
             with self.lock:
                 try:
+                    # Convert times to UTC timestamps
+                    from_time = self.last_check_time.timestamp()
+                    to_time = datetime.now().astimezone(target_tz).timestamp()
+                    
                     # Connection retry logic
                     for _ in range(3):
                         if initialize_mt5():
@@ -100,50 +104,68 @@ class TelegramChannel:
                     else:
                         continue
 
-                    deals = mt5.history_deals_get(self.last_check_time, datetime.now())
+                    # Get deals with UTC timestamps
+                    deals = mt5.history_deals_get(from_time, to_time)
                     if deals:
+                        logging.info(f"Found {len(deals)} deals to process")
                         for deal in deals:
                             if deal.entry == mt5.DEAL_ENTRY_OUT:
                                 self._process_closed_deal(deal)
-                        self.last_check_time = datetime.now()
+                                logging.debug(f"Processed closed deal: {deal.ticket}")
+                        self.last_check_time = datetime.fromtimestamp(to_time)
+
+                    logging.debug("Position check completed successfully")
 
                 except Exception as e:
-                    logging.error(f"Position check error: {str(e)}")
+                    logging.error(f"Position check error: {str(e)}", exc_info=True)
                 finally:
                     mt5.shutdown()
                     time.sleep(10)
-
+                    
     def _process_closed_deal(self, deal):
         try:
-            # Calculate position duration
-            duration = deal.time_close - deal.time
-            hours, remainder = divmod(duration, 3600)
+            # Verify deal type and properties
+            if deal.entry != mt5.DEAL_ENTRY_OUT:
+                return
+
+            # Get symbol information with error handling
+            symbol_info = mt5.symbol_info(deal.symbol)
+            if not symbol_info:
+                logging.error(f"No symbol info for {deal.symbol}")
+                return
+
+            # Calculate position duration in hours/minutes
+            duration_seconds = deal.time_close - deal.time
+            hours, remainder = divmod(duration_seconds, 3600)
             minutes = remainder // 60
 
-            # Calculate risk-reward ratio
-            entry = Decimal(str(deal.price))
-            sl = Decimal(str(deal.sl))
-            tp = Decimal(str(deal.tp))
-            
-            risk = abs(entry - sl)
-            reward = abs(tp - entry)
-            rr_ratio = round(float(reward/risk), 1) if risk > 0 else 0
+            # Calculate precise risk/reward ratio
+            entry_price = Decimal(str(deal.price))
+            sl_price = Decimal(str(deal.sl))
+            tp_price = Decimal(str(deal.tp))
+            risk = abs(entry_price - sl_price)
+            reward = abs(tp_price - entry_price)
+            rr_ratio = round(float(reward/risk), 2) if risk > 0 else 0
 
+            # Build trade data with proper formatting
             trade_data = {
                 'ticket': deal.ticket,
                 'symbol': deal.symbol,
                 'volume': deal.volume,
                 'profit': deal.profit,
-                'price': float(entry),
-                'sl': float(sl),
-                'tp': float(tp),
-                'direction': 'BUY' if deal.entry == mt5.DEAL_ENTRY_IN else 'SELL',
+                'price': float(entry_price),
+                'sl': float(sl_price),
+                'tp': float(tp_price),
+                'direction': 'BUY' if deal.type == mt5.DEAL_TYPE_BUY else 'SELL',
                 'duration': f"{int(hours)}h {int(minutes)}m",
                 'rr_ratio': f"{rr_ratio}:1"
             }
+
+            logging.info(f"Sending closure notification for ticket {deal.ticket}")
             self.on_order_event('closed', trade_data)
+
         except Exception as e:
-            logging.error(f"Deal processing error: {str(e)}")
+            logging.error(f"Deal processing error: {str(e)}", exc_info=True)
 
     def start_monitoring(self):
         self.monitor_thread = threading.Thread(target=self.check_closed_positions)

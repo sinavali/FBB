@@ -136,11 +136,26 @@ export default class MarketShiftStructure {
         this.marketShifts.add(model as IMSS);
         logger.info(`new MSS initiated: ${JSON.stringify(this.marketShifts.getNewest())}`);
 
+        const signal: ISignal = {
+            id: 0, // will be overrided in Signal class
+            triggerCandleId: candle.id,
+            triggerId: model.id,
+            trigger: Triggers.MSS,
+            direction: model.direction,
+            limit: model.limit,
+            stoploss: model.stoploss,
+            takeprofit: model.takeprofit,
+            pairPeriod: model.pairPeriod,
+            status: SignalStatus.TRIGGERED,
+            time: candle.time,
+            liquidityUsed: model.liquidityUsed,
+        };
+        this.generalStore.state.Signal.signals.add(signal);
         
         if (this.generalStore.globalStates.systemMode === SystemMode.LIVE) {
             const positionData: IPosition = {
                 symbol: model.pairPeriod.pair as string,
-                volume: 0.33,
+                volume: 0.01,
                 price: model.limit,
                 sl: model.stoploss,
                 tp: model.takeprofit,
@@ -323,29 +338,13 @@ export default class MarketShiftStructure {
                 triggerId: mss.id,
             };
             this.marketShifts.updateByIndex(index, "liquidityUsed", newLiquidityUsed);
-
-            const signal: ISignal = {
-                id: 0, // will be overrided in Signal class
-                triggerCandleId: candle.id,
-                triggerId: mss.id,
-                trigger: Triggers.MSS,
-                direction: mss.direction,
-                limit: mss.limit,
-                stoploss: mss.stoploss,
-                takeprofit: mss.takeprofit,
-                pairPeriod: mss.pairPeriod,
-                status: SignalStatus.TRIGGERED,
-                time: candle.time,
-                liquidityUsed: newLiquidityUsed,
-            };
-            this.generalStore.state.Signal.signals.add(signal);
             this.generalStore.state.Liquidity.addNewUsed(mss.id, Triggers.MSS, newLiquidityUsed.liquidityId, newLiquidityUsed);
             this.generalStore.state.Liquidity.updateUsed(mss.id, Triggers.MSS, newLiquidityUsed.liquidityId, newLiquidityUsed);
 
             // if (this.generalStore.globalStates.systemMode === SystemMode.LIVE) {
             //     const positionData: IPosition = {
             //         symbol: signal.pairPeriod.pair as string,
-            //         volume: 0.33,
+            //         volume: 0.01,
             //         price: signal.limit,
             //         sl: signal.stoploss,
             //         tp: signal.takeprofit,

@@ -1,3 +1,16 @@
+from zoneinfo import ZoneInfo
+
+target_tz_name = "Europe/Athens"
+target_tz = ZoneInfo(target_tz_name) # +02:00 | +03:00
+
+demo_login = 5034048580
+demo_password = "*h3nNrEu"
+demo_server = "MetaQuotes-Demo"
+
+fundedNext15kWith5PercentLoss_login = 489449
+fundedNext15kWith5PercentLoss_password = "dzsAR42##"
+fundedNext15kWith5PercentLoss_server = "FundedNext-Server"
+
 # MT5 initialization function
 def initialize_mt5():
     import MetaTrader5 as mt5
@@ -8,9 +21,9 @@ def initialize_mt5():
         try:
             if mt5.initialize(
                     path="C:/Program Files/MetaTrader 5/terminal64.exe",
-                    login=5034048580,
-                    password="*h3nNrEu",
-                    server="MetaQuotes-Demo",
+                    login=demo_login,
+                    password=demo_password,
+                    server=demo_server,
                     timeout=5000
             ):
                 return True

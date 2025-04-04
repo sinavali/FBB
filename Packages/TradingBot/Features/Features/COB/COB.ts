@@ -353,7 +353,7 @@ export default class CandleOrderBlock {
             if (this.generalStore.globalStates.systemMode === SystemMode.LIVE) {
                 const positionData: IPosition = {
                     symbol: signal.pairPeriod.pair as string,
-                    volume: 0.33,
+                    volume: 0.01,
                     price: signal.limit,
                     sl: signal.stoploss as number,
                     tp: signal.takeprofit as number,
