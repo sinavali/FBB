@@ -1,6 +1,6 @@
-import {IPosition, ISignal} from "@shared/Types/Interfaces/general.ts";
-import {GeneralStore} from "@shared/Types/Interfaces/generalStore.ts";
-import {CircularBuffer} from "@tradingBot/Features/Core/CircularBuffer.ts";
+import { IPosition, ISignal } from "@shared/Types/Interfaces/general.ts";
+import { GeneralStore } from "@shared/Types/Interfaces/generalStore.ts";
+import { CircularBuffer } from "@tradingBot/Features/Core/CircularBuffer.ts";
 import logger from "@shared/Initiatives/Logger.js";
 
 export default class Signal {
@@ -43,14 +43,14 @@ export default class Signal {
             return;
         }
 
-        const res = await fetch("http://localhost:5000/place_order", {
+        const res = await fetch("http://localhost:5000/place_limit_order", {
             method: "POST",
-            headers: {'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(position),
         })
         const data = await res.json();
 
-        logger.info(`new position: ${JSON.stringify(position)}`);
+        logger.info(`new position limit: ${JSON.stringify(position)}`);
         logger.info(`position request result: ${JSON.stringify(data)}`);
 
         console.log(data);

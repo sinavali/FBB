@@ -35,7 +35,7 @@ export default class MarketShiftStructure {
         this.minCandleToCheck = minCandlesToCheck;
     }
 
-    initiateMSS(candle: ICandle) {
+    async initiateMSS(candle: ICandle) {
         const liquidities = this.generalStore.state.Liquidity?.liquidities
             .getAll().filter(
                 (l) =>
@@ -135,6 +135,28 @@ export default class MarketShiftStructure {
 
         this.marketShifts.add(model as IMSS);
         logger.info(`new MSS initiated: ${JSON.stringify(this.marketShifts.getNewest())}`);
+
+        
+        if (this.generalStore.globalStates.systemMode === SystemMode.LIVE) {
+            const positionData: IPosition = {
+                symbol: model.pairPeriod.pair as string,
+                volume: 0.33,
+                price: model.limit,
+                sl: model.stoploss,
+                tp: model.takeprofit,
+                direction: "BUY"
+            }
+
+            if (model.direction === Directions.UP) {
+                positionData.direction = "BUY";
+                if ((positionData.price - (positionData.sl as number)) < 0.0003) return;
+            } else if (model.direction === Directions.DOWN) {
+                positionData.direction = "SELL";
+                if (((positionData.sl as number) - positionData.price) < 0.0003) return;
+            }
+
+            await this.generalStore.state.Signal.openPosition(positionData);
+        }
     }
 
     updateMSS(candle: ICandle) {
@@ -320,26 +342,26 @@ export default class MarketShiftStructure {
             this.generalStore.state.Liquidity.addNewUsed(mss.id, Triggers.MSS, newLiquidityUsed.liquidityId, newLiquidityUsed);
             this.generalStore.state.Liquidity.updateUsed(mss.id, Triggers.MSS, newLiquidityUsed.liquidityId, newLiquidityUsed);
 
-            if (this.generalStore.globalStates.systemMode === SystemMode.LIVE) {
-                const positionData: IPosition = {
-                    symbol: signal.pairPeriod.pair as string,
-                    volume: 0.33,
-                    price: signal.limit,
-                    sl: signal.stoploss,
-                    tp: signal.takeprofit,
-                    direction: "BUY"
-                }
+            // if (this.generalStore.globalStates.systemMode === SystemMode.LIVE) {
+            //     const positionData: IPosition = {
+            //         symbol: signal.pairPeriod.pair as string,
+            //         volume: 0.33,
+            //         price: signal.limit,
+            //         sl: signal.stoploss,
+            //         tp: signal.takeprofit,
+            //         direction: "BUY"
+            //     }
 
-                if (signal.direction === Enums.Directions.UP) {
-                    positionData.direction = "BUY";
-                    if ((positionData.price - (positionData.sl as number)) < 0.0003) return;
-                } else if (signal.direction === Enums.Directions.DOWN) {
-                    positionData.direction = "SELL";
-                    if (((positionData.sl as number) - positionData.price) < 0.0003) return;
-                }
+            //     if (signal.direction === Enums.Directions.UP) {
+            //         positionData.direction = "BUY";
+            //         if ((positionData.price - (positionData.sl as number)) < 0.0003) return;
+            //     } else if (signal.direction === Enums.Directions.DOWN) {
+            //         positionData.direction = "SELL";
+            //         if (((positionData.sl as number) - positionData.price) < 0.0003) return;
+            //     }
 
-                await this.generalStore.state.Signal.openPosition(positionData);
-            }
+            //     await this.generalStore.state.Signal.openPosition(positionData);
+            // }
         }
     }
 

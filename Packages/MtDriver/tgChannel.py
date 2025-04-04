@@ -4,7 +4,7 @@ import requests
 import threading
 import time
 from datetime import datetime, timedelta
-from MetaTrader5 import mt5
+import MetaTrader5 as mt5
 from queue import Queue
 from decimal import Decimal
 from shared import initialize_mt5
@@ -111,7 +111,7 @@ class TelegramChannel:
                     logging.error(f"Position check error: {str(e)}")
                 finally:
                     mt5.shutdown()
-                    time.sleep(30)
+                    time.sleep(10)
 
     def _process_closed_deal(self, deal):
         try:

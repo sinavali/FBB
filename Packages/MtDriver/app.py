@@ -13,7 +13,7 @@ import eventlet
 import time  # Added missing import
 from zoneinfo import ZoneInfo
 from collections import defaultdict
-from shared import target_tz, initialize_mt5
+from shared import initialize_mt5
 from tgChannel import TelegramChannel
 from threading import Lock
 
@@ -532,11 +532,9 @@ def place_limit_order():
             "message": "Pending order placed successfully",
             "ticket": result.order,
             "direction": direction,
-            "order_type": mt5.order_type_to_string(order_type),
             "entry_price": entry_price,
             "sl": sl,
             "tp": tp,
-            "expiration": order_request['expiration']
         }), 200
 
     except Exception as e:
@@ -709,50 +707,67 @@ def get_candles_in():
         logging.error(f"1m candles error: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
+
+
 @app.route('/test_pending_order', methods=['GET'])
 def test_pending_order():
     """Test endpoint for generating valid pending orders (EURUSD M1)"""
     try:
+        # Initialize MT5 with enhanced logging
         if not initialize_mt5():
+            logging.error("MT5 initialization failed in test endpoint")
             return jsonify({"error": "MT5 connection failed"}), 500
 
-        # Get current EURUSD price
         symbol = "EURUSD"
+        if not mt5.symbol_select(symbol, True):
+            logging.error(f"Failed to select {symbol} in Market Watch")
+            return jsonify({"error": "Symbol not available"}), 400
+
+        # Get detailed price information
         tick = mt5.symbol_info_tick(symbol)
         if not tick:
-            return jsonify({"error": "Failed to get EURUSD price"}), 400
+            logging.error("No tick data received")
+            return jsonify({"error": "Price check failed"}), 400
 
-        # Generate valid order parameters
-        current_price = round((tick.ask + tick.bid)/2, 5)
+        # Calculate prices using precise decimal arithmetic
         point = mt5.symbol_info(symbol).point
         spread = mt5.symbol_info(symbol).spread * point
+        current_price = round((tick.ask + tick.bid) / 2, 5)
+        
+        # Generate valid BUY STOP order parameters
+        entry_price = current_price + 20 * point  # 20 pips above current
+        sl = entry_price - 20 * point            # 10 pips risk
+        tp = entry_price + 60 * point            # 30 pips reward (3:1 ratio)
 
-        # Calculate valid price levels (2% from current price)
-        entry_price = round(current_price + (0.02 * 100 * point), 5)
-        sl = round(entry_price - (0.01 * 100 * point), 5)  # 1% risk
-        tp = round(entry_price + (0.03 * 100 * point), 5)  # 3% reward (3:1 ratio)
-
-        # Build test order
+        # Create test order payload
         test_data = {
             "symbol": symbol,
             "volume": 0.1,
             "direction": "BUY",
-            "sl": sl,
-            "tp": tp,
-            "price": entry_price
+            "sl": round(sl, 5),
+            "tp": round(tp, 5),
+            "price": round(entry_price, 5)
         }
 
-        # Use existing limit order endpoint
-        response = place_limit_order()
-        response.headers.add('X-Test-Data', str(test_data))
-        return response
+        # Simulate POST request to place_limit_order
+        with app.test_client() as client:
+            response = client.post('/place_limit_order', 
+                json=test_data,
+                headers={'Content-Type': 'application/json'}
+            )
+            
+        return response.json, response.status_code
 
     except Exception as e:
-        logging.error(f"Test order failed: {str(e)}")
-        return jsonify({"error": "Test order generation failed"}), 500
+        logging.error(f"Test order failed: {str(e)}", exc_info=True)
+        return jsonify({
+            "error": "Test order failed",
+            "details": str(e)
+        }), 500
     finally:
-        mt5.shutdown()
-
+        # Don't shutdown MT5 here to maintain connection pool
+        pass
+    
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)

@@ -137,7 +137,7 @@ async function initiationPhaseModelOne(generalStore: GeneralStore) {
     generalStore.state.COB?.initiateCOB(data.candle);
     generalStore.state.COB?.updateCOB(data.candle);
 
-    generalStore.state.MSS?.initiateMSS(data.candle);
+    await generalStore.state.MSS?.initiateMSS(data.candle);
     // generalStore.state.MSS?.updateMSS(data.candle);
 
     return data;
