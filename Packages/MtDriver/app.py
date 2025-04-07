@@ -318,7 +318,7 @@ def place_order():
             mt5_request = {
                 "action": mt5.TRADE_ACTION_DEAL,
                 "symbol": symbol,
-                "volume": volume,
+                "volume": 0.01,
                 "type": order_type,
                 "price": current_price,
                 "sl": sl,
@@ -489,7 +489,7 @@ def place_limit_order():
         order_request = {
             "action": mt5.TRADE_ACTION_PENDING,
             "symbol": symbol,
-            "volume": volume,
+            "volume": 0.01,
             "type": order_type,
             "price": entry_price,
             "sl": sl,

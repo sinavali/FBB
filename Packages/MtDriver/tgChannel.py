@@ -68,7 +68,8 @@ class TelegramChannel:
                     f"• Volume: {trade_data['volume']}\n"
                     f"• Price: {fmt % trade_data['price']}\n"
                     f"• SL: {fmt % trade_data['sl']}\n"
-                    f"• TP: {fmt % trade_data['tp']}")
+                    f"• TP: {fmt % trade_data['tp']}\n"
+                    f"#FundedNext")
 
             if 'profit' in trade_data:
                 base += f"\n• Profit: ${trade_data['profit']:.2f}"

@@ -1,6 +1,6 @@
-import {ICandle, ILiquidity, IMSS, IPosition, ISignal, LiquidityUsed,} from "@shared/Types/Interfaces/general.ts";
+import { ICandle, ILiquidity, IMSS, IPosition, ISignal, LiquidityUsed, } from "@shared/Types/Interfaces/general.ts";
 import Query from "@shared/Queries.ts";
-import {GeneralStore} from "@shared/Types/Interfaces/generalStore.ts";
+import { GeneralStore } from "@shared/Types/Interfaces/generalStore.ts";
 import {
     CandleDeepType,
     Directions,
@@ -11,8 +11,8 @@ import {
     Triggers,
     TriggerStatus,
 } from "@shared/Types/Enums.ts";
-import {CircularBuffer} from "@tradingBot/Features/Core/CircularBuffer.ts";
-import {useMarketUtils} from "@shared/Utilities/marketUtils.ts";
+import { CircularBuffer } from "@tradingBot/Features/Core/CircularBuffer.ts";
+import { useMarketUtils } from "@shared/Utilities/marketUtils.ts";
 import * as Enums from "@shared/Types/Enums.js";
 import logger from "@shared/Initiatives/Logger.js";
 
@@ -136,22 +136,6 @@ export default class MarketShiftStructure {
         this.marketShifts.add(model as IMSS);
         logger.info(`new MSS initiated: ${JSON.stringify(this.marketShifts.getNewest())}`);
 
-        const signal: ISignal = {
-            id: 0, // will be overrided in Signal class
-            triggerCandleId: candle.id,
-            triggerId: model.id,
-            trigger: Triggers.MSS,
-            direction: model.direction,
-            limit: model.limit,
-            stoploss: model.stoploss,
-            takeprofit: model.takeprofit,
-            pairPeriod: model.pairPeriod,
-            status: SignalStatus.TRIGGERED,
-            time: candle.time,
-            liquidityUsed: model.liquidityUsed,
-        };
-        this.generalStore.state.Signal.signals.add(signal);
-        
         if (this.generalStore.globalStates.systemMode === SystemMode.LIVE) {
             const positionData: IPosition = {
                 symbol: model.pairPeriod.pair as string,
@@ -341,6 +325,22 @@ export default class MarketShiftStructure {
             this.generalStore.state.Liquidity.addNewUsed(mss.id, Triggers.MSS, newLiquidityUsed.liquidityId, newLiquidityUsed);
             this.generalStore.state.Liquidity.updateUsed(mss.id, Triggers.MSS, newLiquidityUsed.liquidityId, newLiquidityUsed);
 
+            const signal: ISignal = {
+                id: 0, // will be overrided in Signal class
+                triggerCandleId: candle.id,
+                triggerId: mss.id,
+                trigger: Triggers.MSS,
+                direction: mss.direction,
+                limit: mss.limit,
+                stoploss: mss.stoploss,
+                takeprofit: mss.takeprofit,
+                pairPeriod: mss.pairPeriod,
+                status: SignalStatus.TRIGGERED,
+                time: candle.time,
+                liquidityUsed: mss.liquidityUsed,
+            };
+            this.generalStore.state.Signal.signals.add(signal);
+            
             // if (this.generalStore.globalStates.systemMode === SystemMode.LIVE) {
             //     const positionData: IPosition = {
             //         symbol: signal.pairPeriod.pair as string,
@@ -678,8 +678,8 @@ export default class MarketShiftStructure {
                 "SignalTakeProfitError"
             )?.settingValueParsed,
             riskReward:
-            this.generalStore.state.Setting?.getOne("RiskReward")
-                ?.settingValueParsed,
+                this.generalStore.state.Setting?.getOne("RiskReward")
+                    ?.settingValueParsed,
         };
     }
 
