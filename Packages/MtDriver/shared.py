@@ -1,4 +1,10 @@
+# shared.py
+import logging
+import os
+from logging import Handler, Formatter
+from datetime import datetime
 from zoneinfo import ZoneInfo
+import MetaTrader5 as mt5
 
 target_tz_name = "Europe/Athens"
 # target_tz_name = "Asia/Nicosia"
@@ -12,19 +18,85 @@ fundedNext15kWith5PercentLoss_login = 489449
 fundedNext15kWith5PercentLoss_password = "dzsAR42##"
 fundedNext15kWith5PercentLoss_server = "FundedNext-Server"
 
-# MT5 initialization function
+# Logging configuration
+LOG_DIR = "./Logs/mtDriver"
+os.makedirs(LOG_DIR, exist_ok=True)
+
+class DailyRotatingFileHandler(Handler):
+    def __init__(self):
+        super().__init__()
+        self.current_date = None
+        self.file_handler = None
+        self.setFormatter(Formatter(
+            '%(asctime)s - %(levelname)s - %(module)s - %(message)s',
+            datefmt='%Y-%m-%d %H:%M:%S%z'
+        ))
+
+    def get_file_name(self):
+        """Get filename based on Europe/Athens date"""
+        now = datetime.now(target_tz)
+        return os.path.join(LOG_DIR, f"{now.strftime('%Y-%m-%d')}.log")
+
+    def emit(self, record):
+        """Handle log emission with timezone-aware rotation"""
+        try:
+            current_date = datetime.now(target_tz).date()
+            
+            if current_date != self.current_date:
+                self.close_file()
+                self.current_date = current_date
+                filename = self.get_file_name()
+                self.file_handler = open(filename, 'a', encoding='utf-8')
+            
+            msg = self.format(record)
+            if self.file_handler:
+                self.file_handler.write(msg + '\n')
+                self.file_handler.flush()
+                
+        except Exception as e:
+            print(f"Logging failed: {str(e)}")
+
+    def close_file(self):
+        if self.file_handler:
+            self.file_handler.close()
+            self.file_handler = None
+
+    def close(self):
+        self.close_file()
+        super().close()
+
+def setup_logging():
+    """Configure logging for all modules"""
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+
+    # Remove existing handlers
+    for handler in logger.handlers[:]:
+        logger.removeHandler(handler)
+
+    # Add file handler
+    file_handler = DailyRotatingFileHandler()
+    file_handler.setLevel(logging.INFO)
+    logger.addHandler(file_handler)
+
+    # Add console handler
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(Formatter(
+        '%(asctime)s - %(levelname)s - %(module)s - %(message)s'
+    ))
+    logger.addHandler(console_handler)
+
+    logging.info("Logging system initialized")
+
+
 def initialize_mt5():
-    import MetaTrader5 as mt5
-    import time
-    import logging
-    
     for attempt in range(3):
         try:
             if mt5.initialize(
                     path="C:/Program Files/MetaTrader 5/terminal64.exe",
-                    login=fundedNext15kWith5PercentLoss_login,
-                    password=fundedNext15kWith5PercentLoss_password,
-                    server=fundedNext15kWith5PercentLoss_server,
+                    login=demo_login,
+                    password=demo_password,
+                    server=demo_server,
                     timeout=5000
             ):
                 return True
