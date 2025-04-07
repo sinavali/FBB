@@ -15,6 +15,7 @@ import { CircularBuffer } from "@tradingBot/Features/Core/CircularBuffer.ts";
 import { useMarketUtils } from "@shared/Utilities/marketUtils.ts";
 import * as Enums from "@shared/Types/Enums.js";
 import logger from "@shared/Initiatives/Logger.js";
+import { Moment } from "moment";
 
 export default class MarketShiftStructure {
     public marketShifts: CircularBuffer<IMSS>;
@@ -125,6 +126,7 @@ export default class MarketShiftStructure {
 
         model.id = ++this.maxId;
         model.dateTime = candle.time.utc.tz("America/New_York");
+        model.placeOrderTime = candle.time.utc;
         model.state = MssState.INITIATED;
         model.liquidityUsed = {
             liquidityId: liquidity.id,
@@ -211,10 +213,7 @@ export default class MarketShiftStructure {
         return false;
     }
 
-    private checkSecondDeepToMssCandleDiffFailure(
-        mss: IMSS,
-        candle: ICandle
-    ): boolean {
+    private checkSecondDeepToMssCandleDiffFailure(mss: IMSS, candle: ICandle): boolean {
         const secondDeepToMssCandleDiff = this.generalStore.state.Setting.getOne(
             "MSSSecondDeepToMssCandleDiff"
         )?.settingValueParsed as number;
@@ -236,10 +235,7 @@ export default class MarketShiftStructure {
         return false;
     }
 
-    private checkMssCandleToTriggerCandleDiffFailure(
-        mss: IMSS,
-        candle: ICandle
-    ): boolean {
+    private checkMssCandleToTriggerCandleDiffFailure(mss: IMSS, candle: ICandle): boolean {
         const mssCandleToTriggerCandleDiff = this.generalStore.state.Setting.getOne(
             "MSSMssCandleToTriggerCandleDiff"
         )?.settingValueParsed as number;
@@ -338,9 +334,14 @@ export default class MarketShiftStructure {
                 status: SignalStatus.TRIGGERED,
                 time: candle.time,
                 liquidityUsed: mss.liquidityUsed,
+
+                placeOrderTime: mss.placeOrderTime,
+                entryTime: candle.time,
+                confirmToEntryTime: candle.time.utc.diff(mss.placeOrderTime),
+                stopHeight: mss.direction === Directions.DOWN ? mss.stoploss - mss.limit : mss.limit - mss.stoploss,
             };
             this.generalStore.state.Signal.signals.add(signal);
-            
+
             // if (this.generalStore.globalStates.systemMode === SystemMode.LIVE) {
             //     const positionData: IPosition = {
             //         symbol: signal.pairPeriod.pair as string,
@@ -398,6 +399,11 @@ export default class MarketShiftStructure {
                 signalIndex,
                 "time",
                 candle.time
+            );
+            this.generalStore.state.Signal.signals.updateByIndex(
+                signalIndex,
+                "entryToResult",
+                signal.entryTime?.utc.diff(signal.time.utc)
             );
             this.generalStore.state.Signal.signals.updateByIndex(
                 signalIndex,

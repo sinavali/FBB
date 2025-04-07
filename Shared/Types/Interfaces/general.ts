@@ -4,7 +4,7 @@ import {
     DateTime,
     PairPeriod,
 } from "@shared/Types/Interfaces/common.ts";
-import {Setting, Currency, TimeMicroType} from "@prisma/client";
+import { Setting, Currency, TimeMicroType } from "@prisma/client";
 import Net from "net";
 
 export interface IMTSocket {
@@ -87,15 +87,15 @@ export interface AddNewLiquidityParams {
 
 export type GenerateLiquiditiesMethodParams =
     | {
-    candle: ICandle;
-    timezone: string;
-    type: "daily" | "weekly";
-}
+        candle: ICandle;
+        timezone: string;
+        type: "daily" | "weekly";
+    }
     | {
-    pairPeriod: PairPeriod;
-    session: ISession;
-    type: "bySession";
-};
+        pairPeriod: PairPeriod;
+        session: ISession;
+        type: "bySession";
+    };
 
 export interface FVG {
     id: number;
@@ -129,6 +129,7 @@ export interface IMSS {
     FVGs?: number[]; // id of FVGs
     height: number;
     dateTime?: any;
+    placeOrderTime?: any;
 }
 
 export interface ISignal {
@@ -144,6 +145,11 @@ export interface ISignal {
     takeprofit: number;
     status: Enums.SignalStatus;
     time: DateTime;
+    placeOrderTime?: DateTime;
+    entryTime?: DateTime;
+    stopHeight?: number;
+    confirmToEntryTime?: number;
+    entryToResult?: number;
 }
 
 export interface IPosition {
