@@ -1,21 +1,21 @@
 from eventlet import monkey_patch
-
 monkey_patch()
 
-import os
-import requests
 from flask import Flask, request, jsonify
 from flask_socketio import SocketIO
 import MetaTrader5 as mt5
-import logging
 from datetime import datetime, timedelta, timezone
 import eventlet
-import time  # Added missing import
 from zoneinfo import ZoneInfo
 from collections import defaultdict
-from shared import initialize_mt5
+from shared import initialize_mt5, setup_logging, target_tz
 from tgChannel import TelegramChannel
 from threading import Lock
+import logging
+
+# Initialize logging first
+setup_logging()
+logger = logging.getLogger(__name__)
 
 # Initialize Telegram channel
 tg_bot = TelegramChannel(
@@ -71,15 +71,15 @@ DEAL_REASON_TP = 4  # Take Profit triggered
 
 
 def print_default_data():
-    print("--------------------------------------------------")
-    print(f"target_tz_name: {target_tz_name}")
-    print(f"target_tz: {target_tz}")
-    print(f"target_tz_offset_seconds: {target_tz_offset_seconds}")
-    print(f"live_start_time_target_tz: {live_start_time_target_tz}")
-    print(f"live_start_time_utc: {live_start_time_utc}")
-    print(f"now_in_utc: {now_in_utc()}")
-    print(f"now_in_target_tz: {now_in_target_tz()}")
-    print("--------------------------------------------------") 
+    logger.debug("--------------------------------------------------")
+    logger.debug(f"target_tz_name: {target_tz_name}")
+    logger.debug(f"target_tz: {target_tz}")
+    logger.debug(f"target_tz_offset_seconds: {target_tz_offset_seconds}")
+    logger.debug(f"live_start_time_target_tz: {live_start_time_target_tz}")
+    logger.debug(f"live_start_time_utc: {live_start_time_utc}")
+    logger.debug(f"now_in_utc: {now_in_utc()}")
+    logger.debug(f"now_in_target_tz: {now_in_target_tz()}")
+    logger.debug("--------------------------------------------------")
     
     
 def format_positions_message(stats: dict) -> str:
@@ -270,12 +270,14 @@ def place_order():
         # Validate request
         for field in required_fields:
             if field not in data or data[field] is None:
+                logger.warning(f"Missing field {field} in order request")
                 return jsonify({"error": f"Missing required field: {field}"}), 400
 
         if not initialize_mt5():
+            logger.error("MT5 initialization failed in place_order")
             return jsonify({"error": "MT5 connection failed"}), 500
 
-        symbol = data['symbol'].upper()
+        symbol = data['symbol'].upper()        
         direction = data['direction'].upper()
         volume = float(data['volume'])
         entry_price = float(data['price'])
@@ -362,11 +364,13 @@ def place_order():
         result = mt5.order_send(mt5_request)
         if not result:
             error = mt5.last_error()
+            logger.error(f"Order failed for {symbol}: {error}")
             return jsonify({
                 "error": "Order failed - no response from MT5",
                 "code": error[0],
                 "message": error[1]
             }), 500
+        logger.info(f"Order executed successfully: {result.order}")
 
         if result.retcode != mt5.TRADE_RETCODE_DONE:
             error = mt5.last_error()
@@ -399,13 +403,13 @@ def place_order():
         }), 200
 
     except Exception as e:
-        logging.error(f"Order processing error: {str(e)}")
+        logger.error(f"Order processing error: {str(e)}", exc_info=True)
         return jsonify({"error": "Internal server error"}), 500
     finally:
         try:
             mt5.shutdown()
         except Exception as e:
-            logging.error(f"MT5 shutdown error: {str(e)}")
+            logger.error(f"MT5 shutdown error: {str(e)}")
 
 
 @app.route('/place_limit_order', methods=['POST'])
@@ -418,9 +422,11 @@ def place_limit_order():
         # Validate request
         for field in required_fields:
             if field not in data or data[field] is None:
+                logger.warning(f"Missing field {field} in order request")
                 return jsonify({"error": f"Missing required field: {field}"}), 400
 
         if not initialize_mt5():
+            logger.error("MT5 initialization failed in place_order")
             return jsonify({"error": "MT5 connection failed"}), 500
 
         symbol = data['symbol'].upper()
@@ -489,7 +495,7 @@ def place_limit_order():
         order_request = {
             "action": mt5.TRADE_ACTION_PENDING,
             "symbol": symbol,
-            "volume": 0.01,
+            "volume": 0.33,
             "type": order_type,
             "price": entry_price,
             "sl": sl,
@@ -498,16 +504,18 @@ def place_limit_order():
             "type_time": mt5.ORDER_TIME_GTC,
             "type_filling": mt5.ORDER_FILLING_RETURN,  # More suitable for pending orders
         }
-
+        
         # Execute order
         result = mt5.order_send(order_request)
         if not result:
             error = mt5.last_error()
+            logger.error(f"Order failed for {symbol}: {error}")
             return jsonify({
                 "error": "Order failed - no response from MT5",
                 "code": error[0],
                 "message": error[1]
             }), 500
+        logger.info(f"Order executed successfully: {result.order}")
 
         if result.retcode != mt5.TRADE_RETCODE_DONE:
             error = mt5.last_error()
@@ -538,13 +546,13 @@ def place_limit_order():
         }), 200
 
     except Exception as e:
-        logging.error(f"Order processing error: {str(e)}")
+        logger.error(f"Order processing error: {str(e)}", exc_info=True)
         return jsonify({"error": "Internal server error"}), 500
     finally:
         try:
             mt5.shutdown()
         except Exception as e:
-            logging.error(f"MT5 shutdown error: {str(e)}")  
+            logger.error(f"MT5 shutdown error: {str(e)}")  
             
 @app.route('/last_week_candles_1d', methods=['POST'])
 def last_week_candles_1d():
@@ -742,7 +750,7 @@ def test_pending_order():
         # Create test order payload
         test_data = {
             "symbol": symbol,
-            "volume": 0.1,
+            "volume": 0.33,
             "direction": "BUY",
             "sl": round(sl, 5),
             "tp": round(tp, 5),
@@ -770,6 +778,6 @@ def test_pending_order():
     
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
+    logger.info("Application starting...")
     tg_bot.start_monitoring()
     socketio.run(app, host='127.0.0.1', port=5000, debug=True)

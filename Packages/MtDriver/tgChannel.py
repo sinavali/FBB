@@ -1,13 +1,14 @@
-# tgChannel.py
 import logging
 import requests
 import threading
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 import MetaTrader5 as mt5
 from queue import Queue
 from decimal import Decimal
 from shared import initialize_mt5, target_tz
+
+logger = logging.getLogger(__name__)
 
 class TelegramChannel:
     def __init__(self, bot_token: str, chat_id: str):
@@ -20,6 +21,7 @@ class TelegramChannel:
         self.circuit_open = False
         self._start_processing_thread()
         self.lock = threading.Lock()
+        logger.info("Telegram channel initialized")
 
     def _start_processing_thread(self):
         def processor():
@@ -30,9 +32,11 @@ class TelegramChannel:
 
     def _send_message(self, text: str) -> bool:
         if self.circuit_open:
+            logger.warning("Circuit breaker open, message not sent")
             return False
             
         try:
+            logger.debug(f"Sending Telegram message: {text}")
             url = f"https://api.telegram.org/bot{self.bot_token}/sendMessage"
             payload = {
                 'chat_id': self.chat_id,
@@ -42,13 +46,15 @@ class TelegramChannel:
             response = requests.post(url, data=payload, timeout=5)
             response.raise_for_status()
             self.failure_count = 0
+            logger.info("Telegram message sent successfully")
             return True
         except Exception as e:
+            logger.error(f"Telegram notification failed: {str(e)}")
             self.failure_count += 1
             if self.failure_count > 5:
+                logger.critical("Activating circuit breaker for Telegram")
                 self.circuit_open = True
                 threading.Timer(300, self._reset_circuit).start()
-            logging.error(f"Telegram notification failed: {str(e)}")
             return False
 
     def _reset_circuit(self):
@@ -61,7 +67,7 @@ class TelegramChannel:
             digits = symbol_info.digits if symbol_info else 5
             fmt = f"%.{digits}f"
             
-            base = (f"🎯 *{order_type}* - FundedNext\n"
+            base = (f"🎯 *{order_type}* - Demo MetaQuote\n"
                     f"• Ticket: #{trade_data['ticket']}\n"
                     f"• Symbol: {trade_data['symbol']}\n"
                     f"• Direction: {trade_data['direction']}\n"
@@ -69,7 +75,7 @@ class TelegramChannel:
                     f"• Price: {fmt % trade_data['price']}\n"
                     f"• SL: {fmt % trade_data['sl']}\n"
                     f"• TP: {fmt % trade_data['tp']}\n"
-                    f"#FundedNext")
+                    f"#DemoQuote")
 
             if 'profit' in trade_data:
                 base += f"\n• Profit: ${trade_data['profit']:.2f}"
