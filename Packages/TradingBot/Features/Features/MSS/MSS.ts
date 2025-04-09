@@ -125,7 +125,7 @@ export default class MarketShiftStructure {
         model.height = height;
 
         model.id = ++this.maxId;
-        model.dateTime = candle.time.utc.tz("America/New_York");
+        model.dateTime = candle.time.utc;
         model.placeOrderTime = candle.time.utc;
         model.state = MssState.INITIATED;
         model.liquidityUsed = {
@@ -137,122 +137,6 @@ export default class MarketShiftStructure {
 
         this.marketShifts.add(model as IMSS);
         logger.info(`new MSS initiated: ${JSON.stringify(this.marketShifts.getNewest())}`);
-
-        if (this.generalStore.globalStates.systemMode === SystemMode.LIVE) {
-            const positionData: IPosition = {
-                symbol: model.pairPeriod.pair as string,
-                volume: 0.01,
-                price: model.limit,
-                sl: model.stoploss,
-                tp: model.takeprofit,
-                direction: "BUY"
-            }
-
-            if (model.direction === Directions.UP) {
-                positionData.direction = "BUY";
-                if ((positionData.price - (positionData.sl as number)) < 0.0003) return;
-            } else if (model.direction === Directions.DOWN) {
-                positionData.direction = "SELL";
-                if (((positionData.sl as number) - positionData.price) < 0.0003) return;
-            }
-
-            await this.generalStore.state.Signal.openPosition(positionData);
-        }
-    }
-
-    updateMSS(candle: ICandle) {
-        const founds = this.generalStore.state.MSS.marketShifts
-            .getAll()
-            .filter((e) => e.status === TriggerStatus.FOUND);
-        founds.forEach((item) => {
-            this.updateMssData(item, candle);
-            this.checkMssFailure(item, candle);
-
-            // renew the mss data for the function
-            const mss = this.marketShifts.getById(item.id);
-            if (!mss) return;
-
-            if (mss.direction === Directions.DOWN && candle.low <= mss.limit)
-                this.makeMssTriggered(mss, candle);
-            if (mss.direction === Directions.UP && candle.high >= mss.limit)
-                this.makeMssTriggered(mss, candle);
-        });
-
-        const triggered = this.generalStore.state.MSS.marketShifts
-            .getAll().filter((e) => e.status === TriggerStatus.TRIGGERED);
-        triggered.forEach((mss) => {
-            if (mss.direction === Directions.DOWN) {
-                if (candle.high >= mss.stoploss)
-                    this.makeMssTriggerStopLoss(mss, candle);
-                else if (candle.low <= mss.takeprofit)
-                    this.makeMssTriggerTakeProfit(mss, candle);
-            } else if (mss.direction === Directions.UP) {
-                if (candle.low <= mss.stoploss)
-                    this.makeMssTriggerStopLoss(mss, candle);
-                else if (candle.high >= mss.takeprofit)
-                    this.makeMssTriggerTakeProfit(mss, candle);
-            }
-        });
-    }
-
-    private checkMssFailure(mss: IMSS, candle: ICandle): void {
-        if (this.checkHeightLimitFailure(mss, candle)) return;
-        if (this.checkSecondDeepToMssCandleDiffFailure(mss, candle)) return;
-        if (this.checkMssCandleToTriggerCandleDiffFailure(mss, candle)) return;
-    }
-
-    private checkHeightLimitFailure(mss: IMSS, candle: ICandle): boolean {
-        const bigHeightLimit = this.generalStore.state.Setting.getOne(
-            "MSSBigHeightLimit"
-        )?.settingValueParsed as number;
-        const marketUtils = useMarketUtils();
-
-        const heightPip = marketUtils.methods.toPip(mss.height);
-        if (heightPip >= bigHeightLimit) return this.makeMssFailed(mss, candle);
-
-        return false;
-    }
-
-    private checkSecondDeepToMssCandleDiffFailure(mss: IMSS, candle: ICandle): boolean {
-        const secondDeepToMssCandleDiff = this.generalStore.state.Setting.getOne(
-            "MSSSecondDeepToMssCandleDiff"
-        )?.settingValueParsed as number;
-
-        const secondDeepCandle = this.generalStore.state.Candle.getCandle(
-            mss.secondDeepCandle
-        );
-
-        if (!secondDeepCandle) return this.makeMssFailed(mss, candle);
-        let candles = this.generalStore.state.Candle.candles.getRangeOfCandles(
-            candle.pairPeriod,
-            secondDeepCandle.time.unix,
-            secondDeepToMssCandleDiff
-        );
-
-        const isExists = candles.find((c) => c.id === mss.mssCandle);
-        if (!isExists) return this.makeMssFailed(mss, candle);
-
-        return false;
-    }
-
-    private checkMssCandleToTriggerCandleDiffFailure(mss: IMSS, candle: ICandle): boolean {
-        const mssCandleToTriggerCandleDiff = this.generalStore.state.Setting.getOne(
-            "MSSMssCandleToTriggerCandleDiff"
-        )?.settingValueParsed as number;
-
-        const mssCandle = this.generalStore.state.Candle.getCandle(mss.mssCandle);
-        if (!mssCandle) return this.makeMssFailed(mss, candle);
-
-        const candles = this.generalStore.state.Candle.candles.getRangeOfCandles(
-            mss.pairPeriod,
-            mssCandle.time.unix,
-            mssCandleToTriggerCandleDiff
-        );
-
-        const isExists = candles.find((c) => c.id === mss.triggerCandle);
-        if (!isExists) return this.makeMssFailed(mss, candle);
-
-        return false;
     }
 
     private makeMssFailed(mss: IMSS, candle: ICandle): boolean {
@@ -338,30 +222,30 @@ export default class MarketShiftStructure {
                 placeOrderTime: mss.placeOrderTime,
                 entryTime: candle.time,
                 confirmToEntryTime: candle.time.utc.diff(mss.placeOrderTime),
-                stopHeight: mss.direction === Directions.DOWN ? mss.stoploss - mss.limit : mss.limit - mss.stoploss,
+                stopHeight: (mss.direction === Directions.DOWN ? mss.stoploss - mss.limit : mss.limit - mss.stoploss) * 10000,
             };
+            const positionData: IPosition = {
+                symbol: signal.pairPeriod.pair as string,
+                volume: 0.01,
+                price: signal.limit,
+                sl: signal.stoploss,
+                tp: signal.takeprofit,
+                direction: "BUY"
+            }
+
+            if (this.generalStore.globalStates.systemMode === SystemMode.LIVE) {
+                if (signal.direction === Enums.Directions.UP) {
+                    positionData.direction = "BUY";
+                    if ((positionData.price - (positionData.sl as number)) < 0.0003) return;
+                } else if (signal.direction === Enums.Directions.DOWN) {
+                    positionData.direction = "SELL";
+                    if (((positionData.sl as number) - positionData.price) < 0.0003) return;
+                }
+            }
+
             this.generalStore.state.Signal.signals.add(signal);
-
-            // if (this.generalStore.globalStates.systemMode === SystemMode.LIVE) {
-            //     const positionData: IPosition = {
-            //         symbol: signal.pairPeriod.pair as string,
-            //         volume: 0.01,
-            //         price: signal.limit,
-            //         sl: signal.stoploss,
-            //         tp: signal.takeprofit,
-            //         direction: "BUY"
-            //     }
-
-            //     if (signal.direction === Enums.Directions.UP) {
-            //         positionData.direction = "BUY";
-            //         if ((positionData.price - (positionData.sl as number)) < 0.0003) return;
-            //     } else if (signal.direction === Enums.Directions.DOWN) {
-            //         positionData.direction = "SELL";
-            //         if (((positionData.sl as number) - positionData.price) < 0.0003) return;
-            //     }
-
-            //     await this.generalStore.state.Signal.openPosition(positionData);
-            // }
+            if (this.generalStore.globalStates.systemMode === SystemMode.LIVE)
+                await this.generalStore.state.Signal.openPosition(positionData);
         }
     }
 
@@ -390,6 +274,17 @@ export default class MarketShiftStructure {
             const signalIndex = this.generalStore.state.Signal.signals
                 .getAll().findIndex((s) => s.id === signal.id);
 
+
+            this.generalStore.state.Signal.signals.updateByIndex(
+                signalIndex,
+                "entryToResult",
+                signal.entryTime?.utc.diff(candle.time.utc)
+            );
+            this.generalStore.state.Signal.signals.updateByIndex(
+                signalIndex,
+                "closedAt",
+                candle.time.utc
+            );
             this.generalStore.state.Signal.signals.updateByIndex(
                 signalIndex,
                 "status",
@@ -399,11 +294,6 @@ export default class MarketShiftStructure {
                 signalIndex,
                 "time",
                 candle.time
-            );
-            this.generalStore.state.Signal.signals.updateByIndex(
-                signalIndex,
-                "entryToResult",
-                signal.entryTime?.utc.diff(signal.time.utc)
             );
             this.generalStore.state.Signal.signals.updateByIndex(
                 signalIndex,
@@ -443,6 +333,17 @@ export default class MarketShiftStructure {
                 .getAll()
                 .findIndex((s) => s.id === signal.id);
 
+
+            this.generalStore.state.Signal.signals.updateByIndex(
+                signalIndex,
+                "entryToResult",
+                signal.entryTime?.utc.diff(candle.time.utc)
+            );
+            this.generalStore.state.Signal.signals.updateByIndex(
+                signalIndex,
+                "closedAt",
+                candle.time.utc
+            );
             this.generalStore.state.Signal.signals.updateByIndex(
                 signalIndex,
                 "status",
