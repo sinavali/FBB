@@ -2,25 +2,80 @@
 import logging
 import os
 from logging import Handler, Formatter
-from datetime import datetime
+from datetime import datetime, time
 from zoneinfo import ZoneInfo
 import MetaTrader5 as mt5
+import mysql.connector
+from mysql.connector import Error
 
 target_tz_name = "Europe/Athens"
 # target_tz_name = "Asia/Nicosia"
 target_tz = ZoneInfo(target_tz_name) # +02:00 | +03:00
 
-demo_login = 5034048580
-demo_password = "*h3nNrEu"
-demo_server = "MetaQuotes-Demo"
 
-fundedNext15kWith5PercentLoss_login = 489449
-fundedNext15kWith5PercentLoss_password = "dzsAR42##"
-fundedNext15kWith5PercentLoss_server = "FundedNext-Server"
+# demo_login = 5034048580
+# demo_password = "*h3nNrEu"
+# demo_server = "MetaQuotes-Demo"
+
+# fundedNext15kWith5PercentLoss_login = 489449
+# fundedNext15kWith5PercentLoss_password = "dzsAR42##"
+# fundedNext15kWith5PercentLoss_server = "FundedNext-Server"
+
+
+def get_setting(key):
+    """
+    Fetch a record from the 'setting' table where settingKey matches the provided key.
+    
+    Args:
+        key (str): The setting key to search for
+    
+    Returns:
+        tuple: The matching record as a tuple, or None if not found or error occurs
+    """
+    try:
+        # Establish database connection
+        connection = mysql.connector.connect(
+            host='localhost',
+            user='root',
+            password='',
+            database='fbb_core'
+        )
+        
+        # Create cursor to execute queries
+        cursor = connection.cursor()
+        
+        # SQL query with parameterized input to prevent SQL injection
+        query = """SELECT * FROM setting WHERE settingKey = %s"""
+        
+        # Execute the query with the provided key
+        cursor.execute(query, (key,))
+        
+        # Fetch the single record
+        record = cursor.fetchone()
+        
+        return record
+        
+    except Error as e:
+        print(f"Error fetching data from MySQL: {e}")
+        return None
+        
+    finally:
+        # Close database connection in any case
+        if 'connection' in locals() and connection.is_connected():
+            cursor.close()
+            connection.close()
+            print("MySQL connection is closed")
+
+
+mt5_login = get_setting("Mt5Login")
+mt5_password = get_setting("Mt5Password")
+mt5_server = get_setting("Mt5Server")
+
 
 # Logging configuration
 LOG_DIR = "./Logs/mtDriver"
 os.makedirs(LOG_DIR, exist_ok=True)
+
 
 class DailyRotatingFileHandler(Handler):
     def __init__(self):
@@ -65,6 +120,7 @@ class DailyRotatingFileHandler(Handler):
         self.close_file()
         super().close()
 
+
 def setup_logging():
     """Configure logging for all modules"""
     logger = logging.getLogger()
@@ -94,9 +150,9 @@ def initialize_mt5():
         try:
             if mt5.initialize(
                     path="C:/Program Files/MetaTrader 5/terminal64.exe",
-                    login=demo_login,
-                    password=demo_password,
-                    server=demo_server,
+                    login=mt5_login,
+                    password=mt5_password,
+                    server=mt5_server,
                     timeout=5000
             ):
                 return True

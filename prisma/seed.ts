@@ -16,6 +16,11 @@ async function setSettings() {
       { settingKey: "SystemMode", settingValue: "MTBACKTEST", parseTo: "STRING" },
       { settingKey: "RiskReward", settingValue: "2", parseTo: "FLOAT" },
       { settingKey: "SignalLoss", settingValue: "1", parseTo: "FLOAT" },
+
+      { settingKey: "Mt5Login", settingValue: "5034048580", parseTo: "STRING" },
+      { settingKey: "Mt5Password", settingValue: "*h3nNrEu", parseTo: "STRING" },
+      { settingKey: "Mt5Server", settingValue: "MetaQuotes-Demo", parseTo: "STRING" },
+
       {
         settingKey: "SignalStopLossError",
         settingValue: "0.005",
