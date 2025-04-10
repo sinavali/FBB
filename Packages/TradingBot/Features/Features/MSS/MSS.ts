@@ -255,8 +255,14 @@ export default class MarketShiftStructure {
             .findIndex((e) => e.id === mss.id);
 
         if (index >= 0) {
-            this.marketShifts.updateByIndex(index, "status", TriggerStatus.STOPLOSS);
             logger.info(`mss updated stoploss: ${JSON.stringify(mss)}`);
+
+            const signal = this.generalStore.state.Signal.signals
+                .getAll().find((s) => s.triggerId === mss.id);
+            if (!signal) return;
+            if (signal.status !== SignalStatus.TRIGGERED) return;
+
+            this.marketShifts.updateByIndex(index, "status", TriggerStatus.STOPLOSS);
 
             const liquidityUsed: LiquidityUsed = {
                 liquidityId: mss.liquidityUsed.liquidityId,
@@ -266,10 +272,6 @@ export default class MarketShiftStructure {
                 triggerId: mss.id
             };
             this.marketShifts.updateByIndex(index, "liquidityUsed", liquidityUsed);
-
-            const signal = this.generalStore.state.Signal.signals
-                .getAll().find((s) => s.triggerId === mss.id);
-            if (!signal) return;
 
             const signalIndex = this.generalStore.state.Signal.signals
                 .getAll().findIndex((s) => s.id === signal.id);
@@ -310,6 +312,12 @@ export default class MarketShiftStructure {
             .findIndex((e) => e.id === mss.id);
 
         if (index >= 0) {
+
+            const signal = this.generalStore.state.Signal.signals
+                .getAll().find((s) => s.triggerId === mss.id);
+            if (!signal) return;
+            if (signal.status !== SignalStatus.TRIGGERED) return;
+
             this.marketShifts.updateByIndex(
                 index,
                 "status",
@@ -323,11 +331,6 @@ export default class MarketShiftStructure {
                 triggerId: mss.id,
             };
             this.marketShifts.updateByIndex(index, "liquidityUsed", liquidityUsed);
-
-            const signal = this.generalStore.state.Signal.signals
-                .getAll()
-                .find((s) => s.triggerId === mss.id);
-            if (!signal) return;
 
             const signalIndex = this.generalStore.state.Signal.signals
                 .getAll()
