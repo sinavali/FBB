@@ -108,7 +108,7 @@ export default class CandleOrderBlock {
         const newId = ++this.maxId;
         const cob: ICOB = {
             id: newId,
-            dateTime: confirmCandle.time.utc.tz("America/New_York"),
+            dateTime: confirmCandle.time.utc,
             bodyCandles: bodyCandles.map((c) => c.id),
             confirmCandle: confirmCandle.id,
             direction,

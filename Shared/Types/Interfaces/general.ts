@@ -150,6 +150,7 @@ export interface ISignal {
     stopHeight?: number;
     confirmToEntryTime?: number;
     entryToResult?: number;
+    closedAt?: any;
 }
 
 export interface IPosition {
