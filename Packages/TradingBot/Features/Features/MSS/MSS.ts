@@ -16,6 +16,7 @@ import { useMarketUtils } from "@shared/Utilities/marketUtils.ts";
 import * as Enums from "@shared/Types/Enums.js";
 import logger from "@shared/Initiatives/Logger.js";
 import { Moment } from "moment";
+import { DateTime } from "@shared/Types/Interfaces/common.ts";
 
 export default class MarketShiftStructure {
     public marketShifts: CircularBuffer<IMSS>;
@@ -259,7 +260,7 @@ export default class MarketShiftStructure {
 
             const signalIndex = this.generalStore.state.Signal.signals.getAll().findIndex((s) => s.id === signal.id);
 
-            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "entryToResult", signal.entryTime?.utc.diff(candle.time.utc));
+            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "entryToResult", Math.abs(signal.entryTime?.utc.diff(candle.time.utc) as number));
             this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "closedAt", candle.time.utc);
             this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "status", SignalStatus.STOPLOSS);
             this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "time", candle.time);
@@ -292,7 +293,7 @@ export default class MarketShiftStructure {
 
             const signalIndex = this.generalStore.state.Signal.signals.getAll().findIndex((s) => s.id === signal.id);
 
-            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "entryToResult", signal.entryTime?.utc.diff(candle.time.utc));
+            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "entryToResult", Math.abs(signal.entryTime?.utc.diff(candle.time.utc) as number));
             this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "closedAt", candle.time.utc);
             this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "status", SignalStatus.TAKEPROFIT);
             this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "time", candle.time);
@@ -320,18 +321,19 @@ export default class MarketShiftStructure {
 
         const triggered = this.generalStore.state.MSS.marketShifts.getAll().filter((e) => e.status === TriggerStatus.TRIGGERED);
         triggered.forEach((mss) => {
-            if (candle.id <= mss.mssCandle) return;
+            // Get the signal associated with this MSS
+            const signal = this.generalStore.state.Signal.signals.getAll().find((s) => s.triggerId === mss.id);
+            if (!signal) return;
+
+            // Skip if the current candle is the entry candle or older
+            if (candle.time.unix <= (signal.entryTime as DateTime).unix) return;
 
             if (mss.direction === Directions.DOWN) {
-                if (candle.high >= mss.stoploss)
-                    this.makeMssTriggerStopLoss(mss, candle);
-                else if (candle.low <= mss.takeprofit)
-                    this.makeMssTriggerTakeProfit(mss, candle);
+                if (candle.high >= mss.stoploss) this.makeMssTriggerStopLoss(mss, candle);
+                else if (candle.low <= mss.takeprofit) this.makeMssTriggerTakeProfit(mss, candle);
             } else if (mss.direction === Directions.UP) {
-                if (candle.low <= mss.stoploss)
-                    this.makeMssTriggerStopLoss(mss, candle);
-                else if (candle.high >= mss.takeprofit)
-                    this.makeMssTriggerTakeProfit(mss, candle);
+                if (candle.low <= mss.stoploss) this.makeMssTriggerStopLoss(mss, candle);
+                else if (candle.high >= mss.takeprofit) this.makeMssTriggerTakeProfit(mss, candle);
             }
         });
     }
