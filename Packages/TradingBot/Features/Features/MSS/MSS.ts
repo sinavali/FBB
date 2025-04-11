@@ -327,14 +327,29 @@ export default class MarketShiftStructure {
             // Skip candles older than or equal to the entry time
             if (candle.time.unix <= signal.entryTime.unix) return;
 
-            if (mss.direction === Directions.DOWN) {
-                if (candle.high >= mss.stoploss) this.makeMssTriggerStopLoss(mss, candle);
-                else if (candle.low <= mss.takeprofit) this.makeMssTriggerTakeProfit(mss, candle);
-            } else if (mss.direction === Directions.UP) {
-                if (candle.low <= mss.stoploss) this.makeMssTriggerStopLoss(mss, candle);
-                else if (candle.high >= mss.takeprofit) this.makeMssTriggerTakeProfit(mss, candle);
-            }
+            const status = this.evaluateSignal(signal, candle);
+            if (status === SignalStatus.STOPLOSS) this.makeMssTriggerStopLoss(mss, candle);
+            else if (status === SignalStatus.TAKEPROFIT) this.makeMssTriggerStopLoss(mss, candle);
+
+            // if (mss.direction === Directions.DOWN) {
+            //     if (candle.high >= mss.stoploss) this.makeMssTriggerStopLoss(mss, candle);
+            //     else if (candle.low <= mss.takeprofit) this.makeMssTriggerTakeProfit(mss, candle);
+            // } else if (mss.direction === Directions.UP) {
+            //     if (candle.low <= mss.stoploss) this.makeMssTriggerStopLoss(mss, candle);
+            //     else if (candle.high >= mss.takeprofit) this.makeMssTriggerTakeProfit(mss, candle);
+            // }
         });
+    }
+
+    private evaluateSignal(signal: ISignal, candle: ICandle): SignalStatus.STOPLOSS | SignalStatus.TAKEPROFIT | undefined {
+        // Assuming signal.direction is either 'DOWN' or 'UP'
+        if (signal.direction === Directions.DOWN) {
+            if (candle.high >= signal.stoploss) return SignalStatus.STOPLOSS
+            else if (candle.low <= signal.takeprofit) return SignalStatus.TAKEPROFIT
+        } else if (signal.direction === Directions.UP) {
+            if (candle.low <= signal.stoploss) return SignalStatus.STOPLOSS
+            else if (candle.high >= signal.takeprofit) return SignalStatus.TAKEPROFIT
+        }
     }
 
     private checkMssFailure(mss: IMSS, candle: ICandle): void {
