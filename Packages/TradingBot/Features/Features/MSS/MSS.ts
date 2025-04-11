@@ -96,15 +96,15 @@ export default class MarketShiftStructure {
             );
         if (doesExists) return;
 
-        if (model.direction === Directions.DOWN)
-            model.limit = secondDeepCandle?.low;
-        if (model.direction === Directions.UP) model.limit = secondDeepCandle?.high;
+        if (model.direction === Directions.DOWN) model.limit = parseFloat(secondDeepCandle?.low.toFixed(5));
+        if (model.direction === Directions.UP) model.limit = parseFloat(secondDeepCandle?.high.toFixed(5))
 
         if (!model.limit || !this.validateLimit(model)) return;
 
         const stoploss = this.findStopLoss(mainDeepCandle, modelDirection);
         if (!stoploss) return;
-        model.stoploss = stoploss;
+
+        model.stoploss = parseFloat(stoploss.toFixed(5));
         if (!this.validateStopLoss(model)) return;
 
         const takeprofit = this.findTakeProfit(
@@ -113,7 +113,8 @@ export default class MarketShiftStructure {
             modelDirection
         );
         if (!takeprofit) return;
-        model.takeprofit = takeprofit;
+
+        model.takeprofit = parseFloat(takeprofit.toFixed(5));
         if (!this.validateTakeProfit(model)) return;
 
         const height = this.calculateHeight(
@@ -122,7 +123,7 @@ export default class MarketShiftStructure {
             model.direction
         );
         if (!height || !this.validateHeight(height)) return;
-        model.height = height;
+        model.height = parseFloat(height.toFixed(5));
 
         model.id = ++this.maxId;
         model.dateTime = candle.time.utc;
@@ -220,10 +221,10 @@ export default class MarketShiftStructure {
             if (this.generalStore.globalStates.systemMode === SystemMode.LIVE) {
                 if (signal.direction === Enums.Directions.UP) {
                     positionData.direction = "BUY";
-                    if ((positionData.price - (positionData.sl as number)) < 0.0003) return;
+                    if (parseFloat((positionData.price - (positionData.sl as number)).toFixed(5)) < 0.0003) return;
                 } else if (signal.direction === Enums.Directions.DOWN) {
                     positionData.direction = "SELL";
-                    if (((positionData.sl as number) - positionData.price) < 0.0003) return;
+                    if (parseFloat(((positionData.sl as number) - positionData.price).toFixed(5)) < 0.0003) return;
                 }
             }
 
@@ -241,8 +242,7 @@ export default class MarketShiftStructure {
         if (index >= 0) {
             logger.info(`mss updated stoploss: ${JSON.stringify(mss)}`);
 
-            const signal = this.generalStore.state.Signal.signals
-                .getAll().find((s) => s.triggerId === mss.id);
+            const signal = this.generalStore.state.Signal.signals.getAll().find((s) => s.triggerId === mss.id);
             if (!signal) return;
             if (signal.status !== SignalStatus.TRIGGERED) return;
 
@@ -424,26 +424,34 @@ export default class MarketShiftStructure {
         const limitCandle = this.findLimit(candles, mss.direction, mainDeepCandle);
         if (limitCandle) {
             const limit = this.limitCandleToNumber(limitCandle, mss);
-            if (limit) newData.limit = limit;
+            if (limit) {
+                newData.limit = limit;
+                // this.marketShifts.updateByIndex(mssIndex, "limit", newData.limit);
+            }
         }
 
         const stoploss = this.findStopLoss(mainDeepCandle, mss.direction);
-        if (stoploss) newData.stoploss = stoploss;
+        if (stoploss) {
+            newData.stoploss = stoploss;
+            // this.marketShifts.updateByIndex(mssIndex, "stoploss", newData.stoploss);
+        }
 
         const takeprofit = this.findTakeProfit(newData.limit, newData.stoploss, mss.direction);
-        if (takeprofit) newData.takeprofit = takeprofit;
+        if (takeprofit) {
+            newData.takeprofit = takeprofit;
+            // this.marketShifts.updateByIndex(mssIndex, "takeprofit", newData.takeprofit);
+        }
 
         const height = this.calculateHeight(
             newData.stoploss,
             newData.limit,
             mss.direction
         );
-        if (height) newData.height = height;
+        if (height) {
+            newData.height = height;
+            // this.marketShifts.updateByIndex(mssIndex, "height", newData.height);
+        }
 
-        this.marketShifts.updateByIndex(mssIndex, "limit", newData.limit);
-        this.marketShifts.updateByIndex(mssIndex, "stoploss", newData.stoploss);
-        this.marketShifts.updateByIndex(mssIndex, "takeprofit", newData.takeprofit);
-        this.marketShifts.updateByIndex(mssIndex, "height", newData.height);
     }
 
     private detectModelDirection(liquidity: ILiquidity): Directions | undefined {

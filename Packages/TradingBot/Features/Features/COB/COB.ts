@@ -424,10 +424,10 @@ export default class CandleOrderBlock {
             const signalIndex = this.generalStore.state.Signal.signals
                 .getAll().findIndex((s) => s.id === signal.id);
 
-            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "status", SignalStatus.TAKEPROFIT);
-            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "time", candle.time);
-            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "liquidityUsed", liquidityUsed);
-            this.generalStore.state.Liquidity.updateUsed(cob.id, Triggers.COB, liquidityUsed.liquidityId, liquidityUsed);
+            // this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "status", SignalStatus.TAKEPROFIT);
+            // this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "time", candle.time);
+            // this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "liquidityUsed", liquidityUsed);
+            // this.generalStore.state.Liquidity.updateUsed(cob.id, Triggers.COB, liquidityUsed.liquidityId, liquidityUsed);
         }
     }
 
