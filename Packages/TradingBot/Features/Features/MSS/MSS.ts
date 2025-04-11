@@ -270,16 +270,18 @@ export default class MarketShiftStructure {
     }
 
     private makeMssTriggerTakeProfit(mss: IMSS, candle: ICandle) {
-        const index: number = this.marketShifts
-            .getAll()
-            .findIndex((e) => e.id === mss.id);
+        const index: number = this.marketShifts.getAll().findIndex((e) => e.id === mss.id);
 
         if (index >= 0) {
-
             const signal = this.generalStore.state.Signal.signals
                 .getAll().find((s) => s.triggerId === mss.id);
             if (!signal) return;
             if (signal.status !== SignalStatus.TRIGGERED) return;
+
+
+            if ((signal.stopHeight as number) > 11) {
+                console.log(candle, mss, signal)
+            }
 
             this.marketShifts.updateByIndex(index, "status", TriggerStatus.TAKEPROFIT);
             const liquidityUsed: LiquidityUsed = {
