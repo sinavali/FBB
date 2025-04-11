@@ -321,12 +321,11 @@ export default class MarketShiftStructure {
 
         const triggered = this.generalStore.state.MSS.marketShifts.getAll().filter((e) => e.status === TriggerStatus.TRIGGERED);
         triggered.forEach((mss) => {
-            // Get the signal associated with this MSS
             const signal = this.generalStore.state.Signal.signals.getAll().find((s) => s.triggerId === mss.id);
-            if (!signal) return;
+            if (!signal || !signal.entryTime) return;
 
-            // Skip if the current candle is the entry candle or older
-            if (candle.time.unix <= (signal.entryTime as DateTime).unix) return;
+            // Skip candles older than or equal to the entry time
+            if (candle.time.unix <= signal.entryTime.unix) return;
 
             if (mss.direction === Directions.DOWN) {
                 if (candle.high >= mss.stoploss) this.makeMssTriggerStopLoss(mss, candle);
