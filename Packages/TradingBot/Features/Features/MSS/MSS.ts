@@ -305,7 +305,7 @@ export default class MarketShiftStructure {
     }
 
     updateMSS(candle: ICandle) {
-        const founds = this.generalStore.state.MSS.marketShifts.getAll().filter((e) => e.status === TriggerStatus.FOUND);
+        const founds = this.generalStore.state.MSS.marketShifts.getAll().filter((e) => e.status === TriggerStatus.FOUND && e.pairPeriod.pair === candle.pairPeriod.pair);
 
         founds.forEach((item) => {
             this.updateMssData(item, candle);
@@ -321,7 +321,7 @@ export default class MarketShiftStructure {
             }
         });
 
-        const triggered = this.generalStore.state.MSS.marketShifts.getAll().filter((e) => e.status === TriggerStatus.TRIGGERED);
+        const triggered = this.generalStore.state.MSS.marketShifts.getAll().filter((e) => e.status === TriggerStatus.TRIGGERED && e.pairPeriod.pair === candle.pairPeriod.pair);
         triggered.forEach((mss) => {
             const signal = this.generalStore.state.Signal.signals.getAll().find((s) => s.triggerId === mss.id);
             if (!signal || !signal.entryTime) return;
