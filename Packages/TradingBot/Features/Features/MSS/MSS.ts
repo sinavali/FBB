@@ -157,30 +157,14 @@ export default class MarketShiftStructure {
             };
             this.marketShifts.updateByIndex(index, "liquidityUsed", newLiquidityUsed);
 
-            const signal = this.generalStore.state.Signal.signals
-                .getAll()
-                .find((s) => s.triggerId === mss.id);
+            const signal = this.generalStore.state.Signal.signals.getAll().find((s) => s.triggerId === mss.id);
             if (!signal) return true;
 
-            const signalIndex = this.generalStore.state.Signal.signals
-                .getAll()
-                .findIndex((s) => s.id === signal.id);
+            const signalIndex = this.generalStore.state.Signal.signals.getAll().findIndex((s) => s.id === signal.id);
 
-            this.generalStore.state.Signal.signals.updateByIndex(
-                signalIndex,
-                "status",
-                SignalStatus.CLOSED
-            );
-            this.generalStore.state.Signal.signals.updateByIndex(
-                signalIndex,
-                "time",
-                candle.time
-            );
-            this.generalStore.state.Signal.signals.updateByIndex(
-                signalIndex,
-                "liquidityUsed",
-                newLiquidityUsed
-            );
+            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "status", SignalStatus.CLOSED);
+            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "time", candle.time);
+            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "liquidityUsed", newLiquidityUsed);
             this.generalStore.state.Liquidity.updateUsed(mss.id, Triggers.MSS, newLiquidityUsed.liquidityId, newLiquidityUsed);
         }
 
@@ -273,35 +257,13 @@ export default class MarketShiftStructure {
             };
             this.marketShifts.updateByIndex(index, "liquidityUsed", liquidityUsed);
 
-            const signalIndex = this.generalStore.state.Signal.signals
-                .getAll().findIndex((s) => s.id === signal.id);
+            const signalIndex = this.generalStore.state.Signal.signals.getAll().findIndex((s) => s.id === signal.id);
 
-
-            this.generalStore.state.Signal.signals.updateByIndex(
-                signalIndex,
-                "entryToResult",
-                signal.entryTime?.utc.diff(candle.time.utc)
-            );
-            this.generalStore.state.Signal.signals.updateByIndex(
-                signalIndex,
-                "closedAt",
-                candle.time.utc
-            );
-            this.generalStore.state.Signal.signals.updateByIndex(
-                signalIndex,
-                "status",
-                SignalStatus.STOPLOSS
-            );
-            this.generalStore.state.Signal.signals.updateByIndex(
-                signalIndex,
-                "time",
-                candle.time
-            );
-            this.generalStore.state.Signal.signals.updateByIndex(
-                signalIndex,
-                "liquidityUsed",
-                liquidityUsed
-            );
+            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "entryToResult", signal.entryTime?.utc.diff(candle.time.utc));
+            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "closedAt", candle.time.utc);
+            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "status", SignalStatus.STOPLOSS);
+            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "time", candle.time);
+            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "liquidityUsed", liquidityUsed);
             this.generalStore.state.Liquidity.updateUsed(mss.id, Triggers.MSS, liquidityUsed.liquidityId, liquidityUsed);
         }
     }
@@ -318,11 +280,7 @@ export default class MarketShiftStructure {
             if (!signal) return;
             if (signal.status !== SignalStatus.TRIGGERED) return;
 
-            this.marketShifts.updateByIndex(
-                index,
-                "status",
-                TriggerStatus.TAKEPROFIT
-            );
+            this.marketShifts.updateByIndex(index, "status", TriggerStatus.TAKEPROFIT);
             const liquidityUsed: LiquidityUsed = {
                 liquidityId: mss.liquidityUsed.liquidityId,
                 status: LiquidityUsedStatus.TAKEPROFIT,
@@ -332,44 +290,20 @@ export default class MarketShiftStructure {
             };
             this.marketShifts.updateByIndex(index, "liquidityUsed", liquidityUsed);
 
-            const signalIndex = this.generalStore.state.Signal.signals
-                .getAll()
-                .findIndex((s) => s.id === signal.id);
+            const signalIndex = this.generalStore.state.Signal.signals.getAll().findIndex((s) => s.id === signal.id);
 
-
-            this.generalStore.state.Signal.signals.updateByIndex(
-                signalIndex,
-                "entryToResult",
-                signal.entryTime?.utc.diff(candle.time.utc)
-            );
-            this.generalStore.state.Signal.signals.updateByIndex(
-                signalIndex,
-                "closedAt",
-                candle.time.utc
-            );
-            this.generalStore.state.Signal.signals.updateByIndex(
-                signalIndex,
-                "status",
-                SignalStatus.TAKEPROFIT
-            );
-            this.generalStore.state.Signal.signals.updateByIndex(
-                signalIndex,
-                "time",
-                candle.time
-            );
-            this.generalStore.state.Signal.signals.updateByIndex(
-                signalIndex,
-                "liquidityUsed",
-                liquidityUsed
-            );
+            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "entryToResult", signal.entryTime?.utc.diff(candle.time.utc));
+            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "closedAt", candle.time.utc);
+            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "status", SignalStatus.TAKEPROFIT);
+            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "time", candle.time);
+            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "liquidityUsed", liquidityUsed);
             this.generalStore.state.Liquidity.updateUsed(mss.id, Triggers.MSS, liquidityUsed.liquidityId, liquidityUsed);
         }
     }
 
     updateMSS(candle: ICandle) {
-        const founds = this.generalStore.state.MSS.marketShifts
-            .getAll()
-            .filter((e) => e.status === TriggerStatus.FOUND);
+        const founds = this.generalStore.state.MSS.marketShifts.getAll().filter((e) => e.status === TriggerStatus.FOUND);
+
         founds.forEach((item) => {
             this.updateMssData(item, candle);
             this.checkMssFailure(item, candle);
@@ -379,15 +313,12 @@ export default class MarketShiftStructure {
 
             if (this.generalStore.globalStates.systemMode === SystemMode.LIVE) this.makeMssTriggered(mss, candle)
             else {
-                if (mss.direction === Directions.DOWN && candle.low <= mss.limit)
-                    this.makeMssTriggered(mss, candle);
-                if (mss.direction === Directions.UP && candle.high >= mss.limit)
-                    this.makeMssTriggered(mss, candle);
+                if (mss.direction === Directions.DOWN && candle.low <= mss.limit) this.makeMssTriggered(mss, candle);
+                else if (mss.direction === Directions.UP && candle.high >= mss.limit) this.makeMssTriggered(mss, candle);
             }
         });
 
-        const triggered = this.generalStore.state.MSS.marketShifts
-            .getAll().filter((e) => e.status === TriggerStatus.TRIGGERED);
+        const triggered = this.generalStore.state.MSS.marketShifts.getAll().filter((e) => e.status === TriggerStatus.TRIGGERED);
         triggered.forEach((mss) => {
             if (mss.direction === Directions.DOWN) {
                 if (candle.high >= mss.stoploss)
@@ -509,10 +440,10 @@ export default class MarketShiftStructure {
         );
         if (height) newData.height = height;
 
-        // this.marketShifts.updateByIndex(mssIndex, "limit", newData.limit);
-        // this.marketShifts.updateByIndex(mssIndex, "stoploss", newData.stoploss);
-        // this.marketShifts.updateByIndex(mssIndex, "takeprofit", newData.takeprofit);
-        // this.marketShifts.updateByIndex(mssIndex, "height", newData.height);
+        this.marketShifts.updateByIndex(mssIndex, "limit", newData.limit);
+        this.marketShifts.updateByIndex(mssIndex, "stoploss", newData.stoploss);
+        this.marketShifts.updateByIndex(mssIndex, "takeprofit", newData.takeprofit);
+        this.marketShifts.updateByIndex(mssIndex, "height", newData.height);
     }
 
     private detectModelDirection(liquidity: ILiquidity): Directions | undefined {
