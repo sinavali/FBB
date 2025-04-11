@@ -320,6 +320,8 @@ export default class MarketShiftStructure {
 
         const triggered = this.generalStore.state.MSS.marketShifts.getAll().filter((e) => e.status === TriggerStatus.TRIGGERED);
         triggered.forEach((mss) => {
+            if (candle.id <= mss.mssCandle) return;
+
             if (mss.direction === Directions.DOWN) {
                 if (candle.high >= mss.stoploss)
                     this.makeMssTriggerStopLoss(mss, candle);
