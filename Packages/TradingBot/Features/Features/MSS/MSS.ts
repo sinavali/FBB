@@ -328,8 +328,9 @@ export default class MarketShiftStructure {
             if (candle.time.unix <= signal.entryTime.unix) return;
 
             const status = this.evaluateSignal(signal, candle);
+
             if (status === SignalStatus.STOPLOSS) this.makeMssTriggerStopLoss(mss, candle);
-            else if (status === SignalStatus.TAKEPROFIT) this.makeMssTriggerStopLoss(mss, candle);
+            else if (status === SignalStatus.TAKEPROFIT) this.makeMssTriggerTakeProfit(mss, candle);
 
             // if (mss.direction === Directions.DOWN) {
             //     if (candle.high >= mss.stoploss) this.makeMssTriggerStopLoss(mss, candle);
