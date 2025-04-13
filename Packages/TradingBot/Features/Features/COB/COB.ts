@@ -1,6 +1,6 @@
-import {ICandle, ICOB, ILiquidity, IPosition, ISignal, LiquidityUsed} from "@shared/Types/Interfaces/general.ts";
+import { ICandle, ICOB, ILiquidity, IPosition, ISignal, LiquidityUsed } from "@shared/Types/Interfaces/general.ts";
 import Query from "@shared/Queries.ts";
-import {GeneralStore} from "@shared/Types/Interfaces/generalStore.ts";
+import { GeneralStore } from "@shared/Types/Interfaces/generalStore.ts";
 import logger from "@shared/Initiatives/Logger.ts";
 import {
     CandleDeepType,
@@ -10,13 +10,13 @@ import {
     Triggers,
     TriggerStatus,
 } from "@shared/Types/Enums.ts";
-import {CircularBuffer} from "@tradingBot/Features/Core/CircularBuffer.ts";
+import { CircularBuffer } from "@tradingBot/Features/Core/CircularBuffer.ts";
 import {
     isBodyCandlesValid,
     isConfirmCandleValid,
     isStartCandleValid,
 } from "@tradingBot/Features/Features/COB/Validations.ts";
-import {useMarketUtils} from "@shared/Utilities/marketUtils.js";
+import { useMarketUtils } from "@shared/Utilities/marketUtils.js";
 import * as Enums from "@shared/Types/Enums.js";
 
 export default class CandleOrderBlock {
@@ -205,25 +205,37 @@ export default class CandleOrderBlock {
             const cob = this.orderBlocks.getById(item.id);
             if (!cob) return;
 
-            if (cob.direction === Directions.DOWN && candle.low <= cob.limit) this.makeCobTriggered(cob, candle);
-            if (cob.direction === Directions.UP && candle.high >= cob.limit) this.makeCobTriggered(cob, candle);
-        });
-
-        const triggered = this.generalStore.state.COB.orderBlocks
-            .getAll().filter((e) => e.status === TriggerStatus.TRIGGERED);
-        triggered.forEach((cob) => {
-            if (cob.direction === Directions.DOWN) {
-                if (candle.high >= cob.stoploss)
-                    this.makeCobTriggerStopLoss(cob, candle);
-                else if (candle.low <= cob.takeprofit)
-                    this.makeCobTriggerTakeProfit(cob, candle);
-            } else if (cob.direction === Directions.UP) {
-                if (candle.low <= cob.stoploss)
-                    this.makeCobTriggerStopLoss(cob, candle);
-                else if (candle.high >= cob.takeprofit)
-                    this.makeCobTriggerTakeProfit(cob, candle);
+            if (this.generalStore.globalStates.systemMode === SystemMode.LIVE) this.makeCobTriggered(cob, candle)
+            else {
+                if (cob.direction === Directions.DOWN && candle.low <= cob.limit) this.makeCobTriggered(cob, candle);
+                else if (cob.direction === Directions.UP && candle.high >= cob.limit) this.makeCobTriggered(cob, candle);
             }
         });
+
+        const triggered = this.generalStore.state.COB.orderBlocks.getAll().filter((e) => e.status === TriggerStatus.TRIGGERED && e.pairPeriod.pair === candle.pairPeriod.pair);
+        triggered.forEach((cob) => {
+            const signal = this.generalStore.state.Signal.signals.getAll().find((s) => s.triggerId === cob.id);
+            if (!signal || !signal.entryTime) return;
+
+            // Skip candles older than or equal to the entry time
+            if (candle.time.unix <= signal.entryTime.unix) return;
+
+            const status = this.evaluateSignal(signal, candle);
+
+            if (status === SignalStatus.STOPLOSS) this.makeCobTriggerStopLoss(cob, candle);
+            else if (status === SignalStatus.TAKEPROFIT) this.makeCobTriggerTakeProfit(cob, candle);
+        });
+    }
+
+    private evaluateSignal(signal: ISignal, candle: ICandle): SignalStatus.STOPLOSS | SignalStatus.TAKEPROFIT | undefined {
+        // Assuming signal.direction is either 'DOWN' or 'UP'
+        if (signal.direction === Directions.DOWN) {
+            if (candle.high >= signal.stoploss) return SignalStatus.STOPLOSS
+            else if (candle.low <= signal.takeprofit) return SignalStatus.TAKEPROFIT
+        } else if (signal.direction === Directions.UP) {
+            if (candle.low <= signal.stoploss) return SignalStatus.STOPLOSS
+            else if (candle.high >= signal.takeprofit) return SignalStatus.TAKEPROFIT
+        }
     }
 
     private checkCobFailure(cob: ICOB, candle: ICandle): void {
@@ -331,6 +343,7 @@ export default class CandleOrderBlock {
             };
             this.orderBlocks.updateByIndex(index, "liquidityUsed", newLiquidityUsed);
 
+            const confirmCandle = this.generalStore.state.Candle.getCandle(cob.confirmCandle);
             const signal: ISignal = {
                 id: 0, // will be overrided in Signal class
                 triggerCandleId: candle.id,
@@ -344,34 +357,39 @@ export default class CandleOrderBlock {
                 status: SignalStatus.TRIGGERED,
                 time: candle.time,
                 liquidityUsed: newLiquidityUsed,
+
+                entryTime: candle.time,
+                confirmToEntryTime: candle.time.utc.diff(confirmCandle?.time.utc),
+                stopHeight: (cob.direction === Directions.DOWN ? cob.stoploss - cob.limit : cob.limit - cob.stoploss) * 10000,
             };
-            this.generalStore.state.Signal.add(signal);
+            const positionData: IPosition = {
+                symbol: signal.pairPeriod.pair as string,
+                volume: 0.01,
+                price: signal.limit,
+                sl: signal.stoploss,
+                tp: signal.takeprofit,
+                direction: "BUY"
+            }
+
+            if (this.generalStore.globalStates.systemMode === SystemMode.LIVE) {
+                if (signal.direction === Enums.Directions.UP) {
+                    positionData.direction = "BUY";
+                    if (parseFloat((positionData.price - (positionData.sl as number)).toFixed(5)) < 0.0003) return;
+                } else if (signal.direction === Enums.Directions.DOWN) {
+                    positionData.direction = "SELL";
+                    if (parseFloat(((positionData.sl as number) - positionData.price).toFixed(5)) < 0.0003) return;
+                }
+            }
+
+            this.generalStore.state.Signal.signals.add(signal);
             this.generalStore.state.Liquidity.addNewUsed(cob.id, Triggers.COB, newLiquidityUsed.liquidityId, newLiquidityUsed);
             this.generalStore.state.Liquidity.updateUsed(cob.id, Triggers.COB, newLiquidityUsed.liquidityId, newLiquidityUsed);
             logger.info(`new signal: ${JSON.stringify(signal)}`);
 
-            if (this.generalStore.globalStates.systemMode === SystemMode.LIVE) {
-                const positionData: IPosition = {
-                    symbol: signal.pairPeriod.pair as string,
-                    volume: 0.01,
-                    price: signal.limit,
-                    sl: signal.stoploss as number,
-                    tp: signal.takeprofit as number,
-                    direction: "BUY"
-                }
-
-                if (signal.direction === Enums.Directions.UP) {
-                    positionData.direction = "BUY";
-                    if ((positionData.price - (positionData.sl as number)) < 0.0003) return;
-                } else if (signal.direction === Enums.Directions.DOWN) {
-                    positionData.direction = "SELL";
-                    if (((positionData.sl as number) - positionData.price) < 0.0003) return;
-                }
-
-                // for running on Fund and simulating use of LiquidityUsed but no position should get
-                // open by COB so it be matched with backtest
-                // await this.generalStore.state.Signal.openPosition(positionData);
-            }
+            // for running on Fund and simulating use of LiquidityUsed but no position should get
+            // open by COB so it be matched with backtest
+            // if (this.generalStore.globalStates.systemMode === SystemMode.LIVE)
+            //     await this.generalStore.state.Signal.openPosition(positionData);
         }
     }
 
@@ -483,27 +501,27 @@ export default class CandleOrderBlock {
     getVariables() {
         const data: any = {
             postStartCount:
-            this.generalStore.state.Setting?.getOne("COBPostStartCount")
-                ?.settingValueParsed,
+                this.generalStore.state.Setting?.getOne("COBPostStartCount")
+                    ?.settingValueParsed,
             bodyCount:
-            this.generalStore.state.Setting?.getOne("COBBodyCount")
-                ?.settingValueParsed,
+                this.generalStore.state.Setting?.getOne("COBBodyCount")
+                    ?.settingValueParsed,
             pastConfirmCount: this.generalStore.state.Setting?.getOne(
                 "COBPastConfirmCount"
             )?.settingValueParsed,
             candlesFromConfirmToDetermineLimitCount:
-            this.generalStore.state.Setting?.getOne(
-                "COBCandlesFromConfirmToDetermineLimitCount"
-            )?.settingValueParsed,
+                this.generalStore.state.Setting?.getOne(
+                    "COBCandlesFromConfirmToDetermineLimitCount"
+                )?.settingValueParsed,
             pastConfirmCandlesCount: this.generalStore.state.Setting?.getOne(
                 "pastConfirmCandlesCount"
             )?.settingValueParsed,
             stopHeightLimit:
-            this.generalStore.state.Setting?.getOne("COBStopHeightLimit")
-                ?.settingValueParsed,
+                this.generalStore.state.Setting?.getOne("COBStopHeightLimit")
+                    ?.settingValueParsed,
             riskReward:
-            this.generalStore.state.Setting?.getOne("RiskReward")
-                ?.settingValueParsed,
+                this.generalStore.state.Setting?.getOne("RiskReward")
+                    ?.settingValueParsed,
         };
 
         return data;
