@@ -368,7 +368,9 @@ export default class CandleOrderBlock {
                     if (((positionData.sl as number) - positionData.price) < 0.0003) return;
                 }
 
-                await this.generalStore.state.Signal.openPosition(positionData);
+                // for running on Fund and simulating use of LiquidityUsed but no position should get
+                // open by COB so it be matched with backtest
+                // await this.generalStore.state.Signal.openPosition(positionData);
             }
         }
     }

@@ -136,8 +136,8 @@ async function initiationPhaseModelOne(generalStore: GeneralStore) {
 
     if (!data.isInWorkTime) return data;
 
-    // generalStore.state.COB?.initiateCOB(data.candle);
-    // generalStore.state.COB?.updateCOB(data.candle);
+    generalStore.state.COB?.initiateCOB(data.candle);
+    generalStore.state.COB?.updateCOB(data.candle);
 
     await generalStore.state.MSS?.initiateMSS(data.candle);
     // generalStore.state.MSS?.updateMSS(data.candle);
