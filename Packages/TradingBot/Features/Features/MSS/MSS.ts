@@ -16,7 +16,6 @@ import { useMarketUtils } from "@shared/Utilities/marketUtils.ts";
 import * as Enums from "@shared/Types/Enums.js";
 import logger from "@shared/Initiatives/Logger.js";
 import { Moment } from "moment";
-import { DateTime } from "@shared/Types/Interfaces/common.ts";
 
 export default class MarketShiftStructure {
     public marketShifts: CircularBuffer<IMSS>;
@@ -191,6 +190,7 @@ export default class MarketShiftStructure {
             this.generalStore.state.Liquidity.addNewUsed(mss.id, Triggers.MSS, newLiquidityUsed.liquidityId, newLiquidityUsed);
             this.generalStore.state.Liquidity.updateUsed(mss.id, Triggers.MSS, newLiquidityUsed.liquidityId, newLiquidityUsed);
 
+            const confirmCandle = this.generalStore.state.Candle.getCandle(mss.mssCandle);
             const signal: ISignal = {
                 id: 0, // will be overrided in Signal class
                 triggerCandleId: candle.id,
@@ -207,7 +207,7 @@ export default class MarketShiftStructure {
 
                 placeOrderTime: mss.placeOrderTime,
                 entryTime: candle.time,
-                confirmToEntryTime: candle.time.utc.diff(mss.placeOrderTime),
+                confirmToEntryTime: candle.time.utc.diff(confirmCandle?.time.utc),
                 stopHeight: (mss.direction === Directions.DOWN ? mss.stoploss - mss.limit : mss.limit - mss.stoploss) * 10000,
             };
             const positionData: IPosition = {
@@ -277,11 +277,6 @@ export default class MarketShiftStructure {
                 .getAll().find((s) => s.triggerId === mss.id);
             if (!signal) return;
             if (signal.status !== SignalStatus.TRIGGERED) return;
-
-
-            if ((signal.stopHeight as number) > 11) {
-                console.log(candle, mss, signal)
-            }
 
             this.marketShifts.updateByIndex(index, "status", TriggerStatus.TAKEPROFIT);
             const liquidityUsed: LiquidityUsed = {
@@ -359,6 +354,17 @@ export default class MarketShiftStructure {
         if (this.checkHeightLimitFailure(mss, candle)) return;
         if (this.checkSecondDeepToMssCandleDiffFailure(mss, candle)) return;
         if (this.checkMssCandleToTriggerCandleDiffFailure(mss, candle)) return;
+        // if (this.checkExpirationTimeFailure(mss, candle)) return;
+    }
+
+    private checkExpirationTimeFailure(mss: IMSS, candle: ICandle): boolean {
+        const signal = this.generalStore.state.Signal.signals.getAll().find(s => s.trigger === Triggers.MSS && s.triggerId === mss.id);
+        if (!signal || !signal.confirmToEntryTime) return false;
+
+        const mssTillDownSecond = (mss.dateTime as Moment).diff(candle.time.utc) / 1000;
+        if (mssTillDownSecond >= 1800) return this.makeMssFailed(mss, candle);
+
+        return false;
     }
 
     private checkHeightLimitFailure(mss: IMSS, candle: ICandle): boolean {

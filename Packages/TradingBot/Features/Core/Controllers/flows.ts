@@ -1,7 +1,7 @@
-import {ICandle, ModelOneData} from "@shared/Types/Interfaces/general.ts";
-import {GeneralStore} from "@shared/Types/Interfaces/generalStore.ts";
-import {checkForHunt} from "@tradingBot/Features/Features/Liquidity/Controllers/HuntController.ts";
-import {validateLiquidities} from "@tradingBot/Features/Features/Liquidity/Validations.ts";
+import { ICandle, ModelOneData } from "@shared/Types/Interfaces/general.ts";
+import { GeneralStore } from "@shared/Types/Interfaces/generalStore.ts";
+import { checkForHunt } from "@tradingBot/Features/Features/Liquidity/Controllers/HuntController.ts";
+import { validateLiquidities } from "@tradingBot/Features/Features/Liquidity/Validations.ts";
 
 export async function modelOne(generalStore: GeneralStore) {
     let start = new Date().getTime();
@@ -134,8 +134,10 @@ async function initiationPhaseModelOne(generalStore: GeneralStore) {
         new Date().getTime() - startTime
     );
 
-    generalStore.state.COB?.initiateCOB(data.candle);
-    generalStore.state.COB?.updateCOB(data.candle);
+    if (!data.isInWorkTime) return data;
+
+    // generalStore.state.COB?.initiateCOB(data.candle);
+    // generalStore.state.COB?.updateCOB(data.candle);
 
     await generalStore.state.MSS?.initiateMSS(data.candle);
     // generalStore.state.MSS?.updateMSS(data.candle);
