@@ -6,6 +6,7 @@ import {
 } from "@shared/Types/Interfaces/common.ts";
 import { Setting, Currency, TimeMicroType } from "@prisma/client";
 import Net from "net";
+import { Moment } from "moment";
 
 export interface IMTSocket {
     CMD: Net.Socket | null;
@@ -129,7 +130,7 @@ export interface IMSS {
     FVGs?: number[]; // id of FVGs
     height: number;
     dateTime?: any;
-    placeOrderTime?: any;
+    formationTime?: Moment;
 }
 
 export interface ISignal {
@@ -145,12 +146,13 @@ export interface ISignal {
     takeprofit: number;
     status: Enums.SignalStatus;
     time: DateTime;
-    placeOrderTime?: DateTime;
-    entryTime?: DateTime;
+    placeOrderTime?: Moment;
+    entryTime?: Moment;
+    closedTime?: Moment;
     stopHeight?: number;
-    confirmToEntryTime?: number;
-    entryToResult?: number;
-    closedAt?: any;
+    formationToTriggerTime?: number;
+    triggerToCloseTime?: number;
+    formationToCloseTime?: number;
 }
 
 export interface IPosition {

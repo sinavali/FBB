@@ -87,6 +87,7 @@ export default class MarketShiftStructure {
         const mssCandle = this.findMssCandle(mainDeepCandle, secondDeepCandle, candle, modelDirection);
         if (!mssCandle) return;
         model.mssCandle = mssCandle.id;
+        model.formationTime = candle.time.utc;
 
         const doesExists = this.generalStore.state.MSS.marketShifts
             .getAll().find(mss =>
@@ -127,7 +128,6 @@ export default class MarketShiftStructure {
 
         model.id = ++this.maxId;
         model.dateTime = candle.time.utc;
-        model.placeOrderTime = candle.time.utc;
         model.state = MssState.INITIATED;
         model.liquidityUsed = {
             liquidityId: liquidity.id,
@@ -205,11 +205,13 @@ export default class MarketShiftStructure {
                 time: candle.time,
                 liquidityUsed: mss.liquidityUsed,
 
-                placeOrderTime: mss.placeOrderTime,
-                entryTime: candle.time,
-                confirmToEntryTime: candle.time.utc.diff(confirmCandle?.time.utc),
+                placeOrderTime: candle.time.utc,
+                entryTime: candle.time.utc,
                 stopHeight: (mss.direction === Directions.DOWN ? mss.stoploss - mss.limit : mss.limit - mss.stoploss) * 10000,
             };
+
+            signal.formationToTriggerTime = (mss.formationTime as Moment)?.diff(signal.entryTime) / 1000;
+            
             const positionData: IPosition = {
                 symbol: signal.pairPeriod.pair as string,
                 volume: 0.01,
@@ -260,8 +262,9 @@ export default class MarketShiftStructure {
 
             const signalIndex = this.generalStore.state.Signal.signals.getAll().findIndex((s) => s.id === signal.id);
 
-            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "entryToResult", Math.abs(signal.entryTime?.utc.diff(candle.time.utc) as number));
-            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "closedAt", candle.time.utc);
+            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "formationToCloseTime", Math.abs((mss.formationTime as Moment).diff(candle.time.utc) as number));
+            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "triggerToCloseTime", Math.abs((signal.entryTime as Moment).diff(candle.time.utc) as number));
+            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "closedTime", candle.time.utc);
             this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "status", SignalStatus.STOPLOSS);
             this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "time", candle.time);
             this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "liquidityUsed", liquidityUsed);
@@ -308,6 +311,7 @@ export default class MarketShiftStructure {
 
             // renew the mss data for the function
             const mss = this.marketShifts.getById(item.id) as IMSS;
+            if (mss.status !== TriggerStatus.FOUND) return;
 
             if (this.generalStore.globalStates.systemMode === SystemMode.LIVE) this.makeMssTriggered(mss, candle)
             else {
