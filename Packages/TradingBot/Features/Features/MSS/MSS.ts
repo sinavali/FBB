@@ -16,6 +16,7 @@ import { useMarketUtils } from "@shared/Utilities/marketUtils.ts";
 import * as Enums from "@shared/Types/Enums.js";
 import logger from "@shared/Initiatives/Logger.js";
 import { Moment } from "moment";
+import moment from "moment";
 
 export default class MarketShiftStructure {
     public marketShifts: CircularBuffer<IMSS>;
@@ -327,7 +328,7 @@ export default class MarketShiftStructure {
             if (!signal || !signal.entryTime) return;
 
             // Skip candles older than or equal to the entry time
-            if (candle.time.unix <= signal.entryTime.unix()) return;
+            if (candle.time.utc.isBefore(signal.entryTime)) return;
 
             const status = this.evaluateSignal(signal, candle);
 
