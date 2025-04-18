@@ -211,7 +211,7 @@ export default class MarketShiftStructure {
             };
 
             signal.formationToTriggerTime = (mss.formationTime as Moment)?.diff(signal.entryTime) / 1000;
-            
+
             const positionData: IPosition = {
                 symbol: signal.pairPeriod.pair as string,
                 volume: 0.01,
@@ -238,9 +238,7 @@ export default class MarketShiftStructure {
     }
 
     private makeMssTriggerStopLoss(mss: IMSS, candle: ICandle) {
-        const index: number = this.marketShifts
-            .getAll()
-            .findIndex((e) => e.id === mss.id);
+        const index: number = this.marketShifts.getAll().findIndex((e) => e.id === mss.id);
 
         if (index >= 0) {
             logger.info(`mss updated stoploss: ${JSON.stringify(mss)}`);
@@ -276,12 +274,14 @@ export default class MarketShiftStructure {
         const index: number = this.marketShifts.getAll().findIndex((e) => e.id === mss.id);
 
         if (index >= 0) {
-            const signal = this.generalStore.state.Signal.signals
-                .getAll().find((s) => s.triggerId === mss.id);
+            logger.info(`mss updated takeprofit: ${JSON.stringify(mss)}`);
+
+            const signal = this.generalStore.state.Signal.signals.getAll().find((s) => s.triggerId === mss.id);
             if (!signal) return;
             if (signal.status !== SignalStatus.TRIGGERED) return;
 
             this.marketShifts.updateByIndex(index, "status", TriggerStatus.TAKEPROFIT);
+            
             const liquidityUsed: LiquidityUsed = {
                 liquidityId: mss.liquidityUsed.liquidityId,
                 status: LiquidityUsedStatus.TAKEPROFIT,
@@ -293,8 +293,9 @@ export default class MarketShiftStructure {
 
             const signalIndex = this.generalStore.state.Signal.signals.getAll().findIndex((s) => s.id === signal.id);
 
-            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "entryToResult", Math.abs(signal.entryTime?.utc.diff(candle.time.utc) as number));
-            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "closedAt", candle.time.utc);
+            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "formationToCloseTime", Math.abs((mss.formationTime as Moment).diff(candle.time.utc) as number));
+            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "triggerToCloseTime", Math.abs((signal.entryTime as Moment).diff(candle.time.utc) as number));
+            this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "closedTime", candle.time.utc);
             this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "status", SignalStatus.TAKEPROFIT);
             this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "time", candle.time);
             this.generalStore.state.Signal.signals.updateByIndex(signalIndex, "liquidityUsed", liquidityUsed);
@@ -307,7 +308,7 @@ export default class MarketShiftStructure {
 
         founds.forEach((item) => {
             this.updateMssData(item, candle);
-            this.checkMssFailure(item, candle);
+            // this.checkMssFailure(item, candle);
 
             // renew the mss data for the function
             const mss = this.marketShifts.getById(item.id) as IMSS;
@@ -326,7 +327,7 @@ export default class MarketShiftStructure {
             if (!signal || !signal.entryTime) return;
 
             // Skip candles older than or equal to the entry time
-            if (candle.time.unix <= signal.entryTime.unix) return;
+            if (candle.time.unix <= signal.entryTime.unix()) return;
 
             const status = this.evaluateSignal(signal, candle);
 
@@ -363,7 +364,7 @@ export default class MarketShiftStructure {
 
     private checkExpirationTimeFailure(mss: IMSS, candle: ICandle): boolean {
         const signal = this.generalStore.state.Signal.signals.getAll().find(s => s.trigger === Triggers.MSS && s.triggerId === mss.id);
-        if (!signal || !signal.confirmToEntryTime) return false;
+        if (!signal || !signal.formationToTriggerTime) return false;
 
         const mssTillDownSecond = (mss.dateTime as Moment).diff(candle.time.utc) / 1000;
         if (mssTillDownSecond >= 1800) return this.makeMssFailed(mss, candle);
