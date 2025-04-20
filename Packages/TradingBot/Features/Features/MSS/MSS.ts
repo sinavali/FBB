@@ -433,7 +433,6 @@ export default class MarketShiftStructure {
         return false;
     }
 
-
     updateMssData(mss: IMSS, candle: ICandle) {
         const mssIndex = this.marketShifts.getAll().findIndex((e) => e.id === mss.id);
         if (!mssIndex) return;

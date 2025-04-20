@@ -310,6 +310,9 @@ def place_order():
         if direction == "BUY":
             current_price = tick.ask  # Use ASK price for BUY orders
             
+            if abs(current_price - entry_price) > 0.0002:
+                return jsonify({"error": f"for market orders current_price - entry_price is {current_price - entry_price} wich should be lower than 0.0002"}), 400
+            
             # SL must be BELOW current_price, TP must be ABOVE current_price
             if sl >= current_price:
                 return jsonify({"error": "SL must be below entry price for BUY"}), 400
@@ -332,6 +335,9 @@ def place_order():
             }
         elif direction == "SELL":
             current_price = tick.bid  # Use BID price for SELL orders
+            
+            if abs(current_price - entry_price) > 0.0002:
+                return jsonify({"error": f"for market orders current_price - entry_price is {current_price - entry_price} wich should be lower than 0.0002"}), 400
             
             # SL must be ABOVE current_price, TP must be BELOW current_price
             if sl <= current_price:
@@ -553,7 +559,8 @@ def place_limit_order():
             mt5.shutdown()
         except Exception as e:
             logger.error(f"MT5 shutdown error: {str(e)}")  
-            
+
+       
 @app.route('/last_week_candles_1d', methods=['POST'])
 def last_week_candles_1d():
     """Fetch daily candles between client-provided dates"""
