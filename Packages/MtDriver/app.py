@@ -310,6 +310,9 @@ def place_order():
         if direction == "BUY":
             current_price = tick.ask  # Use ASK price for BUY orders
             
+            if abs(current_price - entry_price) > 0.0002:
+                return jsonify({"error": f"for market orders current_price - entry_price is {current_price - entry_price} wich should be lower than 0.0002"}), 400
+            
             # SL must be BELOW current_price, TP must be ABOVE current_price
             if sl >= current_price:
                 return jsonify({"error": "SL must be below entry price for BUY"}), 400
@@ -320,7 +323,7 @@ def place_order():
             mt5_request = {
                 "action": mt5.TRADE_ACTION_DEAL,
                 "symbol": symbol,
-                "volume": 0.01,
+                "volume": volume,
                 "type": order_type,
                 "price": current_price,
                 "sl": sl,
@@ -332,6 +335,9 @@ def place_order():
             }
         elif direction == "SELL":
             current_price = tick.bid  # Use BID price for SELL orders
+            
+            if abs(current_price - entry_price) > 0.0002:
+                return jsonify({"error": f"for market orders current_price - entry_price is {current_price - entry_price} wich should be lower than 0.0002"}), 400
             
             # SL must be ABOVE current_price, TP must be BELOW current_price
             if sl <= current_price:
@@ -495,7 +501,7 @@ def place_limit_order():
         order_request = {
             "action": mt5.TRADE_ACTION_PENDING,
             "symbol": symbol,
-            "volume": 0.33,
+            "volume": volume,
             "type": order_type,
             "price": entry_price,
             "sl": sl,
@@ -553,7 +559,8 @@ def place_limit_order():
             mt5.shutdown()
         except Exception as e:
             logger.error(f"MT5 shutdown error: {str(e)}")  
-            
+
+       
 @app.route('/last_week_candles_1d', methods=['POST'])
 def last_week_candles_1d():
     """Fetch daily candles between client-provided dates"""
@@ -716,7 +723,6 @@ def get_candles_in():
         return jsonify({"error": "Internal server error"}), 500
 
 
-
 @app.route('/test_pending_order', methods=['GET'])
 def test_pending_order():
     """Test endpoint for generating valid pending orders (EURUSD M1)"""
@@ -727,6 +733,7 @@ def test_pending_order():
             return jsonify({"error": "MT5 connection failed"}), 500
 
         symbol = "EURUSD"
+        volume = 0.33
         if not mt5.symbol_select(symbol, True):
             logging.error(f"Failed to select {symbol} in Market Watch")
             return jsonify({"error": "Symbol not available"}), 400
@@ -750,7 +757,7 @@ def test_pending_order():
         # Create test order payload
         test_data = {
             "symbol": symbol,
-            "volume": 0.33,
+            "volume": volume,
             "direction": "BUY",
             "sl": round(sl, 5),
             "tp": round(tp, 5),
