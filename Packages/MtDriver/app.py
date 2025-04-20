@@ -323,7 +323,7 @@ def place_order():
             mt5_request = {
                 "action": mt5.TRADE_ACTION_DEAL,
                 "symbol": symbol,
-                "volume": 0.01,
+                "volume": volume,
                 "type": order_type,
                 "price": current_price,
                 "sl": sl,
@@ -501,7 +501,7 @@ def place_limit_order():
         order_request = {
             "action": mt5.TRADE_ACTION_PENDING,
             "symbol": symbol,
-            "volume": 0.33,
+            "volume": volume,
             "type": order_type,
             "price": entry_price,
             "sl": sl,
@@ -723,7 +723,6 @@ def get_candles_in():
         return jsonify({"error": "Internal server error"}), 500
 
 
-
 @app.route('/test_pending_order', methods=['GET'])
 def test_pending_order():
     """Test endpoint for generating valid pending orders (EURUSD M1)"""
@@ -734,6 +733,7 @@ def test_pending_order():
             return jsonify({"error": "MT5 connection failed"}), 500
 
         symbol = "EURUSD"
+        volume = 0.33
         if not mt5.symbol_select(symbol, True):
             logging.error(f"Failed to select {symbol} in Market Watch")
             return jsonify({"error": "Symbol not available"}), 400
@@ -757,7 +757,7 @@ def test_pending_order():
         # Create test order payload
         test_data = {
             "symbol": symbol,
-            "volume": 0.33,
+            "volume": volume,
             "direction": "BUY",
             "sl": round(sl, 5),
             "tp": round(tp, 5),
