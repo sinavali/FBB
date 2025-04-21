@@ -107,6 +107,7 @@ class TelegramChannel:
                     for _ in range(3):
                         if initialize_mt5():
                             break
+                        print("here")
                         time.sleep(1)
                     else:
                         continue
