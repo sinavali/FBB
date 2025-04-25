@@ -15,6 +15,7 @@ export default class Session {
     constructor(generalStoreInstance: GeneralStore, capacity: number = 100) {
         this.generalStore = generalStoreInstance;
         this.sessions = new CircularBuffer<ISession>(capacity);
+        this.fetch();
     }
 
     /**

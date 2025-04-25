@@ -11,6 +11,7 @@ export default class Setting {
   // capacity = 22000 means 2 weeks and 4 days of 1-minute candles
   constructor(generalStoreInstance: GeneralStore) {
     this.generalStore = generalStoreInstance;
+    this.fetch();
   }
 
   /**

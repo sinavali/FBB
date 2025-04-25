@@ -2,11 +2,20 @@ import Candle from "@tradingBot/Features/Features/Candle/Candle.ts";
 import { ICandle } from "@shared/Types/Interfaces/general.ts";
 import { CandleDirection } from "@shared/Types/Enums.ts";
 import { modelOne } from "@tradingBot/Features/Core/Controllers/flows.ts";
-import { useGeneralStore } from "@shared/Stores/GeneralStore.ts";
+import GeneralStoreClass from "@shared/Stores/GeneralStore.ts";
 
 jest.mock("@shared/Stores/GeneralStore.ts", () => {
   return {
-    useGeneralStore: jest.fn(() => ({
+    useGeneralStore: jest.fn(() => ()),
+  };
+});
+
+describe("Candle.ts", () => {
+  let candleInstance: Candle;
+  let generalStoreMock;
+
+  beforeEach(() => {
+    generalStoreMock = {
       state: {
         Setting: {
           getOne: jest.fn((key: string) =>
@@ -16,19 +25,11 @@ jest.mock("@shared/Stores/GeneralStore.ts", () => {
         Session: { fetch: jest.fn() },
         Database: { init: jest.fn() },
       },
+      setter: {},
       globalStates: {
         systemMode: "LIVE",
       },
-    })),
-  };
-});
-
-describe("Candle.ts", () => {
-  let candleInstance: Candle;
-  let generalStoreMock;
-
-  beforeEach(() => {
-    generalStoreMock = useGeneralStore();
+    };
     candleInstance = new Candle(generalStoreMock, 5); // Assume a circular buffer size of 5
   });
 

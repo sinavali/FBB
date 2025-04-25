@@ -72,8 +72,8 @@ mt5_login = get_setting("Mt5Login")
 mt5_password = get_setting("Mt5Password")
 mt5_server = get_setting("Mt5Server")
 
-mt5_login = 5035461052
-mt5_password = "BgM*YbQ3"
+mt5_login = 5034048580
+mt5_password = "*h3nNrEu"
 mt5_server = "MetaQuotes-Demo"
 
 

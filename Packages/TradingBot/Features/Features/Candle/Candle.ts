@@ -63,7 +63,7 @@ export default class Candle {
     public candles: CandleCircularBuffer;
     private readonly generalStore: GeneralStore;
     public queryClass: Query;
-    private indexMap: Map<number, number> = new Map();
+    public indexMap: Map<number, number> = new Map();
     private maxId: number = 0;
 
     // capacity = 22000 means 2 weeks and 4 days of 1-minute candles
