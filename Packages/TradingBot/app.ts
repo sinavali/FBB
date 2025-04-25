@@ -1,11 +1,14 @@
-import {initLogger} from "@shared/Initiatives/Logger.ts";
+import { initLogger } from "@shared/Initiatives/Logger.ts";
 import logger from "@shared/Initiatives/Logger.ts";
 import liveMode from "@tradingBot/Features/Core/Controllers/liveModeController.ts";
 import signalMode from "@tradingBot/Features/Core/Controllers/signalModeController.ts";
 import backtestMode from "@tradingBot/Features/Core/Controllers/backtestModeController.ts";
 import mtBacktestMode from "@tradingBot/Features/Core/Controllers/MtBacktestModeController.js";
-import {ProjectName, SystemMode} from "@shared/Types/Enums.ts";
-import {useGeneralStore} from "@shared/Stores/GeneralStore.ts";
+import backtestLiveMode from "@tradingBot/Features/Core/Controllers/backtestLiveModeController.ts";
+import { ProjectName, SystemMode } from "@shared/Types/Enums.ts";
+// import { useGeneralStore } from "@shared/Stores/GeneralStore.ts";
+import GeneralStoreClass from "@shared/Stores/GeneralStore.ts";
+import http from "http"
 
 // logger.info("This is an info log.");
 // logger.warn("This is a warning log.");
@@ -36,65 +39,41 @@ console.timeEnd = (label: string) => {
 
 // initiating connections
 initLogger(ProjectName.BOT);
-const generalStore = useGeneralStore();
-const generalStates = generalStore.state;
+const generalStore = new GeneralStoreClass();
 
-if (!generalStates) {
-    logger.error("general store is falsy");
-    console.log("general store is falsy");
-    process.exit();
-}
-
-// prisma is newed in general store by default
-if (!generalStates.Setting) {
-    logger.error("Setting class is not created");
-    console.log("Setting class is not created");
-    process.exit();
-}
-const settingInit = generalStates.Setting.fetch();
-
-if (!generalStates.Session) {
-    logger.error("Session class is not created");
-    console.log("Session class is not created");
-    process.exit();
-}
-const sessionInit = generalStates.Session.fetch();
-
-if (!generalStates.WorkTime) {
-    logger.error("WorkTime class is not created");
-    console.log("WorkTime class is not created");
-    process.exit();
-}
-const workTimeInit = generalStates.WorkTime.fetch();
-
-Promise.all([settingInit, sessionInit, workTimeInit]).then(async () => {
+setTimeout(async () => {
     // init flows
-    if (!generalStates.Setting) return;
+    if (!generalStore.state.Setting) return;
 
-    const systemMode = generalStates.Setting.getOne("SystemMode");
+    const systemMode = generalStore.state.Setting.getOne("SystemMode")?.settingValueParsed;
     if (!systemMode) {
         logger.error("system mode is invalid: " + systemMode);
         process.exit();
     } else logger.info("system mode is: " + systemMode);
 
-    generalStore.globalStates.systemMode = systemMode?.settingValueParsed as SystemMode;
-    await generalStates.Database.init(
+    generalStore.globalStates.systemMode = systemMode;
+    await generalStore.state.Database.init(
         ProjectName.BOT,
-        systemMode?.settingValueParsed as SystemMode
+        systemMode
     );
 
-    generalStates.Time.add(
+    generalStore.state.Time.add(
         "application warmup and initialization",
         new Date().getTime() - start
     );
+    console.log(systemMode)
+    if (systemMode === SystemMode.LIVE) liveMode(generalStore);
+    else if (systemMode === SystemMode.SIGNAL)
+        signalMode(generalStore);
+    else if (systemMode === SystemMode.BACKTEST)
+        backtestMode(generalStore);
+    else if (systemMode === SystemMode.MTBACKTEST)
+        mtBacktestMode(generalStore);
+    else if (systemMode === SystemMode.BACKTESTLIVE)
+        backtestLiveMode(generalStore);
+}, 5000);
 
-    setTimeout(() => {
-        if (systemMode?.settingValueParsed === SystemMode.LIVE) liveMode(generalStore);
-        else if (systemMode?.settingValueParsed === SystemMode.SIGNAL)
-            signalMode(generalStore);
-        else if (systemMode?.settingValueParsed === SystemMode.BACKTEST)
-            backtestMode(generalStore);
-        else if (systemMode?.settingValueParsed === SystemMode.MTBACKTEST)
-            mtBacktestMode(generalStore);
-    }, 5000);
-});
+// initiating a server only for making the app running endlesly
+http.createServer((req, res) => {
+    res.end('Hello from Node!');
+}).listen(12345, () => ({}));

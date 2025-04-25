@@ -1,8 +1,8 @@
-import {IWorkTime} from "@shared/Types/Interfaces/general.ts";
-import {GeneralStore} from "@shared/Types/Interfaces/generalStore.ts";
+import { IWorkTime } from "@shared/Types/Interfaces/general.ts";
+import { GeneralStore } from "@shared/Types/Interfaces/generalStore.ts";
 import moment from "moment-timezone";
-import {CircularBuffer} from "@tradingBot/Features/Core/CircularBuffer.ts";
-import {WorkTime as DBWorkTime} from "@prisma/client";
+import { CircularBuffer } from "@tradingBot/Features/Core/CircularBuffer.ts";
+import { WorkTime as DBWorkTime } from "@prisma/client";
 
 export default class WorkTime {
     public workTimes: CircularBuffer<IWorkTime>;
@@ -15,6 +15,7 @@ export default class WorkTime {
     constructor(generalStoreInstance: GeneralStore, capacity: number = 100) {
         this.generalStore = generalStoreInstance;
         this.workTimes = new CircularBuffer<IWorkTime>(capacity);
+        this.fetch();
     }
 
     /**
