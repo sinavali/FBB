@@ -43,17 +43,32 @@ export default class Signal {
             return;
         }
 
-        const res = await fetch("http://127.0.0.1:5000/place_limit_order", {
-            method: "POST",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(position),
-        })
+        const orderType = this.generalStore.state.Setting.getOne("OrderType")?.settingValueParsed;
+        const res: any = orderType === "MARKET" ? await this.openMarketOrder(position) : orderType === "LIMIT" ? this.openLimitOrder(position) : undefined;
+        if (!res) return;
+
         const data = await res.json();
 
         logger.info(`new position limit: ${JSON.stringify(position)}`);
         logger.info(`position request result: ${JSON.stringify(data)}`);
 
         console.log(data);
+    }
+
+    private async openMarketOrder(position: IPosition) {
+        return await fetch("http://127.0.0.1:5000/place_order", {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(position),
+        })
+    }
+
+    private async openLimitOrder(position: IPosition) {
+        return await fetch("http://127.0.0.1:5000/place_limit_order", {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(position),
+        })
     }
 
     getMaxId(): number {

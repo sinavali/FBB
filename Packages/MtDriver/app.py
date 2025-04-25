@@ -311,7 +311,7 @@ def place_order():
             current_price = tick.ask  # Use ASK price for BUY orders
             
             if abs(current_price - entry_price) > 0.0002:
-                return jsonify({"error": f"for market orders current_price - entry_price is {current_price - entry_price} wich should be lower than 0.0002"}), 400
+                return jsonify({"error": f"for market orders current_price - entry_price is {abs(current_price - entry_price)} wich should be lower than 0.0002"}), 400
             
             # SL must be BELOW current_price, TP must be ABOVE current_price
             if sl >= current_price:
@@ -337,7 +337,7 @@ def place_order():
             current_price = tick.bid  # Use BID price for SELL orders
             
             if abs(current_price - entry_price) > 0.0002:
-                return jsonify({"error": f"for market orders current_price - entry_price is {current_price - entry_price} wich should be lower than 0.0002"}), 400
+                return jsonify({"error": f"for market orders current_price - entry_price is {abs(current_price - entry_price)} wich should be lower than 0.0002"}), 400
             
             # SL must be ABOVE current_price, TP must be BELOW current_price
             if sl <= current_price:

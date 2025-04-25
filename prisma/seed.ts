@@ -14,6 +14,7 @@ async function setSettings() {
   await prisma.setting.createMany({
     data: [
       { settingKey: "SystemMode", settingValue: "MTBACKTEST", parseTo: "STRING" },
+      { settingKey: "OrderType", settingValue: "MARKET", parseTo: "STRING" },
       { settingKey: "RiskReward", settingValue: "2", parseTo: "FLOAT" },
       { settingKey: "SignalLoss", settingValue: "1", parseTo: "FLOAT" },
 

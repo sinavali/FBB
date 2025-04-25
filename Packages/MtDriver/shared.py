@@ -1,8 +1,9 @@
 # shared.py
 import logging
 import os
+import time
 from logging import Handler, Formatter
-from datetime import datetime, time
+from datetime import datetime
 from zoneinfo import ZoneInfo
 import MetaTrader5 as mt5
 import mysql.connector
@@ -70,6 +71,10 @@ def get_setting(key):
 mt5_login = get_setting("Mt5Login")
 mt5_password = get_setting("Mt5Password")
 mt5_server = get_setting("Mt5Server")
+
+mt5_login = 5035461052
+mt5_password = "BgM*YbQ3"
+mt5_server = "MetaQuotes-Demo"
 
 
 # Logging configuration
