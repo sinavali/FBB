@@ -101,10 +101,19 @@ async function runCandleStreamFlow(generalStore: GeneralStore, model: Function) 
         });
     });
 
-    socket.on('new_candle', async (candle) => {
-        console.log(`${candle["closeTime"]}: New ${candle["period"]} candle for ${candle["name"]}:`);
+    socket.on('new_candles', async (candles) => {
+        console.log(candles.length)
+        // console.log(`${candles[0]["closeTime"]}: New ${candles[0]["period"]} candle for ${candles[0]["name"]}:`);
 
-        await generalStore.state.Candle.processCandles([candle], model);
+
+        // fill the lost connection gaps
+        const allCandles = generalStore.state.Candle.candles.getAll();
+        const set1 = new Set(allCandles.map(item => item.time.unix));
+        candles = candles.filter((item: any) => !set1.has(item.closeTime));
+        console.log(candles.length)
+
+        await generalStore.state.Candle.processCandles(candles, model);
+        console.log(generalStore.state.Candle.candles.getAll()[0])
     });
 
     socket.on('error', (error) => {

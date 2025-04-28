@@ -161,9 +161,9 @@ def get_closed_positions_stats(start_date: datetime) -> dict:
     finally:
         mt5.shutdown()
 
-         
-def get_candle(symbol, timeframe):
-    """Fetch latest candle data with enhanced error handling"""
+
+def get_candles(symbol, timeframe, num_candles=360):
+    """Fetch the latest num_candles candle data with enhanced error handling"""
     try:
         if not initialize_mt5():
             logging.error("MT5 initialization failed")
@@ -179,23 +179,27 @@ def get_candle(symbol, timeframe):
             logging.error(f"Invalid timeframe: {timeframe}")
             return None
 
-        rates = mt5.copy_rates_from_pos(symbol, mt5_timeframe, 1, 1)
+        rates = mt5.copy_rates_from_pos(symbol, mt5_timeframe, 1, num_candles)
         if rates is None or len(rates) == 0:
             logging.warning(f"No data returned for {symbol} {timeframe}")
             return None
 
-        return {
-            'closeTime': int(rates[0][0]) - target_tz_offset_seconds,
-            'open': rates[0][1],
-            'high': rates[0][2],
-            'low': rates[0][3],
-            'close': rates[0][4],
-            'name': symbol,
-            'period': timeframe.upper()
-        }
+        candles = [
+            {
+                'closeTime': int(rate[0]) - target_tz_offset_seconds,
+                'open': rate[1],
+                'high': rate[2],
+                'low': rate[3],
+                'close': rate[4],
+                'name': symbol,
+                'period': timeframe.upper()
+            }
+            for rate in rates
+        ]
+        return candles
 
     except Exception as e:
-        logging.error(f"Error fetching candle: {str(e)}")
+        logging.error(f"Error fetching candles: {str(e)}")
         return None
     finally:
         try:
@@ -232,7 +236,6 @@ def handle_candle_stream(data):
         logging.error(f"Stream setup error: {str(e)}")
         socketio.emit('error', {'message': 'Failed to start stream'}, room=sid)
 
-
 def candle_polling_worker(sid, socketio):
     """Background task to check for new candles"""
     with app.app_context():
@@ -241,15 +244,18 @@ def candle_polling_worker(sid, socketio):
                 subs = active_subscriptions.get(sid, {}).get('symbols', {})
                 for key, config in subs.items():
                     print_default_data()
-                    candle = get_candle(config['symbol'], config['timeframe'])
-                    if candle and (candle['closeTime']) > config['last_candle']:
-                        socketio.emit('new_candle', candle, room=sid)
-                        config['last_candle'] = candle['closeTime']
-                eventlet.sleep(60 - now_in_utc().second)
+                    candles = get_candles(config['symbol'], config['timeframe'])
+                    if candles:
+                        # Emit only new candles
+                        socketio.emit('new_candles', candles, room=sid)
+                        config['last_candle'] = max(candle['closeTime'] for candle in candles)
+                        # for candle in candles:
+                            # if candle['closeTime'] > config['last_candle']:
+                        # Update last_candle to the latest closeTime
+                eventlet.sleep(20 - now_in_utc().second)
             except Exception as e:
                 logging.error(f"Polling error: {str(e)}")
                 break
-
 
 @socketio.on('disconnect')
 def handle_disconnect():
@@ -760,7 +766,7 @@ def test_pending_order():
             return jsonify({"error": "MT5 connection failed"}), 500
 
         symbol = "EURUSD"
-        volume = 0.33
+        volume = 0.01
         if not mt5.symbol_select(symbol, True):
             logging.error(f"Failed to select {symbol} in Market Watch")
             return jsonify({"error": "Symbol not available"}), 400
@@ -814,4 +820,4 @@ def test_pending_order():
 if __name__ == '__main__':
     logger.info("Application starting...")
     tg_bot.start_monitoring()
-    socketio.run(app, host='127.0.0.1', port=5000, debug=True)
+    socketio.run(app, host='127.0.0.1', port=5000, debug=False)

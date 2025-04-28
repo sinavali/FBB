@@ -106,10 +106,10 @@ async function runCandleStreamFlow(generalStore: GeneralStore, model: Function) 
         });
     });
 
-    socket.on('new_candle', async (candle) => {
-        console.log(`${candle["closeTime"]}: New ${candle["period"]} candle for ${candle["name"]}:`);
+    socket.on('new_candles', async (candles) => {
+        console.log(`${candles[0]["closeTime"]}: New ${candles[0]["period"]} candle for ${candles[0]["name"]}:`);
         await initRunMode();
-        await generalStore.state.Candle.processCandles([candle], model);
+        await generalStore.state.Candle.processCandles(candles, model);
     });
 
     socket.on('error', (error) => {
