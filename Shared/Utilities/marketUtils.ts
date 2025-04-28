@@ -12,7 +12,7 @@ export function useMarketUtils(): MarketUtilsStore {
       return (priceA - priceB) * 10000;
     },
     toPip(price: number): number {
-      return price / 10000;
+      return price * 10000;
     },
   };
 

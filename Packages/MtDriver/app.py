@@ -12,6 +12,7 @@ from shared import initialize_mt5, setup_logging, target_tz
 from tgChannel import TelegramChannel
 from threading import Lock
 import logging
+import mysql.connector
 
 # Initialize logging first
 setup_logging()
@@ -681,9 +682,35 @@ def get_candles_in():
             if field not in data:
                 return jsonify({"error": f"Missing required field: {field}"}), 400
 
+        if data['fromdb']:
+            fromdb = data['fromdb']
         symbol = data['symbol'].upper()
         start_str = data['start']
         end_str = data['end']
+        
+        print(symbol)
+
+        if fromdb == 1:
+            with mysql.connector.connect(
+                host="localhost",
+                user="root",
+                password="",  # Replace with your actual MySQL root password
+                database="trading_view_candles"
+            ) as mydb:
+                with mydb.cursor() as mycursor:
+                    mycursor.execute(f"SELECT * FROM candles where name = '{symbol}' and closeTime >= {start_str} and closeTime <= {end_str}")
+                    results = mycursor.fetchall()
+                    print(f"SELECT * FROM candles where name = '{symbol}' and closeTime >= {start_str} and closeTime <= {end_str}")
+                    candlesTemp = [{
+                        'closeTime': int(rate[7]),
+                        'open': rate[3],
+                        'high': rate[4],
+                        'low': rate[5],
+                        'close': rate[6],
+                        'period': rate[2],
+                        'name': rate[1]
+                    } for rate in results]
+                    return jsonify({"candles": candlesTemp}), 200      
 
         # Direct conversion without timezone handling
         start_dt = datetime.fromisoformat(start_str).astimezone(target_tz).replace(tzinfo=None)

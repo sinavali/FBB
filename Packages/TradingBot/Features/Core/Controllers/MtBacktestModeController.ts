@@ -1,10 +1,10 @@
 import logger from "@shared/Initiatives/Logger.ts";
-import {LiquidityMode, SystemMode} from "@shared/Types/Enums.ts";
-import {GeneralStore} from "@shared/Types/Interfaces/generalStore.ts";
-import {modelOne} from "@tradingBot/Features/Core/Controllers/flows.ts";
+import { CandleDirection, LiquidityMode, SystemMode } from "@shared/Types/Enums.ts";
+import { GeneralStore } from "@shared/Types/Interfaces/generalStore.ts";
+import { modelOne } from "@tradingBot/Features/Core/Controllers/flows.ts";
 import fs from "fs";
 import moment from "moment";
-import {generateSignalReports} from '@tradingBot/Features/Core/ReportMaker.ts';
+import { generateSignalReports } from '@tradingBot/Features/Core/ReportMaker.ts';
 
 export default async (generalStore: GeneralStore) => {
     try {
@@ -28,7 +28,7 @@ export default async (generalStore: GeneralStore) => {
         }
         console.log(`from: ${moment.utc(start.settingValueParsed * 1000).format("YYYY-MM-DD HH:mm")} to: ${moment.utc(end.settingValueParsed * 1000).format("YYYY-MM-DD HH:mm")}`);
 
-        let candlesInRange: any = [];
+        let candlesInRange: Array<any> = [];
         const currencies = await generalStore.state.Prisma.currency.findMany();
 
         for (const currency of currencies) {
@@ -36,26 +36,29 @@ export default async (generalStore: GeneralStore) => {
             const endTo = moment(end.settingValueParsed * 1000).format("YYYY-MM-DDTHH:mm:ss");
             console.log(`Request payload: ${currency.name}, ${startFrom}, ${endTo}`);
 
+            const fromdb = 1;
             const candlesReq: any = await fetch("http://127.0.0.1:5000/get_candles_in", {
                 method: "POST",
-                headers: {'Content-Type': 'application/json'},
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    fromdb: fromdb,
                     symbol: currency.name,
-                    start: startFrom,
-                    end: endTo
+                    start: fromdb ? start.settingValueParsed : startFrom,
+                    end: fromdb ? end.settingValueParsed : endTo
                 })
             });
 
             let temp = await candlesReq.json();
-            temp = temp.candles;
-            temp.forEach((c: any) => candlesInRange.push(c))
+            if (temp && temp.candles && temp.candles.length > 0) {
+                console.log(temp.candles[0])
+                candlesInRange = [...candlesInRange, ...temp.candles];
+            }
         }
 
         logger.info(`Total candles => ${candlesInRange.length}`);
         console.log(`Total candles => ${candlesInRange.length}`);
 
         candlesInRange.sort((a: any, b: any) => a.closeTime - b.closeTime);
-
         await generalStore.state.Candle.processCandles(candlesInRange, modelOne);
 
         generalStore.state.Time.add("backtest mode time", new Date().getTime() - startTime);
@@ -68,8 +71,10 @@ export default async (generalStore: GeneralStore) => {
 };
 
 function generateReports(generalStore: GeneralStore) {
-    console.log(generalStore.state.Time.getAll().map(t => ({name: t.name, maxTime: t.maxTime})));
+    console.log(generalStore.state.Time.getAll().map(t => ({ name: t.name, maxTime: t.maxTime })));
 
+    console.log(generalStore.state.Candle.candles.getAll()[50]);
+    console.log(generalStore.state.Candle.candles.getAll().filter(c => c.direction === CandleDirection.IDLE).length);
     console.log(`Done All In: ${generalStore.state.Time.get("backtest mode time")?.maxTime}`);
     console.log(`time range from ${moment.utc(1546350000 * 1000)} to ${moment.utc(1547350000 * 1000)}`);
 

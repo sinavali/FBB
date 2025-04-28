@@ -334,14 +334,6 @@ export default class MarketShiftStructure {
 
             if (status === SignalStatus.STOPLOSS) this.makeMssTriggerStopLoss(mss, candle);
             else if (status === SignalStatus.TAKEPROFIT) this.makeMssTriggerTakeProfit(mss, candle);
-
-            // if (mss.direction === Directions.DOWN) {
-            //     if (candle.high >= mss.stoploss) this.makeMssTriggerStopLoss(mss, candle);
-            //     else if (candle.low <= mss.takeprofit) this.makeMssTriggerTakeProfit(mss, candle);
-            // } else if (mss.direction === Directions.UP) {
-            //     if (candle.low <= mss.stoploss) this.makeMssTriggerStopLoss(mss, candle);
-            //     else if (candle.high >= mss.takeprofit) this.makeMssTriggerTakeProfit(mss, candle);
-            // }
         });
     }
 
@@ -374,9 +366,7 @@ export default class MarketShiftStructure {
     }
 
     private checkHeightLimitFailure(mss: IMSS, candle: ICandle): boolean {
-        const bigHeightLimit = this.generalStore.state.Setting.getOne(
-            "MSSBigHeightLimit"
-        )?.settingValueParsed as number;
+        const bigHeightLimit = this.generalStore.state.Setting.getOne("MSSBigHeightLimit")?.settingValueParsed as number;
         const marketUtils = useMarketUtils();
 
         const heightPip = marketUtils.methods.toPip(mss.height);

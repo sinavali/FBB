@@ -7,12 +7,14 @@ with open('Packages/TradingBot/Reports/signal.json') as f:
     signals = json.load(f)
 
 # Filter signals for status "STOPLOSS" or "TAKEPROFIT" and trigger "MSS"
-filtered_signals = [s for s in signals if s['status'] in ('STOPLOSS', 'TAKEPROFIT') and s['trigger'] in ('MSS')]
+filtered_signals = [s for s in signals if s['status'] in ('STOPLOSS', 'TAKEPROFIT') and s['liquidityUsed']['trigger'] in ('MSS')]
 
 # Preprocess datetime fields
 for signal in filtered_signals:
-    signal['entry_time'] = datetime.fromisoformat(signal['entryTime']['utc'].replace('Z', '+00:00'))
-    signal['closed_at'] = datetime.fromisoformat(signal['closedAt'].replace('Z', '+00:00'))
+    if not 'entryTime' in signal:
+        print(signal['triggerCandleId'])
+    signal['entry_time'] = datetime.fromisoformat(signal['entryTime'].replace('Z', '+00:00'))
+    signal['closed_at'] = datetime.fromisoformat(signal['closedTime'].replace('Z', '+00:00'))
     signal['place_order_time'] = datetime.fromisoformat(signal['placeOrderTime'].replace('Z', '+00:00'))
 
 # Define WorkTimes (UTC)

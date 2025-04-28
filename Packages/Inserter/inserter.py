@@ -9,7 +9,7 @@ DB_CONFIG = {
     'host': 'localhost',
     'user': "root",
     'password': "",
-    'database': 'fbb_test_candles',
+    'database': 'trading_view_candles',
     'raise_on_warnings': True
 }
 
@@ -34,9 +34,9 @@ def process_file(cnx, cursor, file_path, pair_name):
                     pair_name,
                     "PERIOD_M1",
                     float(row[2]),  # open
-                    float(row[5]),  # high
+                    float(row[3]),  # high
                     float(row[4]),  # low
-                    float(row[3]),  # close
+                    float(row[5]),  # close
                     close_time,
                     f"{row[0].replace('.', '-')}T{row[1]}"  # ISO format
                 ))

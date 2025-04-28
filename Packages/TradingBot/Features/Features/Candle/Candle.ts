@@ -301,15 +301,15 @@ export default class Candle {
     processCandleDirection(candle: ICandle): CandleDirection {
         try {
             const marketUtils = useMarketUtils();
-            const pipDiff = marketUtils.methods.getPipDiff(candle.high, candle.low);
 
             let candleDirectionBuff = 0.1;
             const candleDirectionBuffVar = this.generalStore.state.Setting.getOne("CandleDirectionBuff");
             if (candleDirectionBuffVar) candleDirectionBuff = parseFloat(candleDirectionBuffVar.settingValue);
 
-            if (pipDiff > candleDirectionBuff) return CandleDirection.UP;
-            else if (pipDiff < -candleDirectionBuff) return CandleDirection.DOWN;
-            else return CandleDirection.IDLE;
+            if (marketUtils.methods.toPip(Math.abs(candle.open - candle.close)) < candleDirectionBuff || (candle.open - candle.close === 0)) return CandleDirection.IDLE;
+            else if (candle.open - candle.close < 0) return CandleDirection.UP;
+            else if (candle.open - candle.close > 0) return CandleDirection.DOWN;
+            return CandleDirection.IDLE;
         } catch (error) {
             console.log(error);
             throw error;
