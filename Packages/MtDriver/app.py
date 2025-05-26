@@ -252,7 +252,9 @@ def candle_polling_worker(sid, socketio):
                         # for candle in candles:
                             # if candle['closeTime'] > config['last_candle']:
                         # Update last_candle to the latest closeTime
-                eventlet.sleep(20 - now_in_utc().second)
+                sleep_time = 20
+                secs = now_in_utc().second % sleep_time
+                eventlet.sleep(sleep_time - secs)
             except Exception as e:
                 logging.error(f"Polling error: {str(e)}")
                 break
