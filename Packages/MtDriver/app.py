@@ -18,9 +18,11 @@ import mysql.connector
 setup_logging()
 logger = logging.getLogger(__name__)
 
+# 6778796222:AAH-UKnDf5y5axNcLjk1LL1prUx2i7R9EL8  // do not use in this repo
+bot_token = ""
 # Initialize Telegram channel
 tg_bot = TelegramChannel(
-    bot_token='6778796222:AAH-UKnDf5y5axNcLjk1LL1prUx2i7R9EL8',
+    bot_token='',
     chat_id='-1002469452779'
 )
 
@@ -62,7 +64,7 @@ utc_tz = ZoneInfo("UTC")
 live_start_time_target_tz = now_in_target_tz().replace(tzinfo=None)
 live_start_time_utc = now_in_utc().replace(tzinfo=None)
 
-telegram_bot_token = '6778796222:AAH-UKnDf5y5axNcLjk1LL1prUx2i7R9EL8'
+telegram_bot_token = bot_token
 telegram_chat_id = '-1002469452779'
 
 # MT5 Constants (verify with your MT5 version)
