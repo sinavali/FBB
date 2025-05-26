@@ -18,10 +18,6 @@ target_tz = ZoneInfo(target_tz_name) # +02:00 | +03:00
 # demo_password = "*h3nNrEu"
 # demo_server = "MetaQuotes-Demo"
 
-# fundedNext15kWith5PercentLoss_login = 489449
-# fundedNext15kWith5PercentLoss_password = "dzsAR42##"
-# fundedNext15kWith5PercentLoss_server = "FundedNext-Server"
-
 
 def get_setting(key):
     """
